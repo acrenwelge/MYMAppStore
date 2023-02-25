@@ -17,7 +17,7 @@ export default class RoleRepository extends Repository<Role> implements OnModule
 	}
 
 	public onModuleInit(): void {
-		this.invalidateRoleCache();
+		//this.invalidateRoleCache();
 	}
 
 	public async invalidateRoleCache(): Promise<void> {
