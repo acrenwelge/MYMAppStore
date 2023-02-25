@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useContext, useReducer, Reducer } from "react";
-import { Form, Button, FormProps, Message, Loader } from "semantic-ui-react";
+import { Form, Button, FormProps, Message, Loader, Segment, Icon, Header } from "semantic-ui-react";
 import CryptoJS from "crypto-js";
 import { useHistory } from "react-router-dom";
 import { ApplicationContext } from "../../context";
@@ -75,11 +75,14 @@ const LocalLoginForm: React.FC = (): JSX.Element => {
 	);
 
 	return (
+
+
 		<Form
 			error={formState.error !== undefined}
 			loading={formState.loading}
 			onSubmit={(event, data) => onSubmit(data)}
 		>
+
 			<Form.Input
 				id="email"
 				label="Email"
