@@ -17,7 +17,7 @@ export default class PermissionRepository extends Repository<Permission> impleme
 	}
 
 	public onModuleInit(): void {
-		this.invalidatePermissionCache();
+		//this.invalidatePermissionCache();
 	}
 
 	public async invalidatePermissionCache(): Promise<void> {
