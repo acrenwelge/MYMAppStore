@@ -2,7 +2,7 @@
 	"name": "client",
 	"version": "0.1.0",
 	"private": true,
-	"proxy": "https://mymathapp2023spring.herokuapp.com",
+	"proxy": "localhost:4396",
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
