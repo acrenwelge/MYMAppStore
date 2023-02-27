@@ -3,13 +3,20 @@ const { expect } = require("chai");
 const { time } = require("console");
 const webdriver = require("selenium-webdriver");
 var { setDefaultTimeout } = require("@cucumber/cucumber");
-
+//const options = new Chrome.Options();
 setDefaultTimeout(60 * 1000);
 const verifyText = "React google login";
 
 let driver;
-Before(function () {
-	driver = new webdriver.Builder().forBrowser("safari").build();
+Before(function (env) {
+	/*
+	const Options = new Chrome.Options();
+	driver = env
+	  .builder()
+	  .setChromeOptions(Options)
+	  .build();
+	  */
+	driver = new webdriver.Builder().forBrowser("chrome").build();
 });
 
 After(function () {
