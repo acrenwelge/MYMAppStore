@@ -9,5 +9,9 @@ client/.yarn
 server/node_modules
 server/yarn.lock
 server/package-lock.json
-
-
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
