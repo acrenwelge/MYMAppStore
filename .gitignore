@@ -4,14 +4,6 @@
 node_modules
 server/node_modules
 client/node_modules
-client/.yarn
-.yarn
 server/node_modules
 server/yarn.lock
 server/package-lock.json
-.yarn/*
-!.yarn/cache
-!.yarn/releases
-!.yarn/plugins
-!.yarn/sdks
-!.yarn/versions
