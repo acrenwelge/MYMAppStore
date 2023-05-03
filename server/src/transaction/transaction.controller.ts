@@ -26,8 +26,8 @@ export class TransactionController {
   @HttpCode(200)
   @Patch('transaction')
   update(@Param('id') id: string, @Body() newTran:Transaction) {
-    console.log("Add transaction");
-    console.log(newTran.user_id);
+    // console.log("Add transaction");
+    // console.log(newTran.user_id);
     return this.transactionService.update(newTran.user_id, newTran.item_id, newTran.code_id, newTran.price);
   }
   @HttpCode(200)

@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
-
-const moduleMocker = new ModuleMocker(global);
+import { repositoryMockFactory } from './transaction.service.spec';
+import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { UpdateTransactionDto } from './dto/update-transaction.dto';
+import { Transaction } from './entities/transaction.entity';
 
 
 describe('TransactionController', () => {
@@ -13,20 +14,13 @@ describe('TransactionController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionController],
-      providers: [TransactionService, { provide: getModelToken(Cat.name), useValue: jest.fn() }],
-    // }).useMocker((token) => {
-    //   const results = ['test1', 'test2'];
-    //   console.log('token', token);
-    //   if (token == TransactionService) {
-    //     return {
-    //       findAll: jest.fn().mockResolvedValue(results)
-    //     };
-    //   }
-    //   if (typeof token == 'function') {
-    //     const mockMetadata = moduleMocker.getMetadata(token) as MockFunctionMetadata<any, any>;
-    //     const Mock = moduleMocker.generateFromMetadata(mockMetadata);
-    //     return new Mock();
-    //   }
+      providers: [
+        TransactionService, 
+        { 
+          provide: TransactionService, 
+          useFactory: repositoryMockFactory
+        }
+      ]
     }).compile();
 
     controller = module.get<TransactionController>(TransactionController);
@@ -38,12 +32,34 @@ describe('TransactionController', () => {
     expect(controller).toBeDefined();
   });
 
-  // describe('findAll', () => {
-  //   it('should return an array of cats', async () => {
-  //     const result = ['test1', 'test2'];
-  //     jest.spyOn(provider, 'findAll').mockImplementation(() => result);
+  it('calling create method', () => {
+    const dto: CreateTransactionDto = new CreateTransactionDto();
+    controller.create(dto);
+    expect(provider.create).toHaveBeenCalledWith(dto);
+  });
 
-  //     expect(await controller.findAll()).toBe(result);
-  //   });
-  // });
+  it('calling findOne method', () => {
+    const id = '123';
+    controller.findOne(id);
+    expect(provider.findOne).toHaveBeenCalledWith(+id);
+  });
+
+  it('calling update method', () => {
+    const id = "123";
+    const trans = new Transaction();
+    controller.update(id, trans);
+    expect(provider.update).toBeCalledWith(trans.user_id, trans.item_id, trans.code_id, trans.price);
+  });
+
+  it('calling remove method', () => {
+    const id = '123';
+    controller.remove(id);
+    expect(provider.remove).toHaveBeenCalledWith(+id);
+  });
+
+  it('calling findAll method', () => {
+    controller.findAll();
+    expect(provider.findAll).toHaveBeenCalled();
+  });
+
 });
