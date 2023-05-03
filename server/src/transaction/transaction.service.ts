@@ -58,8 +58,8 @@ export class TransactionService {
     transaction.item_id = item_id;
     transaction.price = price;
     transaction.user_id = user_id;
-    console.log("Add transaction");
-    console.log(transaction);
+    // console.log("Add transaction");
+    // console.log(transaction);
     const newtrans = await this.transactionRepo.save(transaction);
     return newtrans;
     //return `This action updates a #${id} transaction`;
