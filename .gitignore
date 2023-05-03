@@ -17,3 +17,5 @@ client.pnp.cjs
 client/.yarn/cache
 client/.yarn/unplugged
 client/.yarn/install-state.gz
+
+coverage/
