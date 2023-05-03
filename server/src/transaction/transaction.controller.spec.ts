@@ -13,7 +13,7 @@ describe('TransactionController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionController],
-      providers: [TransactionService],
+      providers: [TransactionService, { provide: getModelToken(Cat.name), useValue: jest.fn() }],
     // }).useMocker((token) => {
     //   const results = ['test1', 'test2'];
     //   console.log('token', token);
