@@ -76,7 +76,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
             localStorage.setItem('purchaseCode', JSON.stringify(purchaseCode));
             setButtonLoading(false)
             setAddModalOpen(false)
-            setMessage({type:'success',message:`Purchase code ${formValues.name} has already added.`})
+            setMessage({type:'success',message:`Purchase code ${formValues.name} has been added successfully.`})
             getPurchaseCode()
         })
             .catch((err) => {
@@ -100,13 +100,13 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
             .then(res => {
                 setButtonLoading(false)
                 getPurchaseCode()
-                setMessage({type:'success',message:`Purchase code ${code.name} is already deleted.`})
+                setMessage({type:'success',message:`Purchase code ${code.name} has been deleted successfully.`})
 
             })
             .catch(error => {
                 setButtonLoading(false)
                 console.error(error)
-                setMessage({type:'fail',message:`Purchase code ${code.name} delete failed. Please try again`})
+                setMessage({type:'fail',message:`Fail to delete purchase code ${code.name}. Please try again.`})
             });
     };
 
@@ -131,14 +131,14 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
             localStorage.setItem('purchaseCode', JSON.stringify(purchaseCode));
             setButtonLoading(false)
             setUpdateModalOpen(false)
-            setMessage({type:'success',message:`Purchase code ${formValues.name} is already deleted.`})
+            setMessage({type:'success',message:`Purchase code ${formValues.name} has been updated successfully.`})
             getPurchaseCode()
         })
             .catch((err) => {
                 console.log(err)
                 setButtonLoading(false)
                 setUpdateModalOpen(false)
-                setMessage({type:'fail',message:`Purchase code ${formValues.name} delete failed. Please try again`})
+                setMessage({type:'fail',message:`Fail to delete purchase code ${formValues.name}. Please try again.`})
                 }
             );
     }

@@ -13,9 +13,12 @@ const MYMACalc3: React.FC = (): JSX.Element => {
 
         <div style = {{display:'flex'}}>
         <h1>MYMathApps Calculus 3: Multi-variable Calculus</h1>
-        <a href = "https://mymathapps.com/mymacalc-sample" style={{ marginBottom: 10, marginLeft: 'auto' }}>
-        <Button color="blue"  >{`Sample Chapter`}</Button>
-        </a>
+			<a href="price" style={{marginBottom: 10, marginLeft: 'auto'}}>
+				<Button color="green">Price & Purchase</Button>
+			</a>
+			<a href="https://mymathapps.com/mymacalc-sample" style={{marginBottom: 10, marginLeft: '16px'}}>
+				<Button color="blue">{`Sample Chapter`}</Button>
+			</a>
         </div>
 		</Container>
 
