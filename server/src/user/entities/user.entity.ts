@@ -12,7 +12,7 @@ export class User {
 
 
     @Column({unique: true})
-    public readonly email: string;
+    public email: string;
 
     @Exclude()
     @Column({name: "google_access_token", nullable: true})
