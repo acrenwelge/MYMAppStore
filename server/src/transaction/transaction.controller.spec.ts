@@ -3,7 +3,6 @@ import { TransactionController } from './transaction.controller';
 import { TransactionService } from './transaction.service';
 import { repositoryMockFactory } from './transaction.service.spec';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { Transaction } from './entities/transaction.entity';
 
 

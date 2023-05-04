@@ -40,38 +40,35 @@ describe('TransactionService', () => {
   it('should remove a transaction', async () => {
     const id = 123;
     const msg = `This action removes a #${id} transaction`;
-    jest.spyOn(repositoryMock, 'remove').mockImplementation(() => msg);
+    jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
     expect(await service.remove(id)).toBe(msg);
   });
 
-  // it('should find all transactions', async () => {
-  //   const result = new Array();
-  //   // jest.spyOn(repositoryMock, 'findAll').mockImplementation(() => result);
-  //   // expect(await service.findAll()).toBe(result);
-  //   expect(await service.findAll)
-  // });
+  it('should find all transactions', async () => {
+    jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
+    expect(await service.findAll()).toBe(true);
+  });
 
-  // it('should create a transaction', async () => {
-  //   const trans = new CreateTransactionDto();
-  //   jest.spyOn(repositoryMock, 'create').mockImplementation(() => trans);
-  //   expect(await service.create(trans)).toBe(trans);
-  // });
+  it('should create a transaction', async () => {
+    const trans = new CreateTransactionDto();
+    jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
+    expect(await service.create(trans)).toBe(true);
+  });
 
-  // it('should update a transaction', async () => {
-  //   const trans = new Transaction();
-  //   jest.spyOn(repositoryMock, 'update').mockImplementation(() => trans);
-  //   expect(await service.update(trans.user_id, trans.item_id, trans.code_id, trans.price)).toBe(trans);
-  // });
+  it('should update a transaction', async () => {
+    const trans = new Transaction();
+    jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
+    expect(await service.update(trans.user_id, trans.item_id, trans.code_id, trans.price)).toBe(true);
+  });
 
 });
 
 
 // @ts-ignore
 export const repositoryMockFactory: () => MockType<Repository<any>> = jest.fn(() => ({
-  create: jest.fn(),
   findOne: jest.fn(),
-  findAll: jest.fn(),
-  update: jest.fn(),
+  find: jest.fn(),
+  save: jest.fn(),
   remove: jest.fn()
 }));
 
