@@ -1,9 +1,8 @@
-<h1> Activate your MYMathApp account </h1>
+<h1>Activate your MYMathApp account </h1>
 
 <h2>Hi {{name}}, </h2>
 
-<p>Welcome to MYMathApps! We hope you will find our array of products
-useful in your pursuit of knowledge.
+<p>Welcome to MYMathApps! We hope you will find our array of products useful in your pursuit of knowledge.
 </p>
 
 <p>Click the link below to activate your account and get started.
@@ -14,9 +13,8 @@ useful in your pursuit of knowledge.
 </p>
 
 <p>
-This email was sent from an account that is not monitored. Replies
-will not be read. If you have other questions or concerns, head over to
-<a href="http://{{storeDomain}}{{contactRoute}}?email={{email}}">Contact Link</a>.
+This email was sent from an account that is not monitored. Replies will not be read.
+If you have other questions or concerns, please <a href="mailto:{{contactMailAddress}}">send an email</a> to us.
 </p>
 
 <p>

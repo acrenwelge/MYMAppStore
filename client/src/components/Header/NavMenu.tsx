@@ -46,9 +46,9 @@ const NavMenu: React.FC = (): JSX.Element => {
 				<Menu.Item as={Link} to="/about">
 					{"About Us"}
 				</Menu.Item>
-				<Menu.Item as={Link} to="/contact">
-					{"Contact"}
-				</Menu.Item>
+				{/*<Menu.Item as={Link} to="/contact">*/}
+				{/*	{"Contact"}*/}
+				{/*</Menu.Item>*/}
 				{ctx.user && (
 				<Menu.Item as={Link} to="/read">
 					{"Read Book"}
