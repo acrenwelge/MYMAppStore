@@ -7,7 +7,7 @@ const SignUp: React.FC = (): JSX.Element => {
 	return (
 		<Page>
 			<LocalSignUpForm />
-			<ThirdPartyAuthenticators action="sign-up" />
+			{/*<ThirdPartyAuthenticators action="sign-up" />*/}
 		</Page>
 	);
 };
