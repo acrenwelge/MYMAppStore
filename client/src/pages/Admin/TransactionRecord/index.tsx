@@ -103,11 +103,6 @@ const AdminTransInfo: React.FC = (props): JSX.Element | null => {
                                             <Table.Cell>{transactionRecord.user.name} - {transactionRecord.user.email}</Table.Cell>
                                             <Table.Cell>${transactionRecord.price}</Table.Cell>
                                             <Table.Cell>{formatDate(transactionRecord.createdAt)}</Table.Cell>
-                                            {/*<Table.Cell>*/}
-                                            {/*    {user.activatedAccount?*/}
-                                            {/*        <Icon color='green' name='checkmark' size='large' />:*/}
-                                            {/*        <div></div>}*/}
-                                            {/*</Table.Cell>*/}
                                         </Table.Row>
                                     ))}
                                 </Table.Body>
