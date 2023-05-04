@@ -15,7 +15,7 @@ type ActivateAccountParams = {
     storeDomain: string;
     activateAccountRoute: string;
     activationCode: string;
-    contactRoute: string;
+    contactMailAddress: string;
 };
 
 @Injectable()
@@ -80,7 +80,7 @@ export class EmailService implements OnModuleDestroy {
             storeDomain: process.env.MYMASTORE_DOMAIN,
             activateAccountRoute: process.env.MYMA_ACTIVATE_ACCOUNT_ROUTE,
             activationCode: user.activationCode!,
-            contactRoute: '/contact'
+            contactMailAddress: process.env.CONTACT_MAIL_ADDRESS
         })
 
         this.transporter.sendMail({

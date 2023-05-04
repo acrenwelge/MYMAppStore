@@ -67,7 +67,7 @@ const TextbookHeader = (): JSX.Element => {
                        </Dimmer>:<></>
                        }
                        <Table.Row>
-                           <Table.HeaderCell>Name</Table.HeaderCell>
+                           <Table.HeaderCell>Book Name</Table.HeaderCell>
                            <Table.HeaderCell>Length</Table.HeaderCell>
                            <Table.HeaderCell>Price</Table.HeaderCell>
                            <Table.HeaderCell></Table.HeaderCell>
@@ -78,7 +78,7 @@ const TextbookHeader = (): JSX.Element => {
                        {ItemData.map(Item => (
                            <Table.Row key={Item.id}>
                                <Table.Cell>{Item.name}</Table.Cell>
-                               <Table.Cell>{Item.length}</Table.Cell>
+                               <Table.Cell>{Item.length} Months</Table.Cell>
                                <Table.Cell>${Item.price}</Table.Cell>
                                <Table.Cell>
                                    <Link to={{

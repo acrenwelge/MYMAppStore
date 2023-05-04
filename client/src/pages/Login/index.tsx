@@ -8,13 +8,13 @@ import LoginHeader from "./LoginHeader";
 const Login: React.FC = (): JSX.Element => {
 	return (
 		<Page>
-			
+
 			<LocalLoginForm />
-			<ThirdPartyAuthenticators action="login" />
-			<LoginHeader />
+			{/*<ThirdPartyAuthenticators action="login" />*/}
+			{/*<LoginHeader />*/}
 		</Page>
 
-		
+
 	);
 };
 

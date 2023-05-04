@@ -77,7 +77,7 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
             localStorage.setItem('emailSubscription', JSON.stringify(emailSubscription));
             setButtonLoading(false)
             setAddModalOpen(false)
-            setMessage({type:'success',message:`Email Subscription with suffix ${formValues.suffix} has already added.`})
+            setMessage({type:'success',message:`Email Subscription with suffix ${formValues.suffix} has been added successfully.`})
             getEmailSubscription()
         })
             .catch((err) => {
@@ -101,13 +101,13 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
             .then(res => {
                 setButtonLoading(false)
                 getEmailSubscription()
-                setMessage({type:'success',message:`Email Subscription with suffix ${code.suffix} is already deleted.`})
+                setMessage({type:'success',message:`Email Subscription with suffix ${code.suffix} has been deleted successfully.`})
 
             })
             .catch(error => {
                 setButtonLoading(false)
                 console.error(error)
-                setMessage({type:'fail',message:`Email Subscription with suffix ${code.suffix} delete failed. Please try again`})
+                setMessage({type:'fail',message:`Fail to delete email subscription with suffix ${code.suffix}. Please try again.`})
             });
     };
 
@@ -130,14 +130,14 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
             localStorage.setItem('emailSubscription', JSON.stringify(emailSubscription));
             setButtonLoading(false)
             setUpdateModalOpen(false)
-            setMessage({type:'success',message:`Email Subscription with suffix ${formValues.suffix} is already deleted.`})
+            setMessage({type:'success',message:`Email Subscription with suffix ${formValues.suffix} has been updated successfully.`})
             getEmailSubscription()
         })
             .catch((err) => {
                     console.log(err)
                     setButtonLoading(false)
                     setUpdateModalOpen(false)
-                    setMessage({type:'fail',message:`Email Subscription with suffix ${formValues.suffix} delete failed. Please try again`})
+                    setMessage({type:'fail',message:`Fail to update email subscription with suffix ${formValues.suffix}. Please try again.`})
                 }
             );
     }
