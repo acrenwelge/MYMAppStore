@@ -11,7 +11,7 @@ describe('TransactionService', () => {
   let service: TransactionService;
   let repositoryMock: MockType<Repository<Transaction>>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TransactionService,

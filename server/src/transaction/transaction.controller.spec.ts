@@ -10,7 +10,7 @@ describe('TransactionController', () => {
   let controller: TransactionController;
   let service: TransactionService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TransactionController],
       providers: [
