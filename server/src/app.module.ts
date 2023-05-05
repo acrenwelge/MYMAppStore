@@ -33,8 +33,12 @@ if (process.env.RUNNING_ENV === 'prod') {
     envFilePath.unshift('.env.prod');
 }
 
+
 @Module({
     imports: [
+        ServeStaticModule.forRoot({
+             rootPath: join(__dirname, '../', 'public','textbook')
+         }),
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '../', 'public')
         }),
