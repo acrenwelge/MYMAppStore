@@ -25,7 +25,6 @@ export class UserService {
       createUser.activationCode = this.generateActivationCode(createUser.name)
       const createResult = await this.userRepo.save(createUser)
       return await this.emailService.sendActivateAccountEmail(createResult)
-
     }
   }
 
