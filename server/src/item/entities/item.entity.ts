@@ -7,7 +7,7 @@ import { Transaction } from "src/transaction/entities/transaction.entity";
 @Entity()
 export class Item {
     @PrimaryGeneratedColumn({name: "item_id"})
-    public readonly id: number;
+    public id: number;
 
     @Column()
     public readonly name: string;
