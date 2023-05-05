@@ -44,15 +44,13 @@ describe('PurchaseCodeController', () => {
   it('calling findOne method', () => {
     const id = 1;
     controller.findOne(id);
-    expect(service.findOne).toHaveBeenCalledWith(+id);
+    expect(service.findOne).toHaveBeenCalledWith(id);
   });
 
   it('calling validate method', () => {
     const name = "AAA";
-    //const trans = new PurchaseCode();
     controller.checkValidPurchaseCode(name);
-    const valiresult = service.validateCode(name);
-    expect(controller.checkValidPurchaseCode(name)).toBe({priceOff:valiresult});
+    expect(service.validateCode).toHaveBeenCalledWith(name);
   });
 
 });
