@@ -25,9 +25,12 @@ export class EmailService implements OnModuleDestroy {
     private readonly activateAccountTemplateDelegate: HandlebarsTemplateDelegate<ActivateAccountParams>;
     private readonly from?: string;
 
+    private readonly logger = new Logger("EmailService");
+
+
     constructor(
         @Inject (forwardRef(() => UserService)) private readonly userService: UserService
-    ) {
+) {
         {
             const appDirectory = process.cwd();
 
@@ -53,7 +56,7 @@ export class EmailService implements OnModuleDestroy {
                 if (!this.healthy()) {
                     process.exit(1);
                 } else {
-                    console.log("Email transport verified");
+                    this.logger.log("Email transport verified");
                 }
             }
         }
@@ -64,16 +67,16 @@ export class EmailService implements OnModuleDestroy {
 
         if (process.env.EMAIL_ENABLE === 'false') {
             await this.userService.activateAccount(user.activationCode!);
-            console.log("not enable mail. User already activate");
+            this.logger.log("not enable mail. User already activate");
             return;
         }
 
         else if (process.env.EMAIL_ENABLE === 'test') {
-            console.log("For test. not send email but also not activate user")
+            this.logger.log("For test. not send email but also not activate user")
             return;
         }
 
-        console.log("mail enabled");
+        this.logger.log("mail enabled");
         const text = this.activateAccountTemplateDelegate({
             name: user.name,
             email: user.email,
@@ -91,8 +94,8 @@ export class EmailService implements OnModuleDestroy {
             })
             .then(() => console.log(`Sent activate account email to ${user.email}`))
             .catch((e: Error) => {
-                console.log(e.message)
-                console.error("Send Error")
+                this.logger.error(e.message)
+                this.logger.error("Send Error")
             });
     }
 
@@ -107,7 +110,7 @@ export class EmailService implements OnModuleDestroy {
             return await this.transporter.verify();
         } catch (_e) {
             const e = _e as Error;
-            console.error(e.message);
+            this.logger.error(e.message);
             return false;
         }
     }
