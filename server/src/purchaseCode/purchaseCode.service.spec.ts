@@ -24,6 +24,8 @@ describe('PurchaseCodeService', () => {
     service = module.get<PurchaseCodeService>(PurchaseCodeService);
     repositoryMock = module.get(getRepositoryToken(PurchaseCode));
 
+    console.log(repositoryMock);
+
   });
 
   afterAll(() => {
@@ -53,35 +55,44 @@ describe('PurchaseCodeService', () => {
   });
 
 
-  it('should add a code', async () => {
-    //const name = "NEWCODE";
-    //const priceOff = 12;
-    const newcode = new PurchaseCode();
-    // @ts-ignore
-    jest.spyOn(repositoryMock, 'addOne').mockImplementation(() => true);
-    expect(await service.addOne(newcode.name, newcode.priceOff)).toBe(true);
+  it('should throw error when add a exists code', async () => {
+
+    const oldCode = new PurchaseCode();
+    const newCode = new PurchaseCode();
+    
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldCode);
+    jest.spyOn(repositoryMock, 'save').mockImplementation(() => newCode);
+    await expect(service.addOne(newCode.name, newCode.priceOff)).rejects.toThrowError();
+  });
+    
+  it('should add a code if it does not exist', async () => {
+    
+    const oldCode = null;
+    const newCode = new PurchaseCode();
+    
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldCode);
+    jest.spyOn(repositoryMock, 'save').mockImplementation(() => newCode);
+    expect(await service.addOne(newCode.name, newCode.priceOff)).toBe(newCode);
   });
 
 
   it('should remove a code', async () => {
     const id= 1;
-    const remove = new PurchaseCode();
-    remove.code_id = 1;
-    //const msg = `This action removes a #${id} transaction`;
-    // @ts-ignore
-    jest.spyOn(repositoryMock, 'deleteCode').mockImplementation(() => true);
-    expect(await service.deleteCode(id)).toStrictEqual(remove);
+    const tmpCode = new PurchaseCode();
+    tmpCode.code_id = id;
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => tmpCode);
+    jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
+    expect(await service.deleteCode(id)).toBe(tmpCode);
   });
 
   it('should validate a code', async () => {
-    const validate = new PurchaseCode();
-    //validate.name = "VALIDATE";
-    validate.code_id = 1;
-    // @ts-ignore
-    jest.spyOn(repositoryMock, 'validateCode').mockImplementation(() => true);
-    expect(await service.validateCode("VALIDATE")).toStrictEqual(validate);
+    const validCode = new PurchaseCode();
+    validCode.name = "VALIDATE";
+    
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => validCode);
+    expect(await service.validateCode(validCode.name)).toBe(validCode);
   });
-  //weird case: give name, return id
+  
 
   it('should update a transaction', async () => {
     const updateid = 1;
@@ -89,8 +100,9 @@ describe('PurchaseCodeService', () => {
     const update = new PurchaseCode();
     update.code_id = updateid;
     update.priceOff = updateprice;
-    // @ts-ignore
-    jest.spyOn(repositoryMock, 'updateCode').mockImplementation(() => true);
+
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => update);
+    jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
     expect(await service.updateCode(update.code_id, update.priceOff)).toStrictEqual(update);
   });
 
@@ -98,13 +110,7 @@ describe('PurchaseCodeService', () => {
 
 });
 
-/*
-export const repositoryMockFactory: () => MockType<Repository<any>> = jest.fn(() => {
-  findOne: jest.fn(),
-  remove:jest.fn(),
-  save:jest.fn()
-});
-*/
+
 export type MockType<T> = {
   [P in keyof T]: jest.Mock<{}>;
 };
