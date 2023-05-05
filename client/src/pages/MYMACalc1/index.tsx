@@ -9,6 +9,7 @@ import TextbookHeader from "../../components/TextbookHeader";
 
 const MYMACalc1: React.FC = (): JSX.Element => {
 
+    const priceURL = process.env.REACT_APP_FRONT_PATH + `/price`;
     const ctx = useContext(ApplicationContext);
     return (
 
@@ -19,7 +20,7 @@ const MYMACalc1: React.FC = (): JSX.Element => {
 
                 <div style={{display: 'flex'}}>
                     <h1>MYMathApps Calculus 1: Differential Calculus</h1>
-                    <a href="price" style={{marginBottom: 10, marginLeft: 'auto'}}>
+                    <a href={priceURL} style={{marginBottom: 10, marginLeft: 'auto'}}>
                         <Button color="green">Price & Purchase</Button>
                     </a>
                     <a href="https://mymathapps.com/mymacalc-sample" style={{marginBottom: 10, marginLeft: '16px'}}>
