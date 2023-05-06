@@ -4,7 +4,6 @@ import { RecordService } from './record.service';
 import { Record } from './entities/record.entity';
 import { createMock } from '@golevelup/ts-jest';
 import { CreateRecordDto } from './dto/create-record.dto';
-import { UpdateRecordDto } from './dto/update-record.dto';
 
 describe('RecordController', () => {
   let controller: RecordController;

@@ -14,7 +14,7 @@ describe('AuthController', () => {
   let service: AuthService;
   let userservice: UserService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
