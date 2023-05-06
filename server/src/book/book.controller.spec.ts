@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BookController } from './book.controller';
 import {TransactionService} from "../transaction/transaction.service";
 import {BookService} from "./book.service";
+import {async} from "rxjs";
 
 describe('BookController', () => {
   let controller: BookController;
@@ -32,7 +33,6 @@ describe('BookController', () => {
   });
 
   //1.
-
 
 
 
