@@ -8,11 +8,11 @@ export class User {
     public readonly id: number;
 
     @Column()
-    public readonly name: string;
+    public name: string;
 
 
     @Column({unique: true})
-    public readonly email: string;
+    public email: string;
 
     @Exclude()
     @Column({name: "google_access_token", nullable: true})

@@ -6,7 +6,7 @@ export class EmailSubscription {
 
 
   @PrimaryGeneratedColumn({name: "email_subscription_id"})
-  public readonly email_sub_id: number;
+  public email_sub_id: number;
 
   @Column()
   public suffix: string;

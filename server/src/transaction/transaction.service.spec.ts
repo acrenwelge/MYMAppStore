@@ -4,19 +4,20 @@ import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { createMock } from '@golevelup/ts-jest';
 
 
 describe('TransactionService', () => {
   let service: TransactionService;
   let repositoryMock: MockType<Repository<Transaction>>;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TransactionService,
         {
           provide: getRepositoryToken(Transaction),
-          useFactory: repositoryMockFactory,
+          useValue: createMock<Transaction>(),
         }
       ],
     }).compile();
@@ -24,6 +25,10 @@ describe('TransactionService', () => {
     service = module.get<TransactionService>(TransactionService);
     repositoryMock = module.get(getRepositoryToken(Transaction));
 
+  });
+
+  afterAll(() => {
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -62,15 +67,6 @@ describe('TransactionService', () => {
   });
 
 });
-
-
-// @ts-ignore
-export const repositoryMockFactory: () => MockType<Repository<any>> = jest.fn(() => ({
-  findOne: jest.fn(),
-  find: jest.fn(),
-  save: jest.fn(),
-  remove: jest.fn()
-}));
 
 export type MockType<T> = {
   [P in keyof T]: jest.Mock<{}>;

@@ -52,7 +52,6 @@ export class PurchaseCodeService {
     newCode.name = name;
     newCode.priceOff = priceOff;
     const oldCode = await this.purchaseCodeRepo.findOne({where: {name}});
-    console.log(oldCode);
     if (oldCode == null){
       const purchaseCode = await this.purchaseCodeRepo.save(newCode);
       return purchaseCode;
@@ -63,9 +62,7 @@ export class PurchaseCodeService {
   }
 
   async deleteCode(code_id: number):Promise<PurchaseCode>{
-    console.log(code_id);
     const findCode = await this.purchaseCodeRepo.findOne({where: {code_id}});
-    console.log(findCode);
     if (findCode != null){ //delete that code
       await this.purchaseCodeRepo.remove(findCode);
       return findCode;
@@ -92,8 +89,6 @@ export class PurchaseCodeService {
     console.log(findCode);
     if (findCode != null){ //update that code
       findCode.priceOff = priceOff;
-      console.log("After updating");
-      console.log(findCode);
       await this.purchaseCodeRepo.save(findCode);
       return findCode;
     }

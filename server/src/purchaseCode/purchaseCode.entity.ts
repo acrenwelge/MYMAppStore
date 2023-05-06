@@ -7,7 +7,7 @@ export class PurchaseCode {
 
 
     @PrimaryGeneratedColumn({name: "purchaseCode_id"})
-    public readonly code_id: number;
+    public code_id: number;
 
     @Column()
     public name: string;
