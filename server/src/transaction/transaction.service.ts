@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Transaction} from "./entities/transaction.entity";
 import {Repository} from "typeorm";
@@ -19,16 +18,6 @@ export class TransactionService {
   }
 
   async findAll() {
-    //const transactions = await this.transactionRepo.find({
-    //  select:{
-    //    id: true,
-    //    item_id: true,
-    //    code_id: true,
-    //    user_id: true,
-    //    createdAt: true,
-    //    price: true
-    //  }
-    //})
     const transactions = await this.transactionRepo.find({
       relations: ["item", "purchasecode", "user"],
       select:{
