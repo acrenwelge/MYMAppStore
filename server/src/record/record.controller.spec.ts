@@ -39,14 +39,13 @@ describe('RecordController', () => {
     expect(service.create).toHaveBeenCalledWith(dto);
   });
 
-  /*
+
   it('calling findAll method', () => {
     const req = "";
     const userid = 1;
     controller.findAll(req);
     expect(service.findAll).toHaveBeenCalledWith(+"req.user.user_id");
   });
-*/
 
   it('calling findOne method', () => {
     const id = '123';
