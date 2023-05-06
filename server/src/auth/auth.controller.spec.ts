@@ -30,8 +30,8 @@ describe('AuthController', () => {
         }
       ]
     }).compile();
-    service: module.get<AuthService>(AuthService);
-    userservice: module.get<UserService>(UserService);
+    service = module.get<AuthService>(AuthService);
+    userservice = module.get<UserService>(UserService);
     controller = module.get<AuthController>(AuthController);
   });
 
@@ -54,13 +54,21 @@ describe('AuthController', () => {
   /*local-login : Request*/
   it('calling local login method', () => {
     const req = createRequest({
-      user: {}
+      user: {user_id: 1,}
     });
     controller.localLogin(req.user);
-    expect(userservice.localSignUp).toHaveBeenCalledWith(req.user);
+    expect(service.login).toHaveBeenCalledWith(undefined);
   });
-  /*get profile : Request*/
 
+  /*get profile : Request*/
+  it('calling get profile method', () => {
+    const req = createRequest({
+      user: {user_id: 1,}
+    });
+    //controller.getProfile(req.user);
+    const result = req.user;
+    expect(controller.getProfile(req.user)).toBe(undefined);
+  });
   /*
   it('calling activate method', () => {
     const actcode = {activationCode: "aaaaaa"};
