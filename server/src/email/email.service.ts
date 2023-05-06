@@ -94,6 +94,7 @@ export class EmailService implements OnModuleDestroy {
                 console.log(e.message)
                 console.error("Send Error")
             });
+        return;
     }
 
     onModuleDestroy(): any {

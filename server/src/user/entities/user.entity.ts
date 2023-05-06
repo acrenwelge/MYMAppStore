@@ -8,7 +8,7 @@ export class User {
     public readonly id: number;
 
     @Column()
-    public readonly name: string;
+    public name: string;
 
 
     @Column({unique: true})

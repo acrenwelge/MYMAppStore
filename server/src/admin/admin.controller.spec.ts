@@ -73,6 +73,7 @@ describe('AdminController', () => {
   it('calling findAllUser method', () => {
     console.log('it')
     console.log(controller)
+
     controller.findAllUser()
 
     console.log(usrservice)
