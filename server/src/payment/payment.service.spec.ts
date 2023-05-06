@@ -7,6 +7,8 @@ import {EmailService} from "../email/email.service";
 import {createMock} from "@golevelup/ts-jest";
 import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
 import {Record} from "../record/entities/record.entity";
+import {Transaction} from "../transaction/entities/transaction.entity";
+
 
 
 describe('PaymentService', () => {
@@ -47,11 +49,11 @@ describe('PaymentService', () => {
     const codeid = 1;
     const itemid = 1;
     const price = 1;
-    const recresult = Promise.prototype;
-    const tranresult = Promise.prototype;
-    jest.spyOn(recservice, 'update').mockReturnValue(recresult);
-    jest.spyOn(transervice, 'update').mockReturnValue(tranresult);
-    expect(await service.finishPurchasing(userid, codeid, itemid, price)).toBe({recresult, tranresult});
+    const recordResult = new Record();
+    const transactionResult = new Transaction();
+    jest.spyOn(recservice, 'update').mockImplementation(async () => recordResult);
+    jest.spyOn(transervice, 'update').mockImplementation(async () => transactionResult);
+    expect(await service.finishPurchasing(userid, codeid, itemid, price)).toEqual({recordResult, transactionResult});
   });
 
 
