@@ -2,17 +2,37 @@
 
 This is for CSCE606 Project Textbook in Spring 2023.
 
-Before run you need:
+## Before run you need:
 1. install nodejs(it will automatically install npm)
+
 2. install yarn
    `npm install -g yarn`
+   
+3. Prepare different .env configuration files as .env.example in `Server` folder
+  The configuration files are as lists:
 
-To Run Backend Server:
+  | Name        | Environment               |
+  | ----------- | ------------------------- |
+  | .env.dev    | Development               |
+  | .env.test   | Test                      |
+  | .env.heroku | Deploy on Heroku          |
+  | .env.prod   | Deploy on CLient's server |
+
+## To Development locally
+
+
+### To Run Backend Server:
 1. Enter server folder
-2. `yarn install`
+2. `yarn`
 3. `yarn start`
 
-To Run Frontend Client:
+### To Run Frontend Client:
 1. Enter client folder
-2. `Yarn`
-3. `Yarn start`
+2. `yarn`
+3. `yarn start`
+
+## To Deploy On Heroku:
+1. Enter the root folder
+2. `Heroku login`
+3. `Heroku create -a mymathapp`
+3. `git push heroku main`
