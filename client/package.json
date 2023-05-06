@@ -3,9 +3,9 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"start": "dotenv -e .env.dev react-scripts start",
-		"build-heroku": "dotenv -e .env.heroku react-scripts build",
-		"build-prod": "dotenv -e .env.prod react-scripts build",
+		"start": "dotenv -e .env.client.dev react-scripts start",
+		"build-heroku": "dotenv -e .env.client.heroku react-scripts build",
+		"build-prod": "dotenv -e .env.client.prod react-scripts build",
 		"test": "react-scripts test",
 		"cucumber-test": "node_modules/.bin/cucumber-js -f @cucumber/pretty-formatter ./src/test/features/CheckOutPurchaseCode.feature",
 		"eject": "react-scripts eject",
