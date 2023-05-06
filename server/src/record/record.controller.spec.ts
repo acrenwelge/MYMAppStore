@@ -4,6 +4,7 @@ import { RecordService } from './record.service';
 import { Record } from './entities/record.entity';
 import { createMock } from '@golevelup/ts-jest';
 import { CreateRecordDto } from './dto/create-record.dto';
+import { createRequest } from 'node-mocks-http';
 
 describe('RecordController', () => {
   let controller: RecordController;
@@ -41,10 +42,15 @@ describe('RecordController', () => {
 
 
   it('calling findAll method', () => {
-    const req = "";
     const userid = 1;
+    const req = createRequest({
+      user: {
+        user_id: userid,
+      }
+    });
+
     controller.findAll(req);
-    expect(service.findAll).toHaveBeenCalledWith(+"req.user.user_id");
+    expect(service.findAll).toHaveBeenCalledWith(+userid);
   });
 
   it('calling findOne method', () => {
