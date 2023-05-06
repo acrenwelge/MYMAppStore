@@ -12,13 +12,13 @@ export class BookService {
     constructor(readonly recordService:RecordService,readonly emailSubscriptionService:EmailSubscriptionService) {
     }
 
-    async getBookContent() {
-        const appDirectory = process.cwd();
-        const bookPath = path.resolve(appDirectory,"src","book","bookContent","index.html")
-
-        const fileContent = await fs.promises.readFile(bookPath, 'utf-8');
-       return fileContent
-    }
+    // async getBookContent() {
+    //     const appDirectory = process.cwd();
+    //     const bookPath = path.resolve(appDirectory,"src","book","bookContent","index.html")
+    //
+    //     const fileContent = await fs.promises.readFile(bookPath, 'utf-8');
+    //    return fileContent
+    // }
 
     async getBookURL(userID: number, itemName: string,userEmail:string) {
         const ifPurchase = await this.recordService.checkIfUserPurchaseItem(userID, itemName)
