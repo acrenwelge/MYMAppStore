@@ -8,6 +8,7 @@ import {User} from "../user/entities/user.entity";
 import {RecordService} from "../record/record.service";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
+import {createRequest} from "node-mocks-http";
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -42,16 +43,22 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-/*
+
   it('calling local sign up method', () => {
     const user = new User();
     user.email = "ncc@me.com";
     controller.create(user);
     expect(userservice.localSignUp).toHaveBeenCalledWith(user);
   });
-*/
-  /*local-login : Request*/
 
+  /*local-login : Request*/
+  it('calling local login method', () => {
+    const req = createRequest({
+      user: {}
+    });
+    controller.localLogin(req.user);
+    expect(userservice.localSignUp).toHaveBeenCalledWith(req.user);
+  });
   /*get profile : Request*/
 
   /*
