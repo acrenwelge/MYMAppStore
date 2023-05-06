@@ -1,6 +1,6 @@
 # MyMathApp
 
-This is for CSCE606 Project Textbook in Spring 2023.
+CSCE606 Textbook Project in Spring 2023.
 
 ## Before run you need:
 1. install nodejs(it will automatically install npm)
@@ -35,4 +35,7 @@ This is for CSCE606 Project Textbook in Spring 2023.
 1. Enter the root folder
 2. `Heroku login`
 3. `Heroku create -a mymathapp`
-3. `git push heroku main`
+4. `git push heroku main`
+
+## Contributor
+Cheng Niu, Shuang Yu, Zhiting Zhao, Yongqing Liang, Shuyu Wang, Yun Du
