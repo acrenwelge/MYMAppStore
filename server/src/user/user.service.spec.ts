@@ -4,10 +4,9 @@ import {User} from "../user/entities/user.entity";
 import {Repository} from "typeorm";
 import {MockType} from "../transaction/transaction.service.spec";
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
 import { createMock } from '@golevelup/ts-jest';
 import {EmailService} from "../email/email.service";
-import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
+
 
 describe('UserService', () => {
   let service: UserService;
@@ -29,7 +28,7 @@ describe('UserService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
           UserService,
-          { 
+          {
             provide: EmailService,
             useValue: createMock<EmailService>(),
           },
