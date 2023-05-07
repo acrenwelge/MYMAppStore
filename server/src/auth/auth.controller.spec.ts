@@ -8,6 +8,7 @@ import {User} from "../user/entities/user.entity";
 import {RecordService} from "../record/record.service";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
+import {createRequest} from "node-mocks-http";
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -29,8 +30,8 @@ describe('AuthController', () => {
         }
       ]
     }).compile();
-    service: module.get<AuthService>(AuthService);
-    userservice: module.get<UserService>(UserService);
+    service = module.get<AuthService>(AuthService);
+    userservice = module.get<UserService>(UserService);
     controller = module.get<AuthController>(AuthController);
   });
 
@@ -42,18 +43,32 @@ describe('AuthController', () => {
     expect(controller).toBeDefined();
   });
 
-/*
+
   it('calling local sign up method', () => {
     const user = new User();
     user.email = "ncc@me.com";
     controller.create(user);
     expect(userservice.localSignUp).toHaveBeenCalledWith(user);
   });
-*/
+
   /*local-login : Request*/
+  it('calling local login method', () => {
+    const req = createRequest({
+      user: {user_id: 1,}
+    });
+    controller.localLogin(req.user);
+    expect(service.login).toHaveBeenCalledWith(undefined);
+  });
 
   /*get profile : Request*/
-
+  it('calling get profile method', () => {
+    const req = createRequest({
+      user: {user_id: 1,}
+    });
+    //controller.getProfile(req.user);
+    const result = req.user;
+    expect(controller.getProfile(req.user)).toBe(undefined);
+  });
   /*
   it('calling activate method', () => {
     const actcode = {activationCode: "aaaaaa"};

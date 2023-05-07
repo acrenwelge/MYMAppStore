@@ -12,7 +12,7 @@ export class BookController {
     @UseGuards(JwtAuthGuard)
     @Get("read")
     async read(@Request() req) {
-        console.log(req.user)
+        // console.log(req.user)
         const userId = req.user.user_id
         const userEmail = req.user.email
         const itemName = 'Calculus1, 2&3'
