@@ -1,6 +1,6 @@
 {
-	"name": "client",
-	"version": "0.1.0",
+	"name": "mymath-client",
+	"version": "2.5.3",
 	"private": true,
 	"scripts": {
 		"start": "dotenv -e .env.client.dev react-scripts start",

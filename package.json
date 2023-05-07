@@ -1,6 +1,6 @@
 {
   "name": "mymath-project-2023-spring",
-  "version": "2.0.0",
+  "version": "2.5.3",
   "description": "my math app spring 2023 ",
   "main": "server/dist/main.js",
   "scripts": {
