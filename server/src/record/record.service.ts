@@ -28,7 +28,7 @@ export class RecordService {
       user_id: user_id
     }
     })
-    console.log(records)
+    // console.log(records)
     return records;
   }
 
@@ -65,7 +65,7 @@ export class RecordService {
         id:item_id
       }
     });
-    console.log(item_info);
+    // console.log(item_info);
 
     if (records == null){//add a new record
       const nowDate =  new Date(Date.now());
@@ -74,8 +74,8 @@ export class RecordService {
       newrecord.item_name = items.name;
       newrecord.expirationDate = newDate;
       newrecord.user_id = user_id;
-      console.log("Store a new record");
-      console.log(newrecord);
+      // console.log("Store a new record");
+      // console.log(newrecord);
       const record = await this.recordRepo.save(newrecord);
       return record;
     }
@@ -83,8 +83,8 @@ export class RecordService {
       const oldDate = records.expirationDate;
       const newDate = this.addMonths(oldDate, length);
       records.expirationDate = newDate;
-      console.log("Update a exist record");
-      console.log(records);
+      // console.log("Update a exist record");
+      // console.log(records);
       await this.recordRepo.save(records);
       return records;
     }

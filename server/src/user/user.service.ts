@@ -45,7 +45,7 @@ export class UserService {
 
   async activateAccount(activationCode: string): Promise<User | null> {
     const user = await this.userRepo.findOne({ where: { activationCode:activationCode} });
-    console.log(user)
+    // console.log(user)
     if (user === null) {
       throw new NotFoundException;
     }

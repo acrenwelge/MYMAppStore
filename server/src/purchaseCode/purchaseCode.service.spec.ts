@@ -24,7 +24,7 @@ describe('PurchaseCodeService', () => {
     service = module.get<PurchaseCodeService>(PurchaseCodeService);
     repositoryMock = module.get(getRepositoryToken(PurchaseCode));
 
-    console.log(repositoryMock);
+    // console.log(repositoryMock);
 
   });
 
