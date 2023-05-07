@@ -50,7 +50,7 @@ describe('EmailService', () => {
     testuser.email = 'abcd'
     testuser.activatedAccount = false
     const result = "A";
-    console.log(process.env);
+    // console.log(process.env);
     //expect.assertions(1);
     jest.spyOn(usrservice, 'activateAccount').mockImplementation(async() => testuser);
     jest.spyOn(service,'sendActivateAccountEmail').mockReturnValue(Promise.resolve());

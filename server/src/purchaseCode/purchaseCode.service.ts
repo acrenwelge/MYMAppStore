@@ -84,9 +84,9 @@ export class PurchaseCodeService {
 
   async updateCode(code_id: number,priceOff:number):Promise<PurchaseCode>{
     const findCode = await this.purchaseCodeRepo.findOne({where: {code_id}});
-    console.log("Update");
-    console.log(code_id);
-    console.log(findCode);
+    // console.log("Update");
+    // console.log(code_id);
+    // console.log(findCode);
     if (findCode != null){ //update that code
       findCode.priceOff = priceOff;
       await this.purchaseCodeRepo.save(findCode);
