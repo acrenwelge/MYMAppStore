@@ -1,9 +1,15 @@
 import React from "react";
-import { Header, Divider } from "semantic-ui-react";
+import { Header, Divider,List,Image } from "semantic-ui-react";
 
 import Page from "../../components/Page";
 import YasskinImg from "../../resources/images/yasskin.png";
 import MeadeImg from "../../resources/images/meade.png";
+import NCImg from "../../resources/images/nc.jpg"
+import YSImg from "../../resources/images/ys.jpg"
+import LYQImg from "../../resources/images/lyq.jpg"
+import ZZTImg from "../../resources/images/zzt.jpg"
+import WSYImg from '../../resources/images/wsy.jpg'
+import DYImg from '../../resources/images/dy.jpg'
 import Person from "./Person";
 
 const PersonInfo = [
@@ -29,6 +35,59 @@ const About: React.FC = (props): JSX.Element => {
 			{PersonInfo.map((p, i) => (
 				<Person key={i} {...p} />
 			))}
+			<h2>Development Team</h2>
+			<List  style={{paddingBottom:'66px'}} animated verticalAlign='middle' relaxed='very'>
+				<List.Item>
+					<Image avatar src={NCImg} />
+					<List.Content>
+						<List.Header as='a'>Cheng Niu</List.Header>
+						<List.Description>
+							Architect, Security, Front-end, Back-end, Deploy
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src={YSImg} />
+					<List.Content>
+						<List.Header as='a'>Shuang Yu</List.Header>
+						<List.Description>
+							Front-end, Back-end, Test
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src={LYQImg} />
+					<List.Content>
+						<List.Header as='a'>Yongqing Liang</List.Header>
+						<List.Description>
+							Front-end, Back-end, Test, Payment
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src={ZZTImg} />
+					<List.Content>
+						<List.Header as='a'>Zhiting Zhao</List.Header>
+						<List.Description>
+							Front-end, Back-end, Test
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src={WSYImg} />
+					<List.Content>
+						<List.Header as='a'>Shuyu Wang</List.Header>
+						<List.Description>Front-end, Back-end, Test, Communication</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src={DYImg} />
+					<List.Content>
+						<List.Header as='a'>Yun Du</List.Header>
+						<List.Description>Test</List.Description>
+					</List.Content>
+				</List.Item>
+			</List>
 		</Page>
 	);
 };
