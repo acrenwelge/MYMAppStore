@@ -1,5 +1,5 @@
 import React from "react";
-import { Header, Divider } from "semantic-ui-react";
+import { Header, Divider,List,Image } from "semantic-ui-react";
 
 import Page from "../../components/Page";
 import YasskinImg from "../../resources/images/yasskin.png";
@@ -29,6 +29,59 @@ const About: React.FC = (props): JSX.Element => {
 			{PersonInfo.map((p, i) => (
 				<Person key={i} {...p} />
 			))}
+			<h2>Development Team</h2>
+			<List  animated verticalAlign='middle' relaxed='very'>
+				<List.Item>
+					<Image avatar src='/avatar/nc.jpg' />
+					<List.Content>
+						<List.Header as='a'>Cheng Niu</List.Header>
+						<List.Description>
+							Architect, Security, Front-end, Back-end, Deploy
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src='/avatar/ys.jpg' />
+					<List.Content>
+						<List.Header as='a'>Shuang Yu</List.Header>
+						<List.Description>
+							Front-end, Back-end, Test
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src='/avatar/lyq.jpg' />
+					<List.Content>
+						<List.Header as='a'>Yongqing Liang</List.Header>
+						<List.Description>
+							Front-end, Back-end, Test, Payment
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src='/avatar/zzt.jpg' />
+					<List.Content>
+						<List.Header as='a'>Zhiting Zhao</List.Header>
+						<List.Description>
+							Front-end, Back-end, Test
+						</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src='/avatar/wsy.jpg' />
+					<List.Content>
+						<List.Header as='a'>Shuyu Wang</List.Header>
+						<List.Description>Front-end, Back-end, Test, Communication</List.Description>
+					</List.Content>
+				</List.Item>
+				<List.Item>
+					<Image avatar src='/avatar/dy.jpg' />
+					<List.Content>
+						<List.Header as='a'>Yun Du</List.Header>
+						<List.Description>Test</List.Description>
+					</List.Content>
+				</List.Item>
+			</List>
 		</Page>
 	);
 };

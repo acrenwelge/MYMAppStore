@@ -28,9 +28,8 @@ import Records from "./pages/Records";
 
 import AdminTransactionRecord from "./pages/Admin/TransactionRecord"
 import Prices from "./pages/Price";
-import AdminEmailSubscription from "./pages/Admin/EmailSubscription"
 import EmailSubscription from "./pages/Admin/EmailSubscription";
-import EmailUserInfo from "./pages/Admin/Email_Sub"
+
 
 
 const App: React.FC = (): JSX.Element => {
@@ -108,13 +107,13 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/admin/user">
 									<AdminUserInfo />
 								</Route>
-								{/*<Route exact path="/admin/purchase-code">*/}
-								{/*	<AdminPurchaseCode />*/}
-								{/*</Route>*/}
-								<Route exact path="/admin/email-subscription">
-									<EmailUserInfo />
+								<Route exact path="/admin/purchase-code">
+									<AdminPurchaseCode />
 								</Route>
-								
+								<Route exact path="/admin/email-subscription">
+									<EmailSubscription/>
+								</Route>
+
 								<Route exact path="/admin/transaction">
 									<AdminTransactionRecord />
 								</Route>
