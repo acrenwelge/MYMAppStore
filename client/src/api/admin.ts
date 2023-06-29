@@ -7,6 +7,13 @@ export function getAllUserData():Promise<any> {
     })
 }
 
+export function deleteUser(id: number):Promise<any> {
+    return request({
+        method: 'delete',
+        url: `api/admin/user/${id}`,
+    })
+}
+
 export function getAllPurchaseCodeData():Promise<any>{
     return request({
         method: 'get',
@@ -34,7 +41,6 @@ export function getAllItemData():Promise<any>{
         url: 'api/item',
     })
 }
-
 
 export function addCodeApi(data:any):Promise<any> {
     return request({

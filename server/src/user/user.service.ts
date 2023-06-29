@@ -13,7 +13,6 @@ export class UserService {
       @Inject(forwardRef(()=> EmailService)) private readonly emailService: EmailService
   ) {}
 
-
   async localSignUp(createUser: User) {
     const email = createUser.email
     const user = await this.userRepo.findOne({where: {email}})
@@ -54,7 +53,6 @@ export class UserService {
     return user
   }
 
-
   async findAll() {
     const users = await this.userRepo.find({
       select:{
@@ -68,10 +66,13 @@ export class UserService {
     return users
   }
 
-
   async findOne(email: string):Promise<User |　undefined> {
     const user = await this.userRepo.findOne({where: {email}});
     return user || null;
+  }
+
+  async deleteOne(id: number):Promise<void> {
+    (await this.userRepo.delete(id))
   }
 
 }

@@ -1,4 +1,4 @@
-import {Controller, Get, UseGuards, Post, HttpCode, Request, Body} from '@nestjs/common';
+import {Controller, Get, UseGuards, Post, HttpCode, Request, Body, Delete, Param} from '@nestjs/common';
 import {UserService} from "../user/user.service";
 import {NeedRole} from "../roles/roles.decorator";
 import {Role} from "../roles/role.enum";
@@ -12,6 +12,7 @@ import {TransactionService} from '../transaction/transaction.service';
 import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {EmailSubscriptionService} from "../email-subscription/email-subscription.service";
 import {EmailSubscription} from "../email-subscription/email-subscription.entity";
+import { User } from 'src/user/entities/user.entity';
 
 
 @UseGuards(AuthGuard('jwt'),RolesGuard)
@@ -28,6 +29,12 @@ export class AdminController {
         return this.userService.findAll();
     }
 
+    @Delete("user/:id")
+    @HttpCode(200)
+    public async deleteUser(@Param('id') userId: number){
+        return this.userService.deleteOne(userId);
+    }
+
     @Get("transaction")
     findAllTransaction() {
         return this.transactionService.findAll()
@@ -37,8 +44,6 @@ export class AdminController {
     findAllPurchaseCode() {
         return this.purchaseCodeService.findAll();
     }
-
-
 
     @Post("add-code")
     @HttpCode(200)
@@ -88,7 +93,5 @@ export class AdminController {
     public async updateEmailSub( @Body() newEmailSubscription:EmailSubscription){
         return this.emailSubscriptionService.updateEmailSub(newEmailSubscription.email_sub_id,newEmailSubscription.suffix)
     }
-
-
 
 }

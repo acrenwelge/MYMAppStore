@@ -7,7 +7,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import {EmailService} from "../email/email.service";
 
-
 describe('UserService', () => {
   let service: UserService;
   let emailservice: EmailService;
@@ -71,7 +70,6 @@ describe('UserService', () => {
   //if too slow it won't work
 */
 
-
   it('should activate an account', async () => {
     const activcode = "a";
     const olduser = new User();
@@ -86,7 +84,6 @@ describe('UserService', () => {
   });
 
   it('should find all user', async () => {
-
     jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
     expect(await service.findAll()).toBe(true);
   });
@@ -98,5 +95,26 @@ describe('UserService', () => {
     expect(await service.findOne("ncc@me.com")).toBe(result);
   });
 
+  it('should authenticate a user', async () => {
+    const result = new User();
+    result.email = "test@mail.com";
+    result.password = "abcdefg";
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
+    expect(await service.authenticate(result)).toBe(result);
+  });
+
+  it('should NOT authenticate a user', async () => {
+    const result = new User();
+    result.email = "test@mail.com";
+    result.password = "abcdefg";
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => null);
+    expect(await service.authenticate(result)).toBeNull();
+  });
+
+  it('should delete a user', async () => {
+    jest.spyOn(repositoryMock, 'delete').mockImplementation(() => null);
+    await service.deleteOne(1);
+    expect(repositoryMock.delete).toBeCalledWith(1);
+  });
 });
 

@@ -32,7 +32,6 @@ if (process.env.RUNNING_ENV === 'prod') {
     envFilePath.unshift('.env.prod');
 }
 
-
 @Module({
     imports: [
         // ServeStaticModule.forRoot({
@@ -68,6 +67,7 @@ if (process.env.RUNNING_ENV === 'prod') {
 
     ],
     providers: [],
+    controllers: [],
 })
 
 export class AppModule {

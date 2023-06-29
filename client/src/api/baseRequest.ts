@@ -1,7 +1,6 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 const baseURL = process.env.REACT_APP_API_PATH
-
 
 const service = axios.create({
     baseURL:baseURL,

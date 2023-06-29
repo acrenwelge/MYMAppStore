@@ -5,12 +5,12 @@ import {
     Grid,
     GridColumn,
     Container,
-     Loader, Dimmer
+     Loader, Dimmer, Button
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
 import {getAllUserData} from "../../../api/admin";
 import {useHistory} from "react-router-dom";
-
+import { deleteUser } from "../../../api/admin";
 
 interface UserData {
     id: number;
@@ -41,14 +41,11 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     const history = useHistory()
     const user: localUser | null = JSON.parse(localStorage.getItem('user') || 'null');
 
-
     if (!user || user.role !== 1) {
         // Redirect to main page
         history.push('/');
         return null;
     }
-
-
 
     const [userData, setUserData] = useState<UserData[]>([]);
     const [loading, setLoading] = useState(false);
@@ -65,6 +62,13 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 setLoading(false)
             });
     }, []);
+
+    const sendVerificationEmail = (id: number) =>{
+        console.log("send verification email - to be implemented");
+    }
+    const activateUser = (id: number) =>{
+        console.log("activate user - to be implemented");
+    }
 
     return (
 
@@ -89,6 +93,9 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                         <Table.HeaderCell>Username</Table.HeaderCell>
                                         <Table.HeaderCell>Register Time</Table.HeaderCell>
                                         <Table.HeaderCell>Activated</Table.HeaderCell>
+                                        <Table.HeaderCell>Send Verification Email</Table.HeaderCell>
+                                        <Table.HeaderCell>Activate</Table.HeaderCell>
+                                        <Table.HeaderCell>Delete User</Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
@@ -102,6 +109,9 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                                     <Icon color='green' name='checkmark' size='large' />:
                                                    <div></div>}
                                             </Table.Cell>
+                                            <Table.Cell><Button color="green" onClick={() => sendVerificationEmail(user.id)}>Send Verification Email</Button></Table.Cell>
+                                            <Table.Cell><Button color="blue" onClick={() => activateUser(user.id)}>Activate User</Button></Table.Cell>
+                                            <Table.Cell><Button color="red" onClick={() => deleteUser(user.id)}>Delete User</Button></Table.Cell>
                                            </Table.Row>
                                     ))}
                                 </Table.Body>

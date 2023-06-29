@@ -7,7 +7,6 @@ export function getRecords():Promise<any> {
     })
 }
 
-
 export function getProfileApi():Promise<any> {
     return request ({
         method : 'get',
