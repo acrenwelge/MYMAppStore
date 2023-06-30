@@ -7,13 +7,14 @@
     "postinstall": "cd client && npm install && npm run build-heroku && cp -R build/* ../server/public/ && cd ../server && npm install && npm run build"
   },
   "engines": {
-    "node": "18.10.0"
+    "node": "18.9.0"
   },
   "cacheDirectories": [
     "client/node_modules",
     "server/node_modules"
   ],
   "dependencies": {
-    "@nestjs/serve-static": "^3.0.1"
+    "@nestjs/serve-static": "^3.0.1",
+    "react-toastify": "^9.1.3"
   }
 }

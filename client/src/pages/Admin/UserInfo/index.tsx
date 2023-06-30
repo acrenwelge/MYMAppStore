@@ -5,19 +5,22 @@ import {
     Grid,
     GridColumn,
     Container,
-     Loader, Dimmer, Button
+    Confirm,
+    Loader, Dimmer, Button
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
 import {getAllUserData} from "../../../api/admin";
 import {useHistory} from "react-router-dom";
 import { deleteUser } from "../../../api/admin";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 interface UserData {
     id: number;
     email: string;
     name: string;
-    activatedAccount:boolean;
-    createdAt:string;
+    activatedAccount: boolean;
+    createdAt: string;
 }
 
 interface localUser {
@@ -40,34 +43,61 @@ const formatDate = (dateTime:string):string =>{
 const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     const history = useHistory()
     const user: localUser | null = JSON.parse(localStorage.getItem('user') || 'null');
-
+    
     if (!user || user.role !== 1) {
         // Redirect to main page
         history.push('/');
         return null;
     }
-
+    
     const [userData, setUserData] = useState<UserData[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const [confirmBoxOpen, setConfirmBoxOpen] = useState(false);
+    const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    
     useEffect(() => {
         setLoading(true);
         getAllUserData()
-            .then(res => {
-                setUserData(res.data)
-                setLoading(false)
-            })
-            .catch(error => {
-                console.error(error)
-                setLoading(false)
-            });
+        .then(res => {
+            setUserData(res.data)
+            setLoading(false)
+        })
+        .catch(error => {
+            console.error(error)
+            setLoading(false)
+        });
     }, []);
-
+    
     const sendVerificationEmail = (id: number) =>{
         console.log("send verification email - to be implemented");
     }
     const activateUser = (id: number) =>{
         console.log("activate user - to be implemented");
+    }
+    const confirmUserDelete = (id: number) => {
+        setSelectedUserId(id);
+        setConfirmBoxOpen(true);
+    }
+    const attemptUserDelete = () => {
+        if (selectedUserId === null) {
+            console.error("Attempted to delete but no user selected");
+            toast.error("User delete failed");
+            return;
+        } else {
+            deleteUser(selectedUserId).then(res => {
+                toast.success("User deleted successfully");
+                setConfirmBoxOpen(false);
+                setUserData(userData.filter(user => user.id !== selectedUserId));
+            }).catch(error => {
+                console.error(error);
+                setConfirmBoxOpen(false);
+                toast.error("User delete failed");
+            });
+        }
+    }
+    const resetSelectedUser = () => {
+        setSelectedUserId(null);
+        setConfirmBoxOpen(false);
     }
 
     return (
@@ -111,7 +141,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                             </Table.Cell>
                                             <Table.Cell><Button color="green" onClick={() => sendVerificationEmail(user.id)}>Send Verification Email</Button></Table.Cell>
                                             <Table.Cell><Button color="blue" onClick={() => activateUser(user.id)}>Activate User</Button></Table.Cell>
-                                            <Table.Cell><Button color="red" onClick={() => deleteUser(user.id)}>Delete User</Button></Table.Cell>
+                                            <Table.Cell><Button color="red" onClick={() => confirmUserDelete(user.id)}>Delete User</Button></Table.Cell>
                                            </Table.Row>
                                     ))}
                                 </Table.Body>
@@ -120,6 +150,14 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                     </GridColumn>
                 </Grid.Row>
             </Grid>
+            <ToastContainer position="bottom-right" />
+            <Confirm
+            open={confirmBoxOpen}
+            content="Are you sure you want to delete this user?"
+            confirmButton="Delete User"
+            onCancel={resetSelectedUser}
+            onConfirm={attemptUserDelete}
+            />
         </Container>
     );
 };

@@ -20,6 +20,20 @@ CSCE606 Textbook Project in Spring 2023.
 
 ## To Development locally
 
+### Setup a local MySQL database on Docker:
+```bash
+# Start the MySQL server container
+docker run --name local-db -e MYSQL_ROOT_PASSWORD=password -d mysql:8.0
+# Copy SQL script to container
+docker cp ./init.sql container_id:/tmp/init.sql
+# Connect to the MySQL server container
+docker exec -it local-db bash
+# Start MySQL client
+mysql -u root -p
+# enter your password from first command
+# Run SQL script
+mysql> source init.sql
+```
 
 ### To Run Backend Server:
 1. Enter server folder
