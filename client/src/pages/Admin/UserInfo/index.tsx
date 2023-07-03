@@ -123,7 +123,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                         <Table.HeaderCell>Username</Table.HeaderCell>
                                         <Table.HeaderCell>Register Time</Table.HeaderCell>
                                         <Table.HeaderCell>Activated</Table.HeaderCell>
-                                        <Table.HeaderCell>Send Verification Email</Table.HeaderCell>
+                                        <Table.HeaderCell>Verify Email</Table.HeaderCell>
                                         <Table.HeaderCell>Activate</Table.HeaderCell>
                                         <Table.HeaderCell>Delete User</Table.HeaderCell>
                                     </Table.Row>
@@ -139,7 +139,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                                     <Icon color='green' name='checkmark' size='large' />:
                                                    <div></div>}
                                             </Table.Cell>
-                                            <Table.Cell><Button color="green" onClick={() => sendVerificationEmail(user.id)}>Send Verification Email</Button></Table.Cell>
+                                            <Table.Cell><Button color="green" onClick={() => sendVerificationEmail(user.id)}>Resend Verification Email</Button></Table.Cell>
                                             <Table.Cell><Button color="blue" onClick={() => activateUser(user.id)}>Activate User</Button></Table.Cell>
                                             <Table.Cell><Button color="red" onClick={() => confirmUserDelete(user.id)}>Delete User</Button></Table.Cell>
                                            </Table.Row>

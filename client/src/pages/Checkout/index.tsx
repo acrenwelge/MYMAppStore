@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-
-import React, {useContext,useRef, useEffect, useLayoutEffect, useState, useCallback, useReducer,Reducer} from "react";
+import React, { useContext, useRef, useEffect, useLayoutEffect, useState, useCallback, useReducer, Reducer } from "react";
 import ReactDOM from "react-dom"
-import { Table, Container, Header, Button,Input, Icon, Item, Message , Form, ModalActions} from "semantic-ui-react";
+import { Table, Container, Header, Button, Input, Icon, Item, Message, Form, ModalActions } from "semantic-ui-react";
 import { ApplicationContext } from "../../context";
-import {getCurrentItem, checkPurchaseCode, addRecord, addTransaction} from "../../api/checkout"
+import { getCurrentItem, checkPurchaseCode, addRecord, addTransaction } from "../../api/checkout"
 
 // @ts-ignore
 const PayPalButton = paypal.Buttons.driver("react", { React, ReactDOM });
@@ -16,12 +15,12 @@ import {
 	Route,
 	useLocation,
 	useParams
-  } from "react-router-dom"
-import {capturePaypalOrder, createPaypalOrder, finishPurchasing} from "../../api/payment";
+} from "react-router-dom"
+import { capturePaypalOrder, createPaypalOrder, finishPurchasing } from "../../api/payment";
 
 interface Item {
-    readonly item_id: number;
-    name: string;
+	readonly item_id: number;
+	name: string;
 	length: number;
 	price: number;
 }
@@ -31,7 +30,7 @@ interface RouteParams {
 }
 
 interface localUser {
-    role: number;
+	role: number;
 	id: number;
 }
 
@@ -45,27 +44,27 @@ const Checkout: React.FC = (props): JSX.Element => {
 
 
 	const item_id = id;
-    const [ItemData, setItemData] = useState<Item[]>([]);
+	const [ItemData, setItemData] = useState<Item[]>([]);
 	//for purchase code
 	const [currentCode, setcurrentCode] = useState('');
 	const [totalPrice, settotalPrice] = useState(-1);
 	const [currentCodeId, setCurrentCodeId] = useState(-1);
-	const [purchaseFinished,setPurchaseFinished] = useState(false)
+	const [purchaseFinished, setPurchaseFinished] = useState(false)
 
 	const user: localUser = JSON.parse(localStorage.getItem('user') || 'null');
 
-    useEffect(() => {
+	useEffect(() => {
 		// console.log("get id from url", id);
 
 		getCurrentItem(item_id)
-		.then(res => {
-			setItemData([res.data]);
-			settotalPrice(res.data.price);
+			.then(res => {
+				setItemData([res.data]);
+				settotalPrice(res.data.price);
 
-		})
-		.catch(error => console.error(error));
+			})
+			.catch(error => console.error(error));
 
-    }, []);
+	}, []);
 
 	const cart = [{
 		sku: item_id,
@@ -138,7 +137,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 
 
 
-	const updateCode = (event: React.FormEvent<HTMLInputElement>) =>{
+	const updateCode = (event: React.FormEvent<HTMLInputElement>) => {
 		setcurrentCode((event.target as HTMLInputElement).value)
 	}
 	const handleApply = () => {
@@ -152,13 +151,13 @@ const Checkout: React.FC = (props): JSX.Element => {
 				settotalPrice(discounted);
 				setCurrentCodeId(res.data.priceOff.code_id);
 				formStateDispatch({ type: "SUCCESS" });
-				})
-		.catch((err)=>{
-			formStateDispatch({
-				type: "REQUEST_ERROR",
-				payload:"Unable to apply. The account has already been created."
 			})
-		})
+			.catch((err) => {
+				formStateDispatch({
+					type: "REQUEST_ERROR",
+					payload: "Unable to apply. The account has already been created."
+				})
+			})
 	};
 
 	//form
@@ -196,7 +195,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 		loading: boolean;
 		requestError?: string;
 		success: boolean;
-		error?:string;
+		error?: string;
 	};
 	const [formState, formStateDispatch] = useReducer<Reducer<FormActionState, FormAction>>(
 		formStateReducer,
@@ -207,12 +206,12 @@ const Checkout: React.FC = (props): JSX.Element => {
 
 	// console.log('ctx.user', ctx.user, 'totalprice', totalPrice);
 
-	const completePurchasing=(item_id:string, code_id:number) =>{
+	const completePurchasing = (item_id: string, code_id: number) => {
 		finishPurchasing({
 			item_id: item_id,
 			code_id: code_id,
 			price: 0
-		}).then(r  => {
+		}).then(r => {
 			setPurchaseFinished(true)
 		})
 	};
@@ -241,9 +240,9 @@ const Checkout: React.FC = (props): JSX.Element => {
 							<Table.Row key={item.item_id}>
 								<Table.Cell>{item.name}</Table.Cell>
 								<Table.Cell>{item.length}</Table.Cell>
-								<Table.Cell>{item.price}</Table.Cell>
+								<Table.Cell>${item.price.toFixed(2)}</Table.Cell>
 								<Table.Cell>
-									<Input type="text" name = "purchasecode" id = "purchasecode" onChange={updateCode} value = {currentCode}></Input>
+									<Input type="text" name="purchasecode" id="purchasecode" onChange={updateCode} value={currentCode}></Input>
 								</Table.Cell>
 								<Table.Cell>
 									<button className="positive ui button" onClick={handleApply} >Apply</button>
@@ -257,39 +256,32 @@ const Checkout: React.FC = (props): JSX.Element => {
 								<b>Total</b>
 							</Table.HeaderCell>
 							<Table.HeaderCell colSpan={2} collapsing>
-								<b>{totalPrice}</b>
+								<b>${totalPrice.toFixed(2)}</b>
 							</Table.HeaderCell>
-							<Table.HeaderCell>
-
-							</Table.HeaderCell>
-
+							<Table.HeaderCell></Table.HeaderCell>
 						</Table.Row>
 					</Table.Footer>
 				</Table>
-
 				<Form
 					error={formState.requestError !== undefined}
 					loading={formState.loading}
 					success={formState.success}
 				>
-
 					<Message
 						content="You have successfully applied current purchase code"
 						header="SUCCESS"
 						success
 					/>
-
 					<Message
 						content="Current purchase code is invalid"
 						header="ERROR"
 						error
 					/>
-
 				</Form>
 
 				{ctx.user === undefined ? (
 					<Header as="h3">You must be signed in to complete your purchase.</Header>
-				) : null }
+				) : null}
 
 				{ctx.user != undefined && totalPrice != 0 ? (
 					<div>
@@ -297,15 +289,15 @@ const Checkout: React.FC = (props): JSX.Element => {
 						{/* <div id="paypal-button-container"></div> */}
 						<PayPalButton
 							createOrder={(data: any) => createOrder(data, cart)}
-							onApprove={(data:any) => onApprove(data)}
+							onApprove={(data: any) => onApprove(data)}
 						/>
 					</div>
 				) : null}
 
 				{ctx.user != undefined && totalPrice == 0 ? (
-					<div style={{textAlign: 'left'}}>
+					<div style={{ textAlign: 'left' }}>
 						<button className="positive ui button"
-								onClick={() => completePurchasing(item_id, currentCodeId)}
+							onClick={() => completePurchasing(item_id, currentCodeId)}
 						>Complete</button>
 					</div>
 				) : null}

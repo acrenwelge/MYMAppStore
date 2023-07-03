@@ -113,12 +113,8 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/admin/email-subscription">
 									<EmailSubscription/>
 								</Route>
-
 								<Route exact path="/admin/transaction">
 									<AdminTransactionRecord />
-								</Route>
-								<Route exact path="/admin/email-subscription">
-									<EmailSubscription />
 								</Route>
 								<Route exact path="/read">
 									<ReadBook />
