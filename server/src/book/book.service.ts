@@ -4,12 +4,15 @@ import * as path from 'path';
 import * as fs from 'fs';
 import {RecordService} from "../record/record.service";
 import {EmailSubscriptionService} from "../email-subscription/email-subscription.service";
-
+import { UserService } from 'src/user/user.service';
+import { Role } from 'src/roles/role.enum';
 
 @Injectable()
 export class BookService {
 
-    constructor(readonly recordService:RecordService,readonly emailSubscriptionService:EmailSubscriptionService) {
+    constructor(readonly recordService:RecordService,
+        readonly emailSubscriptionService:EmailSubscriptionService,
+        readonly userService:UserService) {
     }
 
     // async getBookContent() {
@@ -20,10 +23,11 @@ export class BookService {
     //    return fileContent
     // }
 
-    async getBookURL(userID: number, itemName: string,userEmail:string) {
-        const ifPurchase = await this.recordService.checkIfUserPurchaseItem(userID, itemName)
-        const ifEmailSub = await this.emailSubscriptionService.checkIfUserEmailSubItem(userEmail)
-        if (ifPurchase || ifEmailSub) {
+    async getBookURL(userID: number, itemName: string) {
+        const user = await this.userService.findOneById(userID);
+        const ifPurchase = await this.recordService.checkIfUserPurchaseItem(userID, itemName);
+        const ifEmailSub = await this.emailSubscriptionService.checkIfUserEmailSubItem(user.email);
+        if (ifPurchase || ifEmailSub || user.role == Role.Admin) {
             return  {
                 bookURL: process.env.BOOK_ROOT_PATH,
                 ifPurchase:ifPurchase,

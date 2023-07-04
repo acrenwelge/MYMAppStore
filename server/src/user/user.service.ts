@@ -27,7 +27,7 @@ export class UserService {
     }
   }
 
-  generateActivationCode(username:string) : string {
+  generateActivationCode(username: string): string {
     if (process.env.EMAIL_ENABLE === 'test') {
       return 'naomi2049'+ username + '114514'
     }  else {
@@ -35,7 +35,7 @@ export class UserService {
     }
   }
 
-  async authenticate(loginUser:User):Promise<User> {
+  async authenticate(loginUser: User): Promise<User> {
     const email = loginUser.email
     const password = loginUser.password
     const user = await this.userRepo.findOne({ where:{email,password} });
@@ -66,12 +66,17 @@ export class UserService {
     return users
   }
 
-  async findOne(email: string):Promise<User |　undefined> {
+  async findOneByEmail(email: string): Promise<User | undefined> {
     const user = await this.userRepo.findOne({where: {email}});
     return user || null;
   }
 
-  async deleteOne(id: number):Promise<void> {
+  async findOneById(id: number): Promise<User | undefined> {
+    const user = await this.userRepo.findOne({where: {id}});
+    return user || null;
+  }
+
+  async deleteOne(id: number): Promise<void> {
     (await this.userRepo.delete(id))
   }
 

@@ -13,7 +13,7 @@ export class AuthService {
     ) {}
 
     async validateUserByEmail(email: string, password: string): Promise<any> {
-        const user = await this.userService.findOne(email);
+        const user = await this.userService.findOneByEmail(email);
         // todo fix @exclude
         if (user && user.password === password) {
            const { password, googleAccessToken, temporaryPassword, activationCode, ...result} = user

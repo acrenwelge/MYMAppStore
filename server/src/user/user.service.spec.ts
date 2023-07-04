@@ -92,7 +92,7 @@ describe('UserService', () => {
     const result = new User();
     result.email = "ncc@me.com";
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
-    expect(await service.findOne("ncc@me.com")).toBe(result);
+    expect(await service.findOneByEmail("ncc@me.com")).toBe(result);
   });
 
   it('should authenticate a user', async () => {
