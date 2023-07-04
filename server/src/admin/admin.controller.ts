@@ -1,4 +1,4 @@
-import {Controller, Get, UseGuards, Post, HttpCode, Request, Body, Delete, Param} from '@nestjs/common';
+import {Controller, Get, UseGuards, Post, HttpCode, Request, Body, Put, Delete, Param, HttpStatus} from '@nestjs/common';
 import {UserService} from "../user/user.service";
 import {NeedRole} from "../roles/roles.decorator";
 import {Role} from "../roles/role.enum";
@@ -19,10 +19,10 @@ import { User } from 'src/user/entities/user.entity';
 @Controller('admin')
 @NeedRole(Role.Admin)
 export class AdminController {
-    constructor(private readonly userService:UserService,
-        private readonly purchaseCodeService:PurchaseCodeService,
-        private readonly transactionService:TransactionService,
-        private readonly emailSubscriptionService:EmailSubscriptionService) {}
+    constructor(private readonly userService: UserService,
+        private readonly purchaseCodeService: PurchaseCodeService,
+        private readonly transactionService: TransactionService,
+        private readonly emailSubscriptionService: EmailSubscriptionService) {}
 
     @Get("user")
     findAllUser() {
@@ -30,9 +30,16 @@ export class AdminController {
     }
 
     @Delete("user/:id")
-    @HttpCode(200)
+    @HttpCode(HttpStatus.OK)
     public async deleteUser(@Param('id') userId: number){
         return this.userService.deleteOne(userId);
+    }
+
+    @Put("user/:id")
+    @HttpCode(HttpStatus.OK)
+    public async updateUser(@Body() user: User){
+        console.log('updating user:', user)
+        return this.userService.updateOne(user);
     }
 
     @Get("transaction")

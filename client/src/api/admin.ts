@@ -7,6 +7,14 @@ export function getAllUserData():Promise<any> {
     })
 }
 
+export function updateUser(data: any):Promise<any> {
+    return request({
+        method: 'put',
+        url: `api/admin/user/${data.id}`,
+        data: data
+    });
+}
+
 export function deleteUser(id: number):Promise<any> {
     return request({
         method: 'delete',

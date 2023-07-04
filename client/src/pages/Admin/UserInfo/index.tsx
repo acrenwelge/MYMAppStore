@@ -9,7 +9,7 @@ import {
     Loader, Dimmer, Button
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
-import {getAllUserData} from "../../../api/admin";
+import {getAllUserData, updateUser} from "../../../api/admin";
 import {useHistory} from "react-router-dom";
 import { deleteUser } from "../../../api/admin";
 import { ToastContainer, toast } from 'react-toastify';
@@ -68,11 +68,33 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         });
     }, []);
     
-    const sendVerificationEmail = (id: number) =>{
+    const sendVerificationEmail = (id: number) => {
         console.log("send verification email - to be implemented");
     }
-    const activateUser = (id: number) =>{
-        console.log("activate user - to be implemented");
+    const toggleUserActive = (id: number) => {
+        const user = userData.find(user => user.id === id);
+        if (!user) {
+            console.error("Attempted to activate user but no user found in local data");
+            toast.error("User activation failed");
+        } else {
+            user.activatedAccount = !user.activatedAccount;
+            updateUser(user)
+            .then(res => {
+                const msg  = user.activatedAccount ? 'activated' : 'deactivated';
+                toast.success("User "+msg+" successfully");
+                setUserData(userData.map(u => {
+                    if (u.id === id) {
+                        u.activatedAccount = user.activatedAccount;
+                    }
+                    return u;
+                }));
+            })
+            .catch(error => {
+                console.error(error);
+                const msg  = user.activatedAccount ? 'activation' : 'deactivation';
+                toast.error("User "+msg+" failed");
+            });
+        }
     }
     const confirmUserDelete = (id: number) => {
         setSelectedUserId(id);
@@ -140,7 +162,13 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                                    <div></div>}
                                             </Table.Cell>
                                             <Table.Cell><Button color="green" onClick={() => sendVerificationEmail(user.id)}>Resend Verification Email</Button></Table.Cell>
-                                            <Table.Cell><Button color="blue" onClick={() => activateUser(user.id)}>Activate User</Button></Table.Cell>
+                                            <Table.Cell>
+                                                {user.activatedAccount ?
+                                                <Button color="orange" onClick={() => toggleUserActive(user.id)}>Deactivate User</Button>
+                                                : <Button color="blue" onClick={() => toggleUserActive(user.id)}>Activate User</Button>
+                                                }
+                                                
+                                            </Table.Cell>
                                             <Table.Cell><Button color="red" onClick={() => confirmUserDelete(user.id)}>Delete User</Button></Table.Cell>
                                            </Table.Row>
                                     ))}

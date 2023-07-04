@@ -76,6 +76,26 @@ export class UserService {
     return user || null;
   }
 
+  /**
+   * Updates a user, with only the fields that are provided
+   */
+  async updateOne(user: User): Promise<User | undefined> {
+    const id = user.id;
+    const userToUpdate = await this.userRepo.findOne({where: {id}});
+    if (userToUpdate === null) {
+      throw new NotFoundException;
+    }
+    userToUpdate.name = user.name || userToUpdate.name;
+    userToUpdate.email = user.email || userToUpdate.email;
+    userToUpdate.role = user.role || userToUpdate.role;
+    userToUpdate.activatedAccount = user.activatedAccount === undefined ? userToUpdate.activatedAccount : user.activatedAccount;
+    userToUpdate.activationCode = user.activationCode || userToUpdate.activationCode;
+    userToUpdate.password = user.password || userToUpdate.password;
+    console.log(userToUpdate);
+    await this.userRepo.update(id,userToUpdate);
+    return userToUpdate
+  }
+
   async deleteOne(id: number): Promise<void> {
     (await this.userRepo.delete(id))
   }
