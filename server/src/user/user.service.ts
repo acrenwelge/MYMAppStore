@@ -56,11 +56,12 @@ export class UserService {
   async findAll() {
     const users = await this.userRepo.find({
       select:{
-        id:true,
+        id: true,
         name: true,
         email: true,
-        activatedAccount:true,
-        createdAt:true
+        activatedAccount: true,
+        createdAt: true,
+        role: true,
       }
     })
     return users

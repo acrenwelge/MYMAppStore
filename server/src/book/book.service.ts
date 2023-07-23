@@ -27,7 +27,9 @@ export class BookService {
         const user = await this.userService.findOneById(userID);
         const ifPurchase = await this.recordService.checkIfUserPurchaseItem(userID, itemName);
         const ifEmailSub = await this.emailSubscriptionService.checkIfUserEmailSubItem(user.email);
-        if (ifPurchase || ifEmailSub || user.role == Role.Admin) {
+        const allowableUserEmails = ["tamu.edu", "sc.edu"]
+        console.log(allowableUserEmails.includes(user.email.split("@")[1]));
+        if (ifPurchase || ifEmailSub || user.role == Role.Admin || allowableUserEmails.includes(user.email.split("@")[1])) {
             return  {
                 bookURL: process.env.BOOK_ROOT_PATH,
                 ifPurchase:ifPurchase,

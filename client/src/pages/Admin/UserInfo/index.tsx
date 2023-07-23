@@ -9,9 +9,8 @@ import {
     Loader, Dimmer, Button
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
-import {getAllUserData, updateUser} from "../../../api/admin";
+import {getAllUserData, updateUser, deleteUser} from "../../../api/admin";
 import {useHistory} from "react-router-dom";
-import { deleteUser } from "../../../api/admin";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
 
@@ -21,6 +20,7 @@ interface UserData {
     name: string;
     activatedAccount: boolean;
     createdAt: string;
+    role: number;
 }
 
 interface localUser {
@@ -28,16 +28,19 @@ interface localUser {
 }
 const formatDate = (dateTime:string):string =>{
     const date= new Date(new Date(dateTime).toLocaleString())
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const day = date.getDate().toString().padStart(2, "0");
-    const formattedDate = `${year}-${month}-${day}`;
-    const hour = date.getHours().toString().padStart(2, "0");
-    const minute = date.getMinutes().toString().padStart(2, "0");
-    const second = date.getSeconds().toString().padStart(2, "0");
-    const formattedTime = `${hour}:${minute}:${second}`;
-    const formattedDateTime = `${formattedDate} ${formattedTime}`;
-    return formattedDateTime;
+    return date.toISOString()     // format: 2020-04-20T20:08:18.966Z
+        .replace(/T/, ' ')       // replace T with a space
+        .replace(/\..+/, '')     // delete the dot and everything after
+    // const year = date.getFullYear();
+    // const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    // const day = date.getDate().toString().padStart(2, "0");
+    // const formattedDate = `${year}-${month}-${day}`;
+    // const hour = date.getHours().toString().padStart(2, "0");
+    // const minute = date.getMinutes().toString().padStart(2, "0");
+    // const second = date.getSeconds().toString().padStart(2, "0");
+    // const formattedTime = `${hour}:${minute}:${second}`;
+    // const formattedDateTime = `${formattedDate} ${formattedTime}`;
+    // return formattedDateTime;
 }
 
 const AdminUserInfo: React.FC = (props): JSX.Element | null => {
@@ -80,8 +83,11 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             user.activatedAccount = !user.activatedAccount;
             updateUser(user)
             .then(res => {
-                const msg  = user.activatedAccount ? 'activated' : 'deactivated';
-                toast.success("User "+msg+" successfully");
+                if (user.activatedAccount) {
+                    toast.success("User activated successfully");
+                } else {
+                    toast.warn("User deactivated successfully");
+                }
                 setUserData(userData.map(u => {
                     if (u.id === id) {
                         u.activatedAccount = user.activatedAccount;
@@ -144,6 +150,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                         <Table.HeaderCell>Email</Table.HeaderCell>
                                         <Table.HeaderCell>Username</Table.HeaderCell>
                                         <Table.HeaderCell>Register Time</Table.HeaderCell>
+                                        <Table.HeaderCell>Admin</Table.HeaderCell>
                                         <Table.HeaderCell>Activated</Table.HeaderCell>
                                         <Table.HeaderCell>Verify Email</Table.HeaderCell>
                                         <Table.HeaderCell>Activate</Table.HeaderCell>
@@ -157,19 +164,25 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                             <Table.Cell>{user.name}</Table.Cell>
                                             <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
                                             <Table.Cell>
+                                                {user.role == 1 ?
+                                                    <Icon color='blue' name='checkmark' size='large' />:
+                                                   <div></div>}
+                                            </Table.Cell>
+                                            <Table.Cell>
                                                 {user.activatedAccount?
                                                     <Icon color='green' name='checkmark' size='large' />:
                                                    <div></div>}
                                             </Table.Cell>
-                                            <Table.Cell><Button color="green" onClick={() => sendVerificationEmail(user.id)}>Resend Verification Email</Button></Table.Cell>
+                                            <Table.Cell>
+                                                <Button compact size='medium' color="green" onClick={() => sendVerificationEmail(user.id)}>Resend Verification Email</Button>
+                                            </Table.Cell>
                                             <Table.Cell>
                                                 {user.activatedAccount ?
-                                                <Button color="orange" onClick={() => toggleUserActive(user.id)}>Deactivate User</Button>
-                                                : <Button color="blue" onClick={() => toggleUserActive(user.id)}>Activate User</Button>
+                                                <Button compact size='medium' color="orange" onClick={() => toggleUserActive(user.id)}>Deactivate User</Button>
+                                                : <Button compact size='medium' color="blue" onClick={() => toggleUserActive(user.id)}>Activate User</Button>
                                                 }
-                                                
                                             </Table.Cell>
-                                            <Table.Cell><Button color="red" onClick={() => confirmUserDelete(user.id)}>Delete User</Button></Table.Cell>
+                                            <Table.Cell><Button compact color="red" onClick={() => confirmUserDelete(user.id)}>Delete User</Button></Table.Cell>
                                            </Table.Row>
                                     ))}
                                 </Table.Body>
