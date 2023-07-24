@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useReducer} from "react";
 import {
     Table,
     Icon,
@@ -31,16 +31,13 @@ const formatDate = (dateTime:string):string =>{
     return date.toISOString()     // format: 2020-04-20T20:08:18.966Z
         .replace(/T/, ' ')       // replace T with a space
         .replace(/\..+/, '')     // delete the dot and everything after
-    // const year = date.getFullYear();
-    // const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    // const day = date.getDate().toString().padStart(2, "0");
-    // const formattedDate = `${year}-${month}-${day}`;
-    // const hour = date.getHours().toString().padStart(2, "0");
-    // const minute = date.getMinutes().toString().padStart(2, "0");
-    // const second = date.getSeconds().toString().padStart(2, "0");
-    // const formattedTime = `${hour}:${minute}:${second}`;
-    // const formattedDateTime = `${formattedDate} ${formattedTime}`;
-    // return formattedDateTime;
+}
+
+interface localState {
+    sortBy: string; // 'email', 'name', 'createdAt'
+    sortDirection: 'ascending' | 'descending' | undefined;
+    filterActivated: boolean | null;
+    filterRole: 1 | 2 | null;
 }
 
 const AdminUserInfo: React.FC = (props): JSX.Element | null => {
@@ -57,12 +54,101 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     const [loading, setLoading] = useState(false);
     const [confirmBoxOpen, setConfirmBoxOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+    const initlocalState: localState = {
+        sortBy: '',
+        sortDirection: undefined,
+        filterActivated: null,
+        filterRole: null,
+    };
+    const [state, dispatch] = useReducer(sortingReducer, initlocalState);
+    const filteredUsers = userData.filter(user => {
+        if (state.filterActivated !== null && user.activatedAccount !== state.filterActivated) {
+            return false;
+        }
+        if (state.filterRole !== null && user.role !== state.filterRole) {
+            return false;
+        }
+        return true;
+    });
+
+    let sortedUsers = filteredUsers;
+    if (state.sortBy != '' && state.sortDirection === 'ascending') {
+        switch (state.sortBy) {
+            case 'email':
+                sortedUsers = sortedUsers.sort((a, b) => a['email'].localeCompare(b['email']));
+                break;
+            case 'name':
+                sortedUsers = sortedUsers.sort((a, b) => a['name'].localeCompare(b['name']));
+                break;
+            case 'createdAt':
+                sortedUsers = sortedUsers.sort((a, b) => a['createdAt'].localeCompare(b['createdAt']));
+                break;
+        }
+    } else if (state.sortBy != '' && state.sortDirection === 'descending') {
+        switch (state.sortBy) {
+            case 'email':
+                sortedUsers = sortedUsers.sort((a, b) => b['email'].localeCompare(a['email']));
+                break;
+            case 'name':
+                sortedUsers = sortedUsers.sort((a, b) => b['name'].localeCompare(a['name']));
+                break;
+            case 'createdAt':
+                sortedUsers = sortedUsers.sort((a, b) => b['createdAt'].localeCompare(a['createdAt']));
+                break;
+        }
+    }
+
+    const handleFilterChange = (field: string) => {
+        dispatch({ type: 'FILTER', payload: field });
+    };
+
+    const handleSortChange = (field: string) => {
+        if (state.sortBy === field) {
+            dispatch({ type: 'CHANGE_SORT_DIRECTION', payload: field});
+        } else {
+            dispatch({ type: 'CHANGE_SORT_FIELD', payload: field });
+        }
+    };
+
+    function sortingReducer(state: localState, action: {type: string, payload: string}): localState {
+        switch (action.type) {
+          case 'CHANGE_SORT_FIELD':
+              return {
+                ...state,
+                sortBy: action.payload,
+                sortDirection: 'ascending',
+              }
+          case 'CHANGE_SORT_DIRECTION':
+            return {
+                ...state,
+                sortDirection: state.sortDirection === 'ascending' ? 'descending' : 'ascending',
+            }
+          case 'FILTER':
+            switch (action.payload) {
+                case 'activated':
+                    return {
+                        ...state,
+                        filterActivated: state.filterActivated === null ? true : state.filterActivated === true ? false : null,
+                    }
+                case 'role':
+                    return {
+                        ...state,
+                        filterRole: state.filterRole === null ? 1 : state.filterRole === 1 ? 2 : null,
+                    }
+                default:
+                    throw new Error("invalid filter field")
+            }
+          default:
+            throw new Error("invalid action type")
+        }
+      }
     
     useEffect(() => {
         setLoading(true);
         getAllUserData()
         .then(res => {
             setUserData(res.data)
+            console.log('user data set')
             setLoading(false)
         })
         .catch(error => {
@@ -129,36 +215,50 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     }
 
     return (
-
         <Container className="container-fluid" fluid style={{padding: "2"}}>
             <Grid columns={2}>
                 <Grid.Row>
                     <GridColumn width={3}>
                         <AdminMenu/>
                     </GridColumn>
-
                     <GridColumn width={12}>
                         <div style={{height:'80vh',overflowY:'auto'}}>
                             {loading==true?<Dimmer active inverted>
                                 <Loader inverted>Loading User</Loader>
                             </Dimmer>:<div></div>
                             }
+                            
+                            {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
+                            {state.filterActivated === null ? null : 
+                                <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
+                                </div>
+                            }
+                            {state.filterRole === null ? null : 
+                                <div>Filtering by: {state.filterRole === 1 ? 'Admin' : 'User'}
+                                </div>
+                            }
 
-                            <Table>
+                            <Table sortable>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>Email</Table.HeaderCell>
-                                        <Table.HeaderCell>Username</Table.HeaderCell>
-                                        <Table.HeaderCell>Register Time</Table.HeaderCell>
-                                        <Table.HeaderCell>Admin</Table.HeaderCell>
-                                        <Table.HeaderCell>Activated</Table.HeaderCell>
+                                        <Table.HeaderCell 
+                                        sorted={state.sortBy === 'email' ? state.sortDirection : undefined}
+                                        onClick={() => handleSortChange('email')}>Email</Table.HeaderCell>
+                                        <Table.HeaderCell 
+                                        sorted={state.sortBy === 'name' ? state.sortDirection : undefined}
+                                        onClick={() => handleSortChange('name')}>Username</Table.HeaderCell>
+                                        <Table.HeaderCell 
+                                        sorted={state.sortBy === 'createdAt' ? state.sortDirection : undefined}
+                                        onClick={() => handleSortChange('createdAt')}>Register Time</Table.HeaderCell>
+                                        <Table.HeaderCell onClick={() => handleFilterChange('role')}>Admin</Table.HeaderCell>
+                                        <Table.HeaderCell onClick={() => handleFilterChange('activated')}>Activated</Table.HeaderCell>
                                         <Table.HeaderCell>Verify Email</Table.HeaderCell>
                                         <Table.HeaderCell>Activate</Table.HeaderCell>
                                         <Table.HeaderCell>Delete User</Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {userData.map(user => (
+                                    {sortedUsers.map(user => (
                                         <Table.Row key={user.id}>
                                             <Table.Cell>{user.email}</Table.Cell>
                                             <Table.Cell>{user.name}</Table.Cell>
