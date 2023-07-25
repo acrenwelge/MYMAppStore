@@ -5,7 +5,7 @@ import {Role} from "../roles/role.enum";
 import {RolesGuard} from "../auth/guards/roles.guard";
 import {AuthGuard} from "@nestjs/passport";
 import {PurchaseCodeService} from '../purchaseCode/purchaseCode.service';
-import { PurchaseCode } from 'src/purchaseCode/purchaseCode.entity';
+import { PurchaseCodeEntity } from 'src/purchaseCode/purchaseCode.entity';
 import { ItemService } from 'src/item/item.service';
 import { Item } from 'src/item/entities/item.entity';
 import {TransactionService} from '../transaction/transaction.service';
@@ -13,6 +13,7 @@ import { Transaction } from 'src/transaction/entities/transaction.entity';
 import {EmailSubscriptionService} from "../email-subscription/email-subscription.service";
 import {EmailSubscription} from "../email-subscription/email-subscription.entity";
 import { User } from 'src/user/entities/user.entity';
+import { PurchaseCodeDto } from 'src/purchaseCode/purchaseCode.dto';
 
 
 @UseGuards(AuthGuard('jwt'),RolesGuard)
@@ -55,14 +56,14 @@ export class AdminController {
     @Post("add-code")
     @HttpCode(200)
     // local strategy has a default name of 'local'. code supplied by the passport-local package
-    public async addCode(@Body() newPurchaseCode:PurchaseCode) {
+    public async addCode(@Body() newPurchaseCode:PurchaseCodeEntity) {
         console.log(newPurchaseCode);
         return this.purchaseCodeService.addOne(newPurchaseCode.name, newPurchaseCode.priceOff)
     }
 
     @Post("delete-code")
     @HttpCode(200)
-    public async deleteCode(@Body() newPurchaseCode:PurchaseCode){
+    public async deleteCode(@Body() newPurchaseCode:PurchaseCodeEntity){
         // console.log("server admin");
         // console.log(newPurchaseCode.code_id);
         return this.purchaseCodeService.deleteCode(newPurchaseCode.code_id)
@@ -71,9 +72,9 @@ export class AdminController {
 
     @Post("update-code")
     @HttpCode(200)
-    public async updateCode( @Body() newPurchaseCode:PurchaseCode){
+    public async updateCode(@Body() newPurchaseCode: PurchaseCodeDto){
         // console.log(newPurchaseCode.code_id);
-        return this.purchaseCodeService.updateCode(newPurchaseCode.code_id, newPurchaseCode.priceOff)
+        return this.purchaseCodeService.update(newPurchaseCode)
     }
 
     @Get("emailSubscription")

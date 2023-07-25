@@ -3,8 +3,7 @@ import {Exclude} from '@nestjs/class-transformer'
 import {Transaction} from "../transaction/entities/transaction.entity";
 
 @Entity()
-export class PurchaseCode {
-
+export class PurchaseCodeEntity {
 
     @PrimaryGeneratedColumn({name: "purchaseCode_id"})
     public code_id: number;

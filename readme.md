@@ -23,7 +23,7 @@ CSCE606 Textbook Project in Spring 2023.
 ### Setup a local MySQL database on Docker:
 ```bash
 # Start the MySQL server container
-docker run --name local-db -e MYSQL_ROOT_PASSWORD=password -d mysql:8.0
+docker run --name local-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:8.0
 # Copy SQL script to container
 docker cp ./init.sql container_id:/tmp/init.sql
 # Connect to the MySQL server container

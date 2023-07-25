@@ -2,9 +2,6 @@ import { createMock } from '@golevelup/ts-jest';
 import { PurchaseCodeService } from './purchaseCode.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PurchaseCodeController } from './purchaseCode.controller';
-//import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { PurchaseCode } from './purchaseCode.entity';
-
 
 describe('PurchaseCodeController', () => {
   let controller: PurchaseCodeController;
@@ -21,7 +18,6 @@ describe('PurchaseCodeController', () => {
         }
       ]
     }).compile();
-
     controller = module.get<PurchaseCodeController>(PurchaseCodeController);
     service = module.get<PurchaseCodeService>(PurchaseCodeService);
     
@@ -35,19 +31,18 @@ describe('PurchaseCodeController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('calling findAll method', () => {
-    controller.findAllUser();
+  it('should return all purchase codes', () => {
+    controller.getAllPurchaseCodes();
     expect(service.findAll).toHaveBeenCalled();
   });
 
-
-  it('calling findOne method', () => {
+  it('should get a purchase code by id', () => {
     const id = 1;
-    controller.findOne(id);
+    controller.getOnePurchaseCode(id);
     expect(service.findOne).toHaveBeenCalledWith(id);
   });
 
-  it('calling validate method', () => {
+  it('should validate a purchase code', () => {
     const name = "AAA";
     controller.checkValidPurchaseCode(name);
     expect(service.validateCode).toHaveBeenCalledWith(name);

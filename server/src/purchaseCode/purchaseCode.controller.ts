@@ -1,25 +1,27 @@
-import {Controller, Get, Post, HttpCode, Request, UseGuards,Body, Patch, Param, Delete} from '@nestjs/common';
+import {Controller, Get, Post, HttpCode, Request, UseGuards,Body, Patch, Param, Delete, Put} from '@nestjs/common';
 import {PurchaseCodeService} from "./purchaseCode.service";
-import { ConflictException } from '@nestjs/common';
 @Controller('purchaseCode')
 export class PurchaseCodeController {
     constructor(private readonly PurchaseCodeService:PurchaseCodeService) {}
 
-    @Get("purchaseCode")
-    findAllUser() {
+    @Get()
+    getAllPurchaseCodes() {
         return this.PurchaseCodeService.findAll();
     }
 
-    @Get('id')
-    findOne(@Param('id') id: number) {
+    @Get(':id')
+    getOnePurchaseCode(@Param('id') id: number) {
         return this.PurchaseCodeService.findOne(id);
     }
 
-    @Get(":name")
-    async checkValidPurchaseCode(@Param('name') name: string) {
+    @Put(':id')
+    updatePurchaseCode(@Body() updatePurchaseCodeDto) {
+        return this.PurchaseCodeService.update(updatePurchaseCodeDto);
+    }
 
-        const validateResult = await this.PurchaseCodeService.validateCode(name);
-        return {priceOff:validateResult}
+    @Get("validate")
+    async checkValidPurchaseCode(@Param('name') name: string) {
+        return this.PurchaseCodeService.validateCode(name);
     }
 
 }

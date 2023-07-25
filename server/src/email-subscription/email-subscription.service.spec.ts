@@ -7,7 +7,7 @@ import { createMock } from '@golevelup/ts-jest';
 import {Transaction} from "../transaction/entities/transaction.entity";
 import {MockType} from "../transaction/transaction.service.spec";
 import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
-import {PurchaseCode} from "../purchaseCode/purchaseCode.entity";
+import {PurchaseCodeEntity} from "../purchaseCode/purchaseCode.entity";
 
 
 describe('EmailSubscriptionService', () => {

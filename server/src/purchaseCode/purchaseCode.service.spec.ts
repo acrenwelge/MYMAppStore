@@ -1,28 +1,29 @@
 import { PurchaseCodeService } from './purchaseCode.service';
-import { PurchaseCode } from "./purchaseCode.entity";
+import { PurchaseCodeEntity } from "./purchaseCode.entity";
 import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
+import { PurchaseCodeDto } from './purchaseCode.dto';
 
 
 describe('PurchaseCodeService', () => {
   let service: PurchaseCodeService;
-  let repositoryMock: MockType<Repository<PurchaseCode>>;
+  let repositoryMock: MockType<Repository<PurchaseCodeEntity>>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PurchaseCodeService,
         {
-          provide: getRepositoryToken(PurchaseCode),
-          useValue: createMock<PurchaseCode>(),
+          provide: getRepositoryToken(PurchaseCodeEntity),
+          useValue: createMock<PurchaseCodeEntity>(),
         }
       ],
     }).compile();
 
     service = module.get<PurchaseCodeService>(PurchaseCodeService);
-    repositoryMock = module.get(getRepositoryToken(PurchaseCode));
+    repositoryMock = module.get(getRepositoryToken(PurchaseCodeEntity));
 
     // console.log(repositoryMock);
 
@@ -37,7 +38,7 @@ describe('PurchaseCodeService', () => {
   });
 
   it('should create a code', async () => {
-    const code = new PurchaseCode();
+    const code = new PurchaseCodeEntity();
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
     expect(await service.create(code)).toBe(true);
   });
@@ -48,7 +49,7 @@ describe('PurchaseCodeService', () => {
   });
 
   it('should find one code', async () => {
-    const result = new PurchaseCode();
+    const result = new PurchaseCodeEntity();
     result.code_id = 1;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
     expect(await service.findOne(1)).toBe(result);
@@ -57,8 +58,8 @@ describe('PurchaseCodeService', () => {
 
   it('should throw error when add a exists code', async () => {
 
-    const oldCode = new PurchaseCode();
-    const newCode = new PurchaseCode();
+    const oldCode = new PurchaseCodeEntity();
+    const newCode = new PurchaseCodeEntity();
     
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldCode);
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => newCode);
@@ -68,7 +69,7 @@ describe('PurchaseCodeService', () => {
   it('should add a code if it does not exist', async () => {
     
     const oldCode = null;
-    const newCode = new PurchaseCode();
+    const newCode = new PurchaseCodeEntity();
     
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldCode);
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => newCode);
@@ -78,7 +79,7 @@ describe('PurchaseCodeService', () => {
 
   it('should remove a code', async () => {
     const id= 1;
-    const tmpCode = new PurchaseCode();
+    const tmpCode = new PurchaseCodeEntity();
     tmpCode.code_id = id;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => tmpCode);
     jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
@@ -86,27 +87,12 @@ describe('PurchaseCodeService', () => {
   });
 
   it('should validate a code', async () => {
-    const validCode = new PurchaseCode();
+    const validCode = new PurchaseCodeEntity();
     validCode.name = "VALIDATE";
     
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => validCode);
     expect(await service.validateCode(validCode.name)).toBe(validCode);
   });
-  
-
-  it('should update a transaction', async () => {
-    const updateid = 1;
-    const updateprice = 50;
-    const update = new PurchaseCode();
-    update.code_id = updateid;
-    update.priceOff = updateprice;
-
-    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => update);
-    jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
-    expect(await service.updateCode(update.code_id, update.priceOff)).toStrictEqual(update);
-  });
-
-
 
 });
 

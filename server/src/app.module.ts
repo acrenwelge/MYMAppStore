@@ -11,7 +11,7 @@ import {RecordModule } from './record/record.module';
 import {ItemModule } from './item/item.module';
 import {PurchaseCodeModule } from './purchaseCode/purchaseCode.module';
 import {Item} from "./item/entities/item.entity";
-import {PurchaseCode} from "./purchaseCode/purchaseCode.entity";
+import {PurchaseCodeEntity} from "./purchaseCode/purchaseCode.entity";
 import {Transaction} from "./transaction/entities/transaction.entity";
 import {Record} from "./record/entities/record.entity";
 import { EmailModule } from './email/email.module';
@@ -51,8 +51,8 @@ if (process.env.RUNNING_ENV === 'prod') {
             username: process.env.DB_Username,
             password: process.env.DB_Password,
             database: process.env.DB_Database,
-            entities:[User,Item,PurchaseCode,Record,Transaction,EmailSubscription],
-            synchronize: false,
+            entities:[User,Item,PurchaseCodeEntity,Record,Transaction,EmailSubscription],
+            synchronize: process.env.ENV_TYPE === 'DEV' ? true: false,
         }),
         UserModule,
         AuthModule,

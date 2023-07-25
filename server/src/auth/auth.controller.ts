@@ -11,10 +11,9 @@ export class AuthController {
     constructor(private readonly userService: UserService,
                 private authService:AuthService) {}
 
-
     @HttpCode(200)
     @Post("local-signup")
-    create(@Body() user:User) {
+    create(@Body() user: User) {
         return this.userService.localSignUp(user);
     }
 
@@ -25,7 +24,6 @@ export class AuthController {
     public async localLogin(@Request() req) {
         return this.authService.login(req.user)
     }
-
 
     @HttpCode(200)
     @UseGuards(JwtAuthGuard)

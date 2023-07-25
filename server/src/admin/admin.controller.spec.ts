@@ -2,16 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AdminController } from './admin.controller';
 import {UserService} from "../user/user.service";
 import {PurchaseCodeService} from '../purchaseCode/purchaseCode.service';
-import { PurchaseCode } from 'src/purchaseCode/purchaseCode.entity';
+import { PurchaseCodeEntity } from 'src/purchaseCode/purchaseCode.entity';
 import {TransactionService} from '../transaction/transaction.service';
 import {EmailSubscriptionService} from "../email-subscription/email-subscription.service";
 import {EmailSubscription} from "../email-subscription/email-subscription.entity";
 import { createMock } from '@golevelup/ts-jest';
-import {getRepositoryToken} from "@nestjs/typeorm";
-import {User} from "../user/entities/user.entity";
-import {EmailService} from "../email/email.service";
-
-
+import { PurchaseCodeDto } from 'src/purchaseCode/purchaseCode.dto';
 
 describe('AdminController', () => {
   let controller: AdminController;
@@ -46,15 +42,11 @@ describe('AdminController', () => {
         },
       ]
     }).compile();
-
     controller = module.get<AdminController>(AdminController);
     usrservice = module.get<UserService>(UserService);
     prchservice = module.get<PurchaseCodeService>(PurchaseCodeService);
     transervice = module.get<TransactionService>(TransactionService);
     emsubservice = module.get<EmailSubscriptionService>(EmailSubscriptionService);
-
-    // console.log(controller);
-
   });
 
   afterAll(() => {
@@ -66,11 +58,7 @@ describe('AdminController', () => {
   });
 
   it('calling findAllUser method', () => {
-    //console.log('it')
-    //console.log(controller)
-
     controller.findAllUser();
-    //console.log(usrservice)
     expect(usrservice.findAll).toHaveBeenCalled();
   });
 
@@ -85,15 +73,19 @@ describe('AdminController', () => {
   });
 
   it('calling delete-code method', () => {
-    const testprchcode = new PurchaseCode();
+    const testprchcode = new PurchaseCodeEntity();
     controller.deleteCode(testprchcode);
     expect(prchservice.deleteCode).toHaveBeenCalledWith(testprchcode.code_id);
   });
 
   it('calling update-code method', () => {
-    const testprchcode = new PurchaseCode();
+    const testprchcode: PurchaseCodeDto = {
+      id: 1,
+      name: 'test',
+      priceOff: 10,
+    }
     controller.updateCode(testprchcode);
-    expect(prchservice.updateCode).toHaveBeenCalledWith(testprchcode.code_id, testprchcode.priceOff);
+    expect(prchservice.update).toHaveBeenCalledWith(testprchcode);
   });
 
   it('calling findAllEmailSub method', () => {
