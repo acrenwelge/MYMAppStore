@@ -17,20 +17,16 @@ import Subscription from "./entities/subscription";
 import Home from "./pages/Home";
 import AccountActivation from "./pages/AccountActivation";
 import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
+import SignUp from "./pages/SignUp/SignUpPage";
 import RequestPasswordReset from "./pages/RequestPasswordReset";
 import ResetPassword from "./pages/ResetPassword";
 import ReadBook from "./pages/Book/index"
-
 import AdminUserInfo from "./pages/Admin/UserInfo"
 import AdminPurchaseCode from "./pages/Admin/PurchaseCode"
 import Records from "./pages/Records";
-
 import AdminTransactionRecord from "./pages/Admin/TransactionRecord"
 import Prices from "./pages/Price";
 import EmailSubscription from "./pages/Admin/EmailSubscription";
-
-
 
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line

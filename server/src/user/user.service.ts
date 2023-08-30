@@ -17,6 +17,7 @@ export class UserService {
     const email = createUser.email
     const user = await this.userRepo.findOne({where: {email}})
     if (user != null) {
+      console.log(`User email address ${email} already exists`)
       throw new ConflictException("User email address already exists")
     } else {
       createUser.role = 2
@@ -25,6 +26,20 @@ export class UserService {
       const createResult = await this.userRepo.save(createUser)
       return await this.emailService.sendActivateAccountEmail(createResult)
     }
+  }
+
+  /**
+   * Creates an entire group of users at once
+   * Used by instructors to create a class of students
+   **/
+  async localSignUpForClass(createUsers: User[]) {
+    const createResults: Promise<void>[] = []
+    console.log(createUsers)
+    for (const newUser of createUsers) {
+      let res = this.localSignUp(newUser)
+      createResults.push(res)
+    }
+    return Promise.all(createResults)
   }
 
   generateActivationCode(username: string): string {

@@ -17,6 +17,13 @@ export class AuthController {
         return this.userService.localSignUp(user);
     }
 
+    @HttpCode(200)
+    @Post("class-signup")
+    signUpStudents(@Body() newUsers: User[]) {
+        console.log(newUsers);
+        return this.userService.localSignUpForClass(newUsers);
+    }
+
     @Post("local-login")
     @HttpCode(200)
     @UseGuards(LocalAuthGuard)
