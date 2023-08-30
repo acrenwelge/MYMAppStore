@@ -12,30 +12,29 @@ import {
 import AdminMenu from "../../../components/AdminMenu";
 import {addCodeApi, deleteCodeApi, getAllPurchaseCodeData, updateCodeApi} from "../../../api/admin";
 
-
 interface PurchaseCode {
     readonly code_id: number;
     name: string;
     priceOff: number;
 }
 
-type FormValues = {
-    code_id: string,
-    name: string;
-    priceOff: string;
+export type PurchaseCodeFormValues = {
+    code_id: number | null,
+    name: string | null;
+    priceOff: number | null;
 };
 
 type MessageValues = {
-    type:string,
-    message:string
+    type: string,
+    message: string
 }
 
 const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
 
-    const [formValues, setFormValues] = useState<FormValues>({
-        code_id: "",
-        name: "",
-        priceOff: ""
+    const [formValues, setFormValues] = useState<PurchaseCodeFormValues>({
+        code_id: null,
+        name: null,
+        priceOff: null
     });
 
     const [addModalOpen, setAddModalOpen] = useState(false);
@@ -43,7 +42,6 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
     const [purchaseData, setPurchaseCodeData] = useState<PurchaseCode[]>([]);
     const [loading, setLoading] = useState(false);
     const [buttonLoading, setButtonLoading] = useState(false);
-
 
     const [message, setMessage] = useState<MessageValues>({
         type:'none',
@@ -78,20 +76,18 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
             setAddModalOpen(false)
             setMessage({type:'success',message:`Purchase code ${formValues.name} has been added successfully.`})
             getPurchaseCode()
-        })
-            .catch((err) => {
-                console.log(err)
-                setButtonLoading(false)
-                setAddModalOpen(false)
-                setMessage({type:'fail',message:`Purchase code ${formValues.name} is already used for another purchase code. Please use a new code.`})
-            });
-
+        }).catch((err) => {
+            console.log(err)
+            setButtonLoading(false)
+            setAddModalOpen(false)
+            setMessage({type:'fail',message:`Purchase code ${formValues.name} is already used for another purchase code. Please use a new code.`})
+        });
     };
 
     const handleCancel = () => {
         setAddModalOpen(false)
         setUpdateModalOpen(false)
-        setFormValues({ ...formValues, name: '', priceOff:''})
+        setFormValues({code_id: null, name: null, priceOff: null})
     }
 
     const handleDelete = (code: PurchaseCode) => {
@@ -114,9 +110,9 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
         console.log(code)
         setFormValues({
             ...formValues,
-            code_id: code.code_id.toString(),
+            code_id: code.code_id,
             name: code.name,
-            priceOff: (code.priceOff).toString()
+            priceOff: code.priceOff
         })
         setUpdateModalOpen(true)
     };
@@ -125,22 +121,21 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
         setButtonLoading(true)
         updateCodeApi({
             code_id: formValues.code_id,
+            name: formValues.name,
             priceOff: Number(formValues.priceOff)
         }).then(async (res) => {
-            const purchaseCode = res.data.purchaseCode
+            const purchaseCode = res.data.name
             localStorage.setItem('purchaseCode', JSON.stringify(purchaseCode));
             setButtonLoading(false)
             setUpdateModalOpen(false)
             setMessage({type:'success',message:`Purchase code ${formValues.name} has been updated successfully.`})
             getPurchaseCode()
-        })
-            .catch((err) => {
-                console.log(err)
-                setButtonLoading(false)
-                setUpdateModalOpen(false)
-                setMessage({type:'fail',message:`Fail to delete purchase code ${formValues.name}. Please try again.`})
-                }
-            );
+        }).catch((err) => {
+            console.log(err)
+            setButtonLoading(false)
+            setUpdateModalOpen(false)
+            setMessage({type:'fail',message:`Failed to update purchase code ${formValues.name}. Please try again.`})
+        });
     }
 
     return (
@@ -170,7 +165,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                                 </Message>
                             )}
 
-                            <Button icon="add" labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
+                            <Button icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
                                 <Icon name="add circle"/>Add New Purchase Code
                             </Button>
                         </div>
@@ -232,7 +227,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                                         type="number"
                                         id="priceOff"
                                         label="Percent Off (0-100)"
-                                        onChange={(event, data) => setFormValues({...formValues, priceOff: data.value})}
+                                        onChange={(event, data) => setFormValues({...formValues, priceOff: Number(data.value)})}
                                         required
                                     />
                                 </Form>
@@ -249,7 +244,8 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                                     positive
                                     loading={buttonLoading}
                                 />
-                            </Modal.Actions></Modal>
+                            </Modal.Actions>
+                        </Modal>
 
                         <Modal
                             onClose={() => setUpdateModalOpen(false)}
@@ -262,15 +258,16 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                                     <Form.Input
                                         id="name"
                                         label="Code"
-                                        disabled
                                         value={formValues.name}
+                                        onChange={(event, data) => setFormValues({...formValues, name: data.value})}
+                                        required
                                     />
                                     <Form.Input
                                         type="number"
                                         id="priceOff"
                                         label="Percent Off (0-100)"
                                         value={formValues.priceOff}
-                                        onChange={(event, data) => setFormValues({...formValues, priceOff: data.value})}
+                                        onChange={(event, data) => setFormValues({...formValues, priceOff: Number(data.value)})}
                                         required
                                     />
                                 </Form>

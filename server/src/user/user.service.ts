@@ -9,7 +9,7 @@ export class UserService {
 
   constructor(
       @InjectRepository(User)
-      private readonly userRepo: Repository<User>,  // 使用泛型注入对应类型的存储库实例
+      private readonly userRepo: Repository<User>,
       @Inject(forwardRef(()=> EmailService)) private readonly emailService: EmailService
   ) {}
 
@@ -44,7 +44,6 @@ export class UserService {
 
   async activateAccount(activationCode: string): Promise<User | null> {
     const user = await this.userRepo.findOne({ where: { activationCode:activationCode} });
-    // console.log(user)
     if (user === null) {
       throw new NotFoundException;
     }

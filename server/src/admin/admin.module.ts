@@ -5,10 +5,10 @@ import {RolesGuard} from "../auth/guards/roles.guard";
 import { PurchaseCodeModule } from 'src/purchaseCode/purchaseCode.module';
 import { TransactionModule } from 'src/transaction/transaction.module';
 import {EmailSubscriptionModule} from "../email-subscription/email-subscription.module";
-
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
-  imports:[UserModule, PurchaseCodeModule, TransactionModule,EmailSubscriptionModule],
+  imports:[UserModule, PurchaseCodeModule, TransactionModule,EmailSubscriptionModule,EmailModule],
   controllers: [AdminController],
   providers:[RolesGuard]
 })

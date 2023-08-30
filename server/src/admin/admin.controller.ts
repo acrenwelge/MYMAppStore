@@ -14,7 +14,7 @@ import {EmailSubscriptionService} from "../email-subscription/email-subscription
 import {EmailSubscription} from "../email-subscription/email-subscription.entity";
 import { User } from 'src/user/entities/user.entity';
 import { PurchaseCodeDto } from 'src/purchaseCode/purchaseCode.dto';
-
+import { EmailService } from 'src/email/email.service';
 
 @UseGuards(AuthGuard('jwt'),RolesGuard)
 @Controller('admin')
@@ -23,7 +23,8 @@ export class AdminController {
     constructor(private readonly userService: UserService,
         private readonly purchaseCodeService: PurchaseCodeService,
         private readonly transactionService: TransactionService,
-        private readonly emailSubscriptionService: EmailSubscriptionService) {}
+        private readonly emailSubscriptionService: EmailSubscriptionService,
+        private readonly emailService: EmailService) {}
 
     @Get("user")
     findAllUser() {
@@ -41,6 +42,13 @@ export class AdminController {
     public async updateUser(@Body() user: User){
         console.log('updating user:', user)
         return this.userService.updateOne(user);
+    }
+
+    @Post("user/:id/sendActivateEmail")
+    @HttpCode(HttpStatus.OK)
+    public async sendAccountActivationEmail(@Body() user: User){
+        console.log('sending account activation email to:', user.email);
+        return this.emailService.sendActivateAccountEmail(user);
     }
 
     @Get("transaction")

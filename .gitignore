@@ -9,7 +9,7 @@ server/node_modules
 client/node_modules
 server/package-lock.json
 /node_modules
-
+server/public/*
 
 client/.pnp
 client/.pnp.js
@@ -19,3 +19,5 @@ client/.yarn/unplugged
 client/.yarn/install-state.gz
 
 coverage/
+
+mysql/

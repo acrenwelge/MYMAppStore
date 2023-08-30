@@ -2,6 +2,7 @@ import React, {useEffect, useState, useReducer} from "react";
 import {
     Table,
     Icon,
+    Input,
     Grid,
     GridColumn,
     Container,
@@ -9,7 +10,7 @@ import {
     Loader, Dimmer, Button
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
-import {getAllUserData, updateUser, deleteUser} from "../../../api/admin";
+import {getAllUserData, updateUser, deleteUser, sendAccountActivationEmail} from "../../../api/admin";
 import {useHistory} from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
@@ -38,6 +39,7 @@ interface localState {
     sortDirection: 'ascending' | 'descending' | undefined;
     filterActivated: boolean | null;
     filterRole: 1 | 2 | null;
+    filterText: string;
 }
 
 const AdminUserInfo: React.FC = (props): JSX.Element | null => {
@@ -59,6 +61,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         sortDirection: undefined,
         filterActivated: null,
         filterRole: null,
+        filterText: '',
     };
     const [state, dispatch] = useReducer(sortingReducer, initlocalState);
     const filteredUsers = userData.filter(user => {
@@ -66,6 +69,9 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             return false;
         }
         if (state.filterRole !== null && user.role !== state.filterRole) {
+            return false;
+        }
+        if (state.filterText !== '' && !user.email.includes(state.filterText) && !user.name.includes(state.filterText)) {
             return false;
         }
         return true;
@@ -110,34 +116,42 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         }
     };
 
+    const handleFilterTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch({ type: 'FILTER_TEXT', payload: e.target.value });
+    };
+
     function sortingReducer(state: localState, action: {type: string, payload: string}): localState {
         switch (action.type) {
-          case 'CHANGE_SORT_FIELD':
+            case 'CHANGE_SORT_FIELD':
               return {
                 ...state,
                 sortBy: action.payload,
                 sortDirection: 'ascending',
               }
-          case 'CHANGE_SORT_DIRECTION':
-            return {
-                ...state,
-                sortDirection: state.sortDirection === 'ascending' ? 'descending' : 'ascending',
+            case 'CHANGE_SORT_DIRECTION':
+                return {
+                    ...state,
+                    sortDirection: state.sortDirection === 'ascending' ? 'descending' : 'ascending',
             }
-          case 'FILTER':
-            switch (action.payload) {
-                case 'activated':
-                    return {
-                        ...state,
-                        filterActivated: state.filterActivated === null ? true : state.filterActivated === true ? false : null,
-                    }
-                case 'role':
-                    return {
-                        ...state,
-                        filterRole: state.filterRole === null ? 1 : state.filterRole === 1 ? 2 : null,
-                    }
-                default:
-                    throw new Error("invalid filter field")
-            }
+            case 'FILTER':
+                switch (action.payload) {
+                    case 'activated':
+                        return {
+                            ...state,
+                            filterActivated: state.filterActivated === null ? true : state.filterActivated === true ? false : null,
+                        }
+                    case 'role':
+                        return {
+                            ...state,
+                            filterRole: state.filterRole === null ? 1 : state.filterRole === 1 ? 2 : null,
+                        }
+                    default: throw new Error("invalid filter field")
+                }
+            case 'FILTER_TEXT':
+                return {
+                    ...state,
+                    filterText: action.payload,
+                }
           default:
             throw new Error("invalid action type")
         }
@@ -148,7 +162,6 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         getAllUserData()
         .then(res => {
             setUserData(res.data)
-            console.log('user data set')
             setLoading(false)
         })
         .catch(error => {
@@ -158,7 +171,20 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     }, []);
     
     const sendVerificationEmail = (id: number) => {
-        console.log("send verification email - to be implemented");
+        const user = userData.find(user => user.id === id);
+        if (!user) {
+            console.error("Attempted to send verification email but no user found in local data");
+            toast.error("Verification email failed - are you logged in?");
+        } else {
+            sendAccountActivationEmail(user)
+            .then(res => {
+                toast.success("Verification email sent successfully");
+            })
+            .catch(error => {
+                console.error(error);
+                toast.error("Verification email failed");
+            });
+        }
     }
     const toggleUserActive = (id: number) => {
         const user = userData.find(user => user.id === id);
@@ -227,16 +253,20 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                 <Loader inverted>Loading User</Loader>
                             </Dimmer>:<div></div>
                             }
-                            
-                            {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
-                            {state.filterActivated === null ? null : 
-                                <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
-                                </div>
-                            }
-                            {state.filterRole === null ? null : 
-                                <div>Filtering by: {state.filterRole === 1 ? 'Admin' : 'User'}
-                                </div>
-                            }
+                            <Container>
+                                {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
+                                {state.filterActivated === null ? null : 
+                                    <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
+                                    </div>
+                                }
+                                {state.filterRole === null ? null : 
+                                    <div>Filtering by: {state.filterRole === 1 ? 'Admin' : 'User'}
+                                    </div>
+                                }
+                            </Container>
+
+                            <Input label="Search by Email or Username:" icon='search' placeholder='email@domain.com'
+                                onChange={(e) => handleFilterTextChange(e)}/>
 
                             <Table sortable>
                                 <Table.Header>
