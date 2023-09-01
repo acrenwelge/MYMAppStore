@@ -6,16 +6,16 @@ import Page from "../../components/Page";
 
 const ContactPage: React.FC = (props): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
-	const [name, setName] = useState<string>(ctx.user?.name ?? "");
+	const [firstName, setFirstName] = useState<string>(ctx.user?.firstName ?? "");
+	const [lastName, setLastName] = useState<string>(ctx.user?.lastName ?? "");
 	const [phone, setPhone] = useState<string>("");
 	const [phoneError, setPhoneError] = useState<boolean>(false);
 	const [email, setEmail] = useState<string>(ctx.user?.email ?? "");
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [subject, setSubject] = useState<string>("");
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [message, setMessage] = useState<string>("");
 
-	const userName = ctx.user?.name;
+	const userFirstName = ctx.user?.firstName;
+	const userLastName = ctx.user?.lastName;
 	const userEmail = ctx.user?.email;
 
 	const onSubmit = useCallback((): void => {
@@ -24,14 +24,15 @@ const ContactPage: React.FC = (props): JSX.Element => {
 			return;
 		}
 
-		setName(userName ?? "");
+		setFirstName(userFirstName ?? "");
+		setLastName(userLastName ?? "");
 		setPhone("");
 		setPhoneError(false);
 		setEmail(userEmail ?? "");
 		setSubject("");
 		setMessage("");
 	}, [
-		setName,
+		setFirstName,
 		setPhone,
 		setPhoneError,
 		setEmail,
@@ -39,7 +40,7 @@ const ContactPage: React.FC = (props): JSX.Element => {
 		setMessage,
 		phone,
 		userEmail,
-		userName
+		userFirstName
 	]);
 
 	return (
@@ -51,11 +52,18 @@ const ContactPage: React.FC = (props): JSX.Element => {
 			<Divider />
 			<Form action="/api/contact" method="post" onSubmit={(event, data) => onSubmit()}>
 				<Form.Input
-					id="contact-form-name"
-					label="Name"
-					onChange={(event) => setName(event.target.value)}
+					id="contact-form-first-name"
+					label="First Name"
+					onChange={(event) => setFirstName(event.target.value)}
 					required
-					value={name}
+					value={firstName}
+				/>
+				<Form.Input
+					id="contact-form-last-name"
+					label="Last Name"
+					onChange={(event) => setLastName(event.target.value)}
+					required
+					value={lastName}
 				/>
 				<Form.Input
 					error={phoneError}
@@ -65,7 +73,6 @@ const ContactPage: React.FC = (props): JSX.Element => {
 						if (phoneError) {
 							setPhoneError(false);
 						}
-
 						setPhone(event.target.value);
 					}}
 					type="tel"

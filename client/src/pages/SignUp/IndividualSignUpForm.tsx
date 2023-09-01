@@ -3,7 +3,8 @@ import {Form, FormProps, Button, Message, Loader, Container} from "semantic-ui-r
 import {localSignupApi} from "../../api/auth";
 
 type FormValues = {
-	name: string;
+	firstName: string;
+	lastName: string;
 	email: string;
 	confirmedEmail: string;
 	password: string;
@@ -67,7 +68,8 @@ const formStateReducer = (state: FormActionState, action: FormAction): FormActio
 
 const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 	const emptyVals: FormValues = {
-		name: "",
+		firstName: "",
+		lastName: "",
 		email: "",
 		confirmedEmail: "",
 		password: "",
@@ -83,19 +85,24 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 		(data: FormProps) => {
 			formStateDispatch({ type: "LOADING" });
 			localSignupApi({
-				name: formValues.name,
+				firstName: formValues.firstName,
+				lastName: formValues.lastName,
 				email: formValues.email,
 				password: formValues.password
 			}).then((res) => {
 					setFormValues(emptyVals);
 					formStateDispatch({ type: "SUCCESS" });
 			}).catch((err) => {
+					let text = ""
 					if (err.response.status == 409) {
-						formStateDispatch({
-							type: "REQUEST_ERROR",
-							payload:"Unable to Signup. The account has already been created."
-						})
+						text = "Unable to Signup. The account has already been created."
+					} else if (err.response.status >= 500) {
+						text = "Unable to Signup due to server error. Please try again later."
 					}
+					formStateDispatch({
+						type: "REQUEST_ERROR",
+						payload: text
+					})
 			});
 		},
 		[formStateDispatch, formValues]
@@ -111,9 +118,16 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 			>
 				<Form.Input
 					id="name"
-					label="Name"
-					value={formValues.name}
-					onChange={(event, data) => setFormValues({ ...formValues, name: data.value })}
+					label="First Name"
+					value={formValues.firstName }
+					onChange={(event, data) => setFormValues({ ...formValues, firstName: data.value })}
+					required
+				/>
+				<Form.Input
+					id="name"
+					label="Last Name"
+					value={formValues.lastName }
+					onChange={(event, data) => setFormValues({ ...formValues, lastName: data.value })}
 					required
 				/>
 				<Form.Input

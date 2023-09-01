@@ -14,7 +14,7 @@ export class SubscriptionController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('record')
+  @Get()
   findAll(@Request() req) {
     return this.subscriptionService.findAllForUser(req.user.user_id);
   }

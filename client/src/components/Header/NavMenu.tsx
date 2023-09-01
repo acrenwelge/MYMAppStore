@@ -50,24 +50,15 @@ const NavMenu: React.FC = (): JSX.Element => {
 				{/*	{"Contact"}*/}
 				{/*</Menu.Item>*/}
 				{ctx.user && (
-				<Menu.Item as={Link} to="/read">
-					{"Read Book"}
-				</Menu.Item >
+				<Menu.Item as={Link} to="/read">Read Book</Menu.Item >
 				)}
 
 				<Menu.Item fitted position="right">
-					{ctx.user ? <Menu.Item as={Link} to="/records">
-						{"My Records"}
-					</Menu.Item>: null
-					}
-					{ctx.user?.role === 1 ?
-						<Menu.Item as={Link} to="/admin/user">
-							{"Admin"}
-						</Menu.Item>: null}
-					{ctx.user?.role === 3 ?
-						<Menu.Item as={Link} to="/instructor/class">
-							{"Manage Class"}
-						</Menu.Item>: null}
+					{ctx.user ? <Menu.Item as={Link} to="/records">My Records</Menu.Item> : null}
+					{ctx.user?.role === "admin" ?
+						<Menu.Item as={Link} to="/admin/user">Admin</Menu.Item> : null}
+					{ctx.user?.role === "instructor" ?
+						<Menu.Item as={Link} to="/instructor/class">Manage Class</Menu.Item>: null}
 					{/*<Cart />*/}
 					{ctx.user ? <Profile /> : <LoginSignUp />}
 				</Menu.Item>

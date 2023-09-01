@@ -1,6 +1,7 @@
 export default interface User {
 	readonly id: number;
-	readonly name: string;
+	readonly firstName: string;
+	readonly lastName: string;
 	readonly email: string;
-	readonly role: number;
+	readonly role: string;
 }

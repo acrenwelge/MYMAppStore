@@ -8,7 +8,7 @@ import {
     Loader, Dimmer, Button
 } from "semantic-ui-react";
 import {useHistory} from "react-router-dom";
-import {getRecords} from "../../api/user";
+import {getUserSubscriptions} from "../../api/user";
 
 
 interface Records {
@@ -39,21 +39,17 @@ const formatDate = (dateTime:string):string =>{
 const UserRecordInfo: React.FC = (props): JSX.Element | null => {
     const history = useHistory()
     const user: localUser | null = JSON.parse(localStorage.getItem('user') || 'null');
-
-
     if (!user) {
         // Redirect to main page
         history.push('/');
         return null;
     }
-
-
-    const [Records, setRecords] = useState<Records[]>([]);
+    const [records, setRecords] = useState<Records[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setLoading(true);
-        getRecords()
+        getUserSubscriptions()
             .then(res => {
                 setRecords(res.data)
                 setLoading(false)
@@ -88,7 +84,7 @@ const UserRecordInfo: React.FC = (props): JSX.Element | null => {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {Records.map(record => (
+                                    {records.map(record => (
                                         <Table.Row key={record.record_id}>
                                             <Table.Cell>{record.item_name}</Table.Cell>
                                             <Table.Cell>{formatDate(record.expirationDate)}</Table.Cell>

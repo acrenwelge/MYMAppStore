@@ -11,7 +11,7 @@ const Profile: React.FC = (): JSX.Element => {
 	const history = useHistory();
 
 	return (
-		<Dropdown as={Menu.Item} item text={ctx.user!.name}>
+		<Dropdown as={Menu.Item} item text={ctx.user!.firstName}>
 			<Dropdown.Menu>
 
 				<Dropdown.Item
@@ -20,8 +20,7 @@ const Profile: React.FC = (): JSX.Element => {
 						localStorage.removeItem('token');
 						ctx.setUser!(undefined);
 						history.push("/");
-					}}
-				>
+					}}>
 					Logout
 				</Dropdown.Item>
 			</Dropdown.Menu>

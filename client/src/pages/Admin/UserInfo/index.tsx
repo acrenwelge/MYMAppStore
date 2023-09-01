@@ -18,14 +18,15 @@ import 'react-toastify/dist/ReactToastify.min.css';
 interface UserData {
     id: number;
     email: string;
-    name: string;
+    firstName: string;
+    lastName: string;
     activatedAccount: boolean;
     createdAt: string;
-    role: number;
+    role: string;
 }
 
 interface localUser {
-    role: number;
+    role: string;
 }
 const formatDate = (dateTime:string):string =>{
     const date= new Date(new Date(dateTime).toLocaleString())
@@ -38,7 +39,7 @@ interface localState {
     sortBy: string; // 'email', 'name', 'createdAt'
     sortDirection: 'ascending' | 'descending' | undefined;
     filterActivated: boolean | null;
-    filterRole: 1 | 2 | null;
+    filterRole: "admin" | "user" | "instructor" | null;
     filterText: string;
 }
 
@@ -46,7 +47,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     const history = useHistory()
     const user: localUser | null = JSON.parse(localStorage.getItem('user') || 'null');
     
-    if (!user || user.role !== 1) {
+    if (!user || user.role !== "admin") {
         // Redirect to main page
         history.push('/');
         return null;
@@ -71,7 +72,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         if (state.filterRole !== null && user.role !== state.filterRole) {
             return false;
         }
-        if (state.filterText !== '' && !user.email.includes(state.filterText) && !user.name.includes(state.filterText)) {
+        if (state.filterText !== '' && !user.email.includes(state.filterText) && !user.firstName.includes(state.filterText)) {
             return false;
         }
         return true;
@@ -84,7 +85,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 sortedUsers = sortedUsers.sort((a, b) => a['email'].localeCompare(b['email']));
                 break;
             case 'name':
-                sortedUsers = sortedUsers.sort((a, b) => a['name'].localeCompare(b['name']));
+                sortedUsers = sortedUsers.sort((a, b) => a['firstName'].localeCompare(b['firstName']));
                 break;
             case 'createdAt':
                 sortedUsers = sortedUsers.sort((a, b) => a['createdAt'].localeCompare(b['createdAt']));
@@ -96,7 +97,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 sortedUsers = sortedUsers.sort((a, b) => b['email'].localeCompare(a['email']));
                 break;
             case 'name':
-                sortedUsers = sortedUsers.sort((a, b) => b['name'].localeCompare(a['name']));
+                sortedUsers = sortedUsers.sort((a, b) => b['firstName'].localeCompare(a['firstName']));
                 break;
             case 'createdAt':
                 sortedUsers = sortedUsers.sort((a, b) => b['createdAt'].localeCompare(a['createdAt']));
@@ -143,7 +144,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                     case 'role':
                         return {
                             ...state,
-                            filterRole: state.filterRole === null ? 1 : state.filterRole === 1 ? 2 : null,
+                            filterRole: state.filterRole === null ? "admin" : state.filterRole === "admin" ? "user" : null,
                         }
                     default: throw new Error("invalid filter field")
                 }
@@ -260,14 +261,13 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                     </div>
                                 }
                                 {state.filterRole === null ? null : 
-                                    <div>Filtering by: {state.filterRole === 1 ? 'Admin' : 'User'}
+                                    <div>Filtering by: {state.filterRole}
                                     </div>
                                 }
                             </Container>
 
-                            <Input label="Search by Email or Username:" icon='search' placeholder='email@domain.com'
+                            <Input label="Search by Email or Name:" icon='search' placeholder='email@domain.com'
                                 onChange={(e) => handleFilterTextChange(e)}/>
-
                             <Table sortable>
                                 <Table.Header>
                                     <Table.Row>
@@ -275,8 +275,11 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                         sorted={state.sortBy === 'email' ? state.sortDirection : undefined}
                                         onClick={() => handleSortChange('email')}>Email</Table.HeaderCell>
                                         <Table.HeaderCell 
+                                        sorted={state.sortBy === 'firstName' ? state.sortDirection : undefined}
+                                        onClick={() => handleSortChange('firstName')}>First Name</Table.HeaderCell>
+                                        <Table.HeaderCell 
                                         sorted={state.sortBy === 'name' ? state.sortDirection : undefined}
-                                        onClick={() => handleSortChange('name')}>Username</Table.HeaderCell>
+                                        onClick={() => handleSortChange('lastName')}>Last Name</Table.HeaderCell>
                                         <Table.HeaderCell 
                                         sorted={state.sortBy === 'createdAt' ? state.sortDirection : undefined}
                                         onClick={() => handleSortChange('createdAt')}>Register Time</Table.HeaderCell>
@@ -291,15 +294,16 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                     {sortedUsers.map(user => (
                                         <Table.Row key={user.id}>
                                             <Table.Cell>{user.email}</Table.Cell>
-                                            <Table.Cell>{user.name}</Table.Cell>
+                                            <Table.Cell>{user.firstName}</Table.Cell>
+                                            <Table.Cell>{user.lastName}</Table.Cell>
                                             <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
                                             <Table.Cell>
-                                                {user.role == 1 ?
+                                                {user.role === "admin" ?
                                                     <Icon color='blue' name='checkmark' size='large' />:
                                                    <div></div>}
                                             </Table.Cell>
                                             <Table.Cell>
-                                                {user.activatedAccount?
+                                                {user.activatedAccount ?
                                                     <Icon color='green' name='checkmark' size='large' />:
                                                    <div></div>}
                                             </Table.Cell>

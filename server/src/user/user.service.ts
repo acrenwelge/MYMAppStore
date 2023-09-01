@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm";
 import {UserEntity} from "./entities/user.entity";
 import {Repository} from "typeorm";
 import {EmailService} from "../email/email.service";
-import {bcrypt} from 'bcrypt';
+import {hash, compare} from 'bcrypt';
 import { UserDto } from './user.dto';
 import { Roles } from 'src/roles/role.enum';
 import { SubscriptionService } from 'src/subscription/subscription.service';
@@ -21,20 +21,14 @@ export class UserService {
    * Inserts a new user into the database after checking that the email address is not already in use
    **/
   async localSignUp(userFromClient: UserDto) {
-    const email = userFromClient.email
-    const exists = await this.userRepo.exist({where: {email}})
+    const exists = await this.userRepo.exist({where: {email: userFromClient.email}})
     if (exists) {
-      console.log(`User email address ${email} already exists`)
+      console.log(`User email address ${userFromClient.email} already exists`)
       throw new ConflictException("User email address already exists")
     }
-    const newUserToCreate = new UserEntity()
-    bcrypt.hash(userFromClient.password, function(err, hash) {
-        if (err) {
-          console.log(err);
-          throw new Error("Error hashing password");
-        }
-        newUserToCreate.passwordHash = hash
-    });
+    const newUserToCreate = this.userRepo.create(userFromClient)
+    const hashed = await hash(userFromClient.password, 10)
+    newUserToCreate.passwordHash = hashed
     newUserToCreate.role = Roles.User // default to regular user. TODO: allow admin/instructor roles
     newUserToCreate.activatedAccount = false
     newUserToCreate.activationCode = this.generateActivationCode(userFromClient.firstName + userFromClient.lastName)
@@ -69,12 +63,13 @@ export class UserService {
     const email = loginUser.email
     const password = loginUser.password
     const user = await this.userRepo.findOne({ where:{email} });
-    return bcrypt.compare(password, user.passwordHash, function(err, result) {
-      if (err) {
-        throw new Error("Error comparing provided password to database hash")
-      }
-      return result ? user : Promise.reject(new UnauthorizedException("Incorrect email or password"))
-    });
+    console.log("hashed comparison value:",user.passwordHash)
+    console.log("password:",password)
+    const validCredentials = await compare(password, user.passwordHash)
+    if (!validCredentials) {
+      Promise.reject(new UnauthorizedException("Incorrect email or password"))
+    }
+    return user
   }
 
   async activateAccount(activationCode: string): Promise<UserEntity | null> {
@@ -145,14 +140,9 @@ export class UserService {
     userToUpdate.lastName = user.lastName || userToUpdate.lastName;
     userToUpdate.role = user.role || userToUpdate.role;
     if (user.password) {
-      bcrypt.hash(user.password, function(err, hash) {
-        if (err) {
-          console.log(err);
-          throw new Error("Error hashing new password");
-        }
-        console.log(`new password set for user ${user.firstName} ${user.lastName}`, hash);
-        userToUpdate.passwordHash = hash
-      });
+        const hashed = await hash(user.password, 10)
+        userToUpdate.passwordHash =  hashed
+        console.log(`new password set for user ${user.firstName} ${user.lastName} - ${hashed}`);
     }
     await this.userRepo.update(userToUpdate.userId,userToUpdate);
     return userToUpdate

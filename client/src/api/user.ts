@@ -1,9 +1,9 @@
 import { request } from "./baseRequest"
 
-export function getRecords():Promise<any> {
+export function getUserSubscriptions():Promise<any> {
     return request({
         method: 'get',
-        url: `api/record/record`
+        url: `api/subscription`
     })
 }
 

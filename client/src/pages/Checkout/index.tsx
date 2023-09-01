@@ -3,7 +3,7 @@ import React, { useContext, useRef, useEffect, useLayoutEffect, useState, useCal
 import ReactDOM from "react-dom"
 import { Table, Container, Header, Button, Input, Icon, Item, Message, Form, ModalActions } from "semantic-ui-react";
 import { ApplicationContext } from "../../context";
-import { getCurrentItem, checkPurchaseCode, addRecord, addTransaction } from "../../api/checkout"
+import { getCurrentItem, checkPurchaseCode, addSubscription, addTransaction } from "../../api/checkout"
 
 // @ts-ignore
 const PayPalButton = paypal.Buttons.driver("react", { React, ReactDOM });

@@ -24,12 +24,13 @@ export class AuthController {
         return this.userService.localSignUpForClass(newUsers);
     }
 
+    /**
+     * Authenticates a user with email and password and returns a JWT token
+     */
     @Post("local-login")
     @HttpCode(200)
-    @UseGuards(LocalAuthGuard)
-    // local strategy has a default name of 'local'. code supplied by the passport-local package
     public async localLogin(@Body() user: UserDto) {
-        console.log("user:",user)
+        await this.userService.authenticate(user)
         return this.authService.login(user)
     }
 

@@ -17,7 +17,8 @@ const ThirdPartyAuthenticators: React.FC<ThirdPartyAuthenticatorsProps> = (props
 		console.log("success:", res);
 		const user: User = {
 			id: res.profileObj.googleId,
-			name: res.profileObj.name,
+			firstName: res.profileObj.firstName,
+			lastName: res.profileObj.lastName,
 			email: res.profileObj.email,
 			role:res.profileObj.role
 		};

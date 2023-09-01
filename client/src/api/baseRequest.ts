@@ -34,6 +34,7 @@ service.interceptors.response.use(
 )
 
 export function request(config:AxiosRequestConfig):Promise<AxiosResponse> {
+    console.log("REQUEST BODY: ",config.data)
     return service(config)
 }
 
