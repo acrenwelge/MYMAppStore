@@ -4,10 +4,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 
 import {UserService} from "../user/user.service";
-import {User} from "../user/entities/user.entity";
-import {RecordService} from "../record/record.service";
+import {UserEntity} from "../user/entities/user.entity";
+import {SubscriptionService} from "../subscription/subscription.service";
 import {getRepositoryToken} from "@nestjs/typeorm";
-import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
+import {CreateTransactionDto} from "../transaction/transaction.dto";
 import {createRequest} from "node-mocks-http";
 
 describe('AuthController', () => {
@@ -26,7 +26,7 @@ describe('AuthController', () => {
         },
         {
           provide: UserService,
-          useValue: createMock<User>(),
+          useValue: createMock<UserEntity>(),
         }
       ]
     }).compile();
@@ -45,7 +45,7 @@ describe('AuthController', () => {
 
 
   it('calling local sign up method', () => {
-    const user = new User();
+    const user = new UserEntity();
     user.email = "ncc@me.com";
     controller.create(user);
     expect(userservice.localSignUp).toHaveBeenCalledWith(user);

@@ -64,6 +64,10 @@ const NavMenu: React.FC = (): JSX.Element => {
 						<Menu.Item as={Link} to="/admin/user">
 							{"Admin"}
 						</Menu.Item>: null}
+					{ctx.user?.role === 3 ?
+						<Menu.Item as={Link} to="/instructor/class">
+							{"Manage Class"}
+						</Menu.Item>: null}
 					{/*<Cart />*/}
 					{ctx.user ? <Profile /> : <LoginSignUp />}
 				</Menu.Item>

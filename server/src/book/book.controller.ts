@@ -11,10 +11,10 @@ export class BookController {
     @UseGuards(JwtAuthGuard)
     @Get("read")
     async read(@Request() req) {
-        // console.log(req.user)
         const userId = req.user.user_id
-        const itemName = 'Calculus1, 2&3'
-        const readValidation = await this.bookService.getBookURL(userId,itemName)
+        // TODO: differentiate between items instead of hard-coding
+        const itemId = 1
+        const readValidation = await this.bookService.getBookURL(userId,itemId)
         return {readValidation}
     }
 

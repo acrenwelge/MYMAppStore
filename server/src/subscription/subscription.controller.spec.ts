@@ -1,29 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecordController } from './record.controller';
-import { RecordService } from './record.service';
-import { Record } from './entities/record.entity';
+import { SubscriptionController } from './subscription.controller';
+import { SubscriptionService } from './subscription.service';
+import { SubscriptionEntity } from './subscription.entity';
 import { createMock } from '@golevelup/ts-jest';
-import { CreateRecordDto } from './dto/create-record.dto';
+import { SubscriptionDto } from './subscription.dto';
 import { createRequest } from 'node-mocks-http';
 
 describe('RecordController', () => {
-  let controller: RecordController;
-  let service: RecordService;
+  let controller: SubscriptionController;
+  let service: SubscriptionService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [RecordController],
+      controllers: [SubscriptionController],
       providers: [
-        RecordService,
+        SubscriptionService,
         {
-          provide: RecordService,
-          useValue: createMock<RecordService>(),
+          provide: SubscriptionService,
+          useValue: createMock<SubscriptionService>(),
         }
       ]
     }).compile();
 
-    controller = module.get<RecordController>(RecordController);
-    service = module.get<RecordService>(RecordService);
+    controller = module.get<SubscriptionController>(SubscriptionController);
+    service = module.get<SubscriptionService>(SubscriptionService);
   });
 
   afterAll(() => {
@@ -35,7 +35,7 @@ describe('RecordController', () => {
   });
 
   it('calling create method', () => {
-    const dto: CreateRecordDto = new CreateRecordDto();
+    const dto: SubscriptionDto = new SubscriptionDto();
     controller.create(dto);
     expect(service.create).toHaveBeenCalledWith(dto);
   });
@@ -50,7 +50,7 @@ describe('RecordController', () => {
     });
 
     controller.findAll(req);
-    expect(service.findAll).toHaveBeenCalledWith(+userid);
+    expect(service.findAllForUser).toHaveBeenCalledWith(+userid);
   });
 
   it('calling findOne method', () => {
@@ -63,7 +63,7 @@ describe('RecordController', () => {
     const id = "123";
     const user_id = 1;
     const item_id = 1;
-    const rec = new Record();
+    const rec = new SubscriptionEntity();
     controller.update(id, user_id, item_id);
     expect(service.update).toBeCalledWith(user_id, item_id);
   });

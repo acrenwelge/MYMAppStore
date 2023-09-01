@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ThirdPartyAuthenticators from "../../components/ThirdPartyAuthenticators";
 import Page from "../../components/Page";
-import LocalSignUpForm from "./IndividualSignUpForm";
+import IndividualSignUpForm from "./IndividualSignUpForm";
 import { Button, Container } from "semantic-ui-react";
 import InstructorClassSignUpForm from "./InstructorClassSignUpForm";
 
@@ -17,7 +17,7 @@ const SignUp: React.FC = (): JSX.Element => {
 				<Button color="green" onClick={()=>setIsIndividual(false)}>Instructor Sign-Up</Button>
 			</Button.Group>
 			<Container>
-				{ isIndividual ? <LocalSignUpForm /> : <InstructorClassSignUpForm />}
+				{ isIndividual ? <IndividualSignUpForm /> : <InstructorClassSignUpForm />}
 				{/* TODO: Third party authenticators? */}
 				{/*<ThirdPartyAuthenticators action="sign-up" />*/}
 			</Container>

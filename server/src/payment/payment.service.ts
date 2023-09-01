@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import * as paypal from "./paypal-api";
-import { RecordService } from 'src/record/record.service';
+import { SubscriptionService } from 'src/subscription/subscription.service';
 import {TransactionService} from "../transaction/transaction.service";
+import { TransactionDto } from 'src/transaction/transaction.dto';
 
 
 @Injectable()
 export class PaymentService {
 
-    constructor(private readonly recordService: RecordService,
+    constructor(private readonly subscriptionService: SubscriptionService,
                 private readonly transactionService:TransactionService) {}
 
     async create(req, res) {
@@ -32,11 +33,12 @@ export class PaymentService {
         }
     }
 
-    async finishPurchasing(user_id:number,code_id:number,item_id:number,price:number) {
-        const recordResult = await this.recordService.update(user_id, item_id);
-        const transactionResult = await this.transactionService.update(user_id, item_id, code_id,price);
-        return {
-            recordResult,transactionResult
-        }
+    /**
+     * Creates the transaction and subscription database records.
+     * If a subscription already exists for the item, it updates the expiration date.
+     * @returns 
+     */
+    async recordPurchase() {
+        // TODO: implement
     }
 }

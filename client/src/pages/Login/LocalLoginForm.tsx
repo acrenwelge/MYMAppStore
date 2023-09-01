@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useContext, useReducer, Reducer } from "react";
 import { Form, Button, FormProps, Message, Loader, Segment, Icon, Header } from "semantic-ui-react";
-import CryptoJS from "crypto-js";
 import {useHistory, useLocation} from "react-router-dom";
 import { ApplicationContext } from "../../context";
 import { User } from "../../entities";
@@ -52,7 +51,7 @@ const LocalLoginForm: React.FC = (): JSX.Element => {
 		(data: FormProps) => {
 			formStateDispatch({ type: "LOADING" });
 			localLoginApi({
-				email:formValues.email,
+				email: formValues.email,
 				password: formValues.password
 			}).then(async (res) => {
 				const user = res.data.user

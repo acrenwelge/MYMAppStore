@@ -1,8 +1,16 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany} from "typeorm";
-import {Exclude} from '@nestjs/class-transformer'
-import {Transaction} from "../transaction/entities/transaction.entity";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { TransactionEntity } from "../transaction/entities/transaction.entity";
+import { ItemEntity } from "src/item/item.entity";
 
-@Entity()
+/**
+ * @description A purchase code that can be used to purchase a specific item at a discount
+ * @property {number} code_id - unique purchase code identifier
+ * @property {string} name - name of the purchase code
+ * @property {@link ItemEntity} item - the item that this purchase code can apply to
+ * @property {number} priceOff - amount of dollars that the purchase code takes off the price of an item
+ * @property {@link TransactionEntity} transactions - a list of transactions that include this purchase code
+ */
+@Entity("purchase_code")
 export class PurchaseCodeEntity {
 
     @PrimaryGeneratedColumn({name: "purchaseCode_id"})
@@ -11,10 +19,11 @@ export class PurchaseCodeEntity {
     @Column()
     public name: string;
 
+    @ManyToOne(() => ItemEntity, item => item.itemId)
+    @JoinColumn({ name: 'item_id' })
+    public item: ItemEntity;
+
     @Column()
     public priceOff: number;
-
-    @OneToMany(() => Transaction, transaction => transaction.purchasecode)
-    transaction: Transaction[]
 
 }

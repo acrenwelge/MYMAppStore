@@ -1,46 +1,56 @@
-import { Injectable } from '@nestjs/common';
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ItemDto } from './item.dto';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
-import { ConflictException } from '@nestjs/common';
-import { Item } from './entities/item.entity';
+import { ItemEntity } from './item.entity';
 
 @Injectable()
 export class ItemService {
 
   constructor(
-    @InjectRepository(Item)
-    private ItemRepo: Repository<Item>,  // 使用泛型注入对应类型的存储库实例
+    @InjectRepository(ItemEntity)
+    private ItemRepo: Repository<ItemEntity>,
 ) {}
 
-  create(createItemDto: CreateItemDto) {
-    return 'This action adds a new item';
+  convertToDto(ent: ItemEntity): ItemDto {
+    const dto = new ItemDto();
+    dto.itemId = ent.itemId;
+    dto.name = ent.name;
+    dto.price = ent.price;
+    dto.subscriptionLengthMonths = ent.subscriptionLengthMonths;
+    return dto;
+  }
+
+  async create(createItemDto: ItemDto) {
+    const item = this.ItemRepo.create(createItemDto);
+    return this.ItemRepo.save(item);
   }
 
   async findAll() {
-    const items = await this.ItemRepo.find({
-      select:{
-        id: true,
-        name: true,
-        length: true,
-        price: true
-      }
-    })
-    return items;
+    const items = await this.ItemRepo.find()
+    return items.map((item) => this.convertToDto(item));
   }
 
-  async findOne(id: number):Promise<Item |　undefined> {
-    const item = await this.ItemRepo.findOne({where: {id}});
-    return item || null;
+  async findOne(id: number): Promise<ItemDto | undefined> {
+    const ent = await this.ItemRepo.findOne({where: {itemId: id}});
+    return ent ? this.convertToDto(ent) : undefined;
   }
 
-
-  update(id: number, updateItemDto: UpdateItemDto) {
-    return `This action updates a #${id} item`;
+  async update(id: number, updateItemDto: ItemDto) {
+    const itemEnt = await this.ItemRepo.findOne({where: {itemId: id}});
+    if (itemEnt) {
+      return this.ItemRepo.save(itemEnt);
+    } else {
+      throw new NotFoundException("Item could not be updated; Item not found");
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} item`;
+  async remove(id: number) {
+    const itemEnt = await this.ItemRepo.findOne({where: {itemId: id}});
+    if (itemEnt) {
+      return this.ItemRepo.remove(itemEnt);
+    } else {
+      throw new NotFoundException("Item could not be deleted; Item not found");
+    }
   }
 }

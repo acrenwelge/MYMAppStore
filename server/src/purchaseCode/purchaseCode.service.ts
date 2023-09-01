@@ -4,81 +4,89 @@ import {PurchaseCodeEntity} from "./purchaseCode.entity";
 import {Repository} from "typeorm";
 import { ConflictException } from '@nestjs/common';
 import { PurchaseCodeDto } from './purchaseCode.dto';
+import { ItemEntity } from 'src/item/item.entity';
+import { ItemService } from 'src/item/item.service';
 
 @Injectable()
 export class PurchaseCodeService {
 
   constructor(
-      @InjectRepository(PurchaseCodeEntity)
-      private purchaseCodeRepo: Repository<PurchaseCodeEntity>,  // 使用泛型注入对应类型的存储库实例
+      @InjectRepository(PurchaseCodeEntity) private purchaseCodeRepo: Repository<PurchaseCodeEntity>,
+      @InjectRepository(ItemEntity) private itemRepo: Repository<ItemEntity>,
   ) {}
 
-  create(createPurchaseCode: PurchaseCodeEntity) {
-    //ToDO if user already exist
-    return this.purchaseCodeRepo.save(createPurchaseCode)
+  private convertToDto(purchaseCode: PurchaseCodeEntity): PurchaseCodeDto {
+    let res = new PurchaseCodeDto();
+    res.codeId = purchaseCode.code_id;
+    res.name = purchaseCode.name;
+    res.item = {
+      itemId: purchaseCode.item.itemId,
+      itemName: purchaseCode.item.name
+    }
+    res.priceOff = purchaseCode.priceOff;
+    return res;
   }
 
-  async findAll() {
-    const purchaseCodes = await this.purchaseCodeRepo.find({
-      select:{
-        code_id: true,
-        name: true,
-        priceOff: true
-      }
-    })
-    return purchaseCodes
+  async findAll(): Promise<PurchaseCodeDto[]> {
+    const entities = await this.purchaseCodeRepo.find();
+    return entities.map(purchaseCode => this.convertToDto(purchaseCode));
   }
 
-  async findOne(code_id: number): Promise<PurchaseCodeEntity> {
+  async findOne(code_id: number): Promise<PurchaseCodeDto> {
     const purchaseCode = await this.purchaseCodeRepo.findOne({where: {code_id}});
     if (purchaseCode == null){
       throw new NotFoundException("Purchase code doesn't exist!");
     }
-    return Promise.resolve(purchaseCode);
+    return Promise.resolve(this.convertToDto(purchaseCode));
   }
 
-  async addOne(name: string, priceOff: number): Promise<PurchaseCodeEntity> {
-    const newCode = new PurchaseCodeEntity();
-    newCode.name = name;
-    newCode.priceOff = priceOff;
-    const oldCode = await this.purchaseCodeRepo.findOne({where: {name}});
-    if (oldCode === null) {
+  // adds new purchase code and links to item if code name does not already exist
+  async addOne(codeToAdd: PurchaseCodeDto): Promise<PurchaseCodeDto> {
+    const existsAlready = this.purchaseCodeRepo.exist({ where: {name: codeToAdd.name}});
+    if (!existsAlready) {
+      const newCode = new PurchaseCodeEntity();
+      newCode.name = codeToAdd.name;
+      newCode.priceOff = codeToAdd.priceOff;
+      newCode.item = await this.itemRepo.findOne({where: {itemId: codeToAdd.item.itemId}});
       const purchaseCode = await this.purchaseCodeRepo.save(newCode);
-      return purchaseCode;
+      return this.convertToDto(purchaseCode);
     } else {
-      throw new ConflictException("Purchase code already exist!");
+      throw new ConflictException("Purchase code name already exists!");
     }
   }
 
-  async deleteCode(code_id: number): Promise<PurchaseCodeEntity>{
+  async deleteCode(code_id: number): Promise<PurchaseCodeDto>{
     const findCode = await this.purchaseCodeRepo.findOne({where: {code_id}});
     if (findCode != null) {
       await this.purchaseCodeRepo.remove(findCode);
-      return findCode;
+      return Promise.resolve(this.convertToDto(findCode));
     } else {
       throw new ConflictException("Purchase code doesn't exist!");
     }
   }
 
-  async validateCode(name:string): Promise<PurchaseCodeEntity>{
+  async validateCode(name:string): Promise<PurchaseCodeDto>{
     const findCode = await this.purchaseCodeRepo.findOne({where: {name}});
     if (findCode != null) {
-      return findCode;
+      return Promise.resolve(this.convertToDto(findCode));
     } else {
-      throw new ConflictException("Purchase code doesn't exist!");
+      return Promise.reject("Purchase code doesn't exist!");
     }
   }
 
-  async update(code: PurchaseCodeDto): Promise<PurchaseCodeEntity> {
-    const code_id = code.id;
-    const findCode = await this.purchaseCodeRepo.findOne({where: {code_id}});
+  async update(code: PurchaseCodeDto): Promise<PurchaseCodeDto> {
+    const findCode = await this.purchaseCodeRepo.findOne({where: {code_id: code.codeId}});
     if (findCode === null) {
       throw new NotFoundException("Purchase code doesn't exist!");
     }
     findCode.priceOff = code.priceOff;
     findCode.name = code.name;
+    findCode.item = await this.itemRepo.findOne({where: {itemId: code.item.itemId}});
+    if (findCode.item === null) {
+      throw new NotFoundException("Item for the purchase code does not exist!");
+    }
     await this.purchaseCodeRepo.save(findCode);
-    return Promise.resolve(findCode);
+    return Promise.resolve(this.convertToDto(findCode));
   }
 
 }

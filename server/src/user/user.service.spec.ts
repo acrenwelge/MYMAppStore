@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
-import {User} from "../user/entities/user.entity";
+import {UserEntity} from "../user/entities/user.entity";
 import {Repository} from "typeorm";
 import {MockType} from "../transaction/transaction.service.spec";
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -10,7 +10,7 @@ import {EmailService} from "../email/email.service";
 describe('UserService', () => {
   let service: UserService;
   let emailservice: EmailService;
-  let repositoryMock: MockType<Repository<User>>;
+  let repositoryMock: MockType<Repository<UserEntity>>;
 
   // const UserServiceMock =
   //     { localSignUp: jest.fn(),
@@ -32,15 +32,15 @@ describe('UserService', () => {
             useValue: createMock<EmailService>(),
           },
           {
-            provide: getRepositoryToken(User),
-            useValue: createMock<User>(),
+            provide: getRepositoryToken(UserEntity),
+            useValue: createMock<UserEntity>(),
           }
     ],
     }).compile();
 
     service = module.get<UserService>(UserService);
     emailservice = module.get<EmailService>(EmailService);
-    repositoryMock = module.get(getRepositoryToken(User));
+    repositoryMock = module.get(getRepositoryToken(UserEntity));
   });
 
   afterAll(() => {
@@ -53,7 +53,7 @@ describe('UserService', () => {
 
   it('should signup locally', async () => {
       const olduser = null;
-      const testuser = new User();
+      const testuser = new UserEntity();
       jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => olduser);
       jest.spyOn(repositoryMock, 'save').mockImplementation(() => testuser);
       jest.spyOn(emailservice, 'sendActivateAccountEmail').mockReturnValue(Promise.resolve());
@@ -72,10 +72,10 @@ describe('UserService', () => {
 
   it('should activate an account', async () => {
     const activcode = "a";
-    const olduser = new User();
+    const olduser = new UserEntity();
     olduser.activationCode = activcode;
     olduser.activatedAccount = false;
-    const newuser = new User();
+    const newuser = new UserEntity();
     newuser.activationCode = activcode;
     newuser.activatedAccount = true;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => olduser);
@@ -89,14 +89,14 @@ describe('UserService', () => {
   });
 
   it('should find one user', async () => {
-    const result = new User();
+    const result = new UserEntity();
     result.email = "ncc@me.com";
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
     expect(await service.findOneByEmail("ncc@me.com")).toBe(result);
   });
 
   it('should authenticate a user', async () => {
-    const result = new User();
+    const result = new UserEntity();
     result.email = "test@mail.com";
     result.password = "abcdefg";
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
@@ -104,7 +104,7 @@ describe('UserService', () => {
   });
 
   it('should NOT authenticate a user', async () => {
-    const result = new User();
+    const result = new UserEntity();
     result.email = "test@mail.com";
     result.password = "abcdefg";
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => null);

@@ -2,6 +2,8 @@
 .DS_Store
 server/.DS_Store
 client/.DS_Store
+documentation/.DS_Store
+sql/*
 
 /node_modules
 node_modules

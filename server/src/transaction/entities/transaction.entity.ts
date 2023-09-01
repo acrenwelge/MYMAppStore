@@ -1,54 +1,32 @@
 /* eslint-disable prettier/prettier */
-import {
-    Column,
-    CreateDateColumn,
-    Double,
-    Entity,
-    JoinColumn,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-    UpdateDateColumn
-} from "typeorm";
-import {Exclude} from '@nestjs/class-transformer'
-import {Item} from "../../item/entities/item.entity";
-import {PurchaseCodeEntity} from "../../purchaseCode/purchaseCode.entity";
-import {User} from "../../user/entities/user.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { UserEntity } from "../../user/entities/user.entity";
+import { TransactionDetailEntity } from "./transaction-detail.entity";
 
-@Entity()
-export class Transaction {
-    @PrimaryGeneratedColumn({name: "transaction_id"})
-    public id: number;
+/**
+ * @description A record of each purchase made in the system. This is used to track the purchase history of each user.
+ * Transactions can be purchases of one or more items.
+ * @property {number} txId - unique transaction identifier
+ * @property {number} transactionDetails - a list of items, purchase codes, and prices for each item in this transaction
+ * @property {number} user - the user who made this transaction
+ * @property {number} total - the price paid by the user in this transaction
+ * @property {Date} date - the date that this transaction was created
+ **/
+@Entity("transaction")
+export class TransactionEntity {
+    @PrimaryGeneratedColumn({ name: "transaction_id" })
+    public txId: number;
 
-    @Exclude()
-    @Column()
-    public item_id: number;
-    //public readonly item_name: string;
+    @OneToMany(() => TransactionDetailEntity, transactionDetail => transactionDetail.transaction)
+    public transactionDetails: TransactionDetailEntity[];
 
-    @ManyToOne(() => Item, item => item.transaction)
-    @JoinColumn({name: 'item_id'})
-    item: Item;
-
-    @Exclude()
-    @Column()
-    public code_id: number;
-    //public readonly code_name: string;
-
-    @ManyToOne(() => PurchaseCodeEntity, purchasecode => purchasecode.transaction)
-    @JoinColumn({name: 'code_id'})
-    purchasecode: PurchaseCodeEntity;
-
-    @Exclude()
-    @Column()
-    public user_id: number;
-    //public readonly user_name: string;
-
-    @ManyToOne(() => User, user => user.transaction)
-    @JoinColumn({name: 'user_id'})
-    user: User;
+    @ManyToOne(() => UserEntity, user => user.transactions)
+    @JoinColumn({ name: 'user_id' })
+    public user: UserEntity;
 
     @Column()
-    public price: number;
+    public total: number;
 
-    @CreateDateColumn({name: "created_at"})
-    public createdAt: Date;
+    @CreateDateColumn({ name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    public date: Date;
 }

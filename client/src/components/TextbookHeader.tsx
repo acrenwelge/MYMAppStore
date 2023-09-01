@@ -42,42 +42,42 @@ const TextbookHeader = (): JSX.Element => {
             <Button color="blue"  >{`Sample Chapter`}</Button>
             </a>
         </div>
-           <div>
-               <Table fixed>
-                   <Table.Header>
-                       {loading==true?<Dimmer active inverted>
-                           <Loader inverted>Loading Products</Loader>
-                       </Dimmer>:<></>
-                       }
-                       <Table.Row>
-                           <Table.HeaderCell>Book Name</Table.HeaderCell>
-                           <Table.HeaderCell>Length</Table.HeaderCell>
-                           <Table.HeaderCell>Price</Table.HeaderCell>
-                           <Table.HeaderCell></Table.HeaderCell>
-                       </Table.Row>
-                   </Table.Header>
-                   <Table.Body>
-                       {ItemData.map(Item => (
-                           <Table.Row key={Item.id}>
-                               <Table.Cell>{Item.name}</Table.Cell>
-                               <Table.Cell>{Item.length} Months</Table.Cell>
-                               <Table.Cell>${Item.price.toFixed(2)}</Table.Cell>
-                               <Table.Cell>
-                                   <Link to={{
-                                       pathname: `/checkout/${Item.id}`,
-                                   }}>   <Button  color='green' animated='fade'>
-                                       <Button.Content visible>Purchase</Button.Content>
-                                       <Button.Content hidden>
-                                           <Icon name='shopping bag' />
-                                       </Button.Content>
-                                   </Button>
-                                   </Link>
-                               </Table.Cell>
-                           </Table.Row>
-                       ))}
-                   </Table.Body>
-               </Table>
-           </div>
+        <div>
+            <Table fixed>
+                <Table.Header>
+                    {loading==true?<Dimmer active inverted>
+                        <Loader inverted>Loading Products</Loader>
+                    </Dimmer>:<></>
+                    }
+                    <Table.Row>
+                        <Table.HeaderCell>Book Name</Table.HeaderCell>
+                        <Table.HeaderCell>Length</Table.HeaderCell>
+                        <Table.HeaderCell>Price</Table.HeaderCell>
+                        <Table.HeaderCell></Table.HeaderCell>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                    {ItemData.map(Item => (
+                        <Table.Row key={Item.id}>
+                            <Table.Cell>{Item.name}</Table.Cell>
+                            <Table.Cell>{Item.length} Months</Table.Cell>
+                            <Table.Cell>${Item.price.toFixed(2)}</Table.Cell>
+                            <Table.Cell>
+                                <Link to={{
+                                    pathname: `/checkout/${Item.id}`,
+                                }}>   <Button  color='green' animated='fade'>
+                                    <Button.Content visible>Purchase</Button.Content>
+                                    <Button.Content hidden>
+                                        <Icon name='shopping bag' />
+                                    </Button.Content>
+                                </Button>
+                                </Link>
+                            </Table.Cell>
+                        </Table.Row>
+                    ))}
+                </Table.Body>
+            </Table>
+        </div>
 		</Container>
 	);
 };

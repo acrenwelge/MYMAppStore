@@ -2,8 +2,8 @@ import { createMock } from '@golevelup/ts-jest';
 import { TransactionService } from './transaction.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionController } from './transaction.controller';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
-import { Transaction } from './entities/transaction.entity';
+import { CreateTransactionDto } from './transaction.dto';
+import { TransactionEntity } from './entities/transaction.entity';
 
 
 describe('TransactionController', () => {
@@ -53,9 +53,9 @@ describe('TransactionController', () => {
 
   it('calling update method', () => {
     const id = "123";
-    const trans = new Transaction();
+    const trans = new TransactionEntity();
     controller.update(id, trans);
-    expect(service.update).toBeCalledWith(trans.user_id, trans.item_id, trans.code_id, trans.price);
+    expect(service.update).toBeCalledWith(trans.user_id, trans.itemId, trans.codeId, trans.total);
   });
 
   it('calling remove method', () => {

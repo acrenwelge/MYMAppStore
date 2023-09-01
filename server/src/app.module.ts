@@ -3,23 +3,24 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule} from "@nestjs/config";
 import {ServeStaticModule} from "@nestjs/serve-static";
 import {UserModule } from './user/user.module';
-import {User} from "./user/entities/user.entity";
+import {UserEntity} from "./user/entities/user.entity";
 import {AuthModule } from './auth/auth.module';
 import {AdminModule } from './admin/admin.module';
 import {TransactionModule } from './transaction/transaction.module';
-import {RecordModule } from './record/record.module';
+import {SubscriptionModule } from './subscription/subscription.module';
 import {ItemModule } from './item/item.module';
 import {PurchaseCodeModule } from './purchaseCode/purchaseCode.module';
-import {Item} from "./item/entities/item.entity";
+import {ItemEntity} from "./item/item.entity";
 import {PurchaseCodeEntity} from "./purchaseCode/purchaseCode.entity";
-import {Transaction} from "./transaction/entities/transaction.entity";
-import {Record} from "./record/entities/record.entity";
+import {TransactionEntity} from "./transaction/entities/transaction.entity";
+import {SubscriptionEntity} from "./subscription/subscription.entity";
 import { EmailModule } from './email/email.module';
 import { BookModule } from './book/book.module';
 
 import { PaymentModule } from './payment/payment.module';
-import {EmailSubscription} from "./email-subscription/email-subscription.entity";
+import {FreeSubscriptionEntity} from "./free-subscription/free-subscription.entity";
 import {join} from 'path';
+import { TransactionDetailEntity } from './transaction/entities/transaction-detail.entity';
 
 let envFilePath = [];
 if (process.env.RUNNING_ENV === 'dev') {
@@ -51,26 +52,24 @@ if (process.env.RUNNING_ENV === 'prod') {
             username: process.env.DB_Username,
             password: process.env.DB_Password,
             database: process.env.DB_Database,
-            entities:[User,Item,PurchaseCodeEntity,Record,Transaction,EmailSubscription],
+            entities:[
+                UserEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
+                TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
+            ],
             synchronize: process.env.ENV_TYPE === 'DEV' ? true: false,
         }),
         UserModule,
         AuthModule,
         AdminModule,
         TransactionModule,
-        RecordModule,
+        SubscriptionModule,
         ItemModule,
         PurchaseCodeModule,
         EmailModule,
         PaymentModule,
         BookModule,
-
     ],
     providers: [],
     controllers: [],
 })
-
-export class AppModule {
-    constructor() {
-    }
-}
+export class AppModule {}

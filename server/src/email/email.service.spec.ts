@@ -6,7 +6,7 @@ import {MockType} from "../transaction/transaction.service.spec";
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import {UserService} from "../user/user.service";
-import { User } from "../user/entities/user.entity";
+import { UserEntity } from "../user/entities/user.entity";
 import * as path from "path";
 import { async } from 'rxjs';
 
@@ -51,14 +51,14 @@ describe('EmailService', () => {
   });
 
   it ('should return when email is false', async () => {
-    const testuser = new User();
+    const testuser = new UserEntity();
     process.env.EMAIL_ENABLE = 'false';
     jest.spyOn(usrservice, 'activateAccount').mockImplementation(async() => testuser);
     await expect(service.sendActivateAccountEmail(testuser)).resolves.not.toThrow();
   });
 
   it ('should return when email is test', async () => {
-    const testuser = new User();
+    const testuser = new UserEntity();
     process.env.EMAIL_ENABLE = 'test';
     // jest.spyOn(usrservice, 'activateAccount').mockImplementation(async() => testuser);
     await expect(service.sendActivateAccountEmail(testuser)).resolves.not.toThrow();
@@ -66,7 +66,7 @@ describe('EmailService', () => {
 
   it('should send activate account email', async () => {
     process.env.EMAIL_ENABLE = 'none';
-    const testuser = new User();
+    const testuser = new UserEntity();
     testuser.activationCode='a'
     testuser.name = 'a'
     testuser.email = 'abcd'

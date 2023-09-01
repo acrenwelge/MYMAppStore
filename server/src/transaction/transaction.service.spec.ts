@@ -1,29 +1,29 @@
 import { TransactionService } from './transaction.service';
-import { Transaction } from "./entities/transaction.entity";
+import { TransactionEntity } from "./entities/transaction.entity";
 import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { CreateTransactionDto } from './transaction.dto';
 import { createMock } from '@golevelup/ts-jest';
 
 
 describe('TransactionService', () => {
   let service: TransactionService;
-  let repositoryMock: MockType<Repository<Transaction>>;
+  let repositoryMock: MockType<Repository<TransactionEntity>>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TransactionService,
         {
-          provide: getRepositoryToken(Transaction),
-          useValue: createMock<Transaction>(),
+          provide: getRepositoryToken(TransactionEntity),
+          useValue: createMock<TransactionEntity>(),
         }
       ],
     }).compile();
 
     service = module.get<TransactionService>(TransactionService);
-    repositoryMock = module.get(getRepositoryToken(Transaction));
+    repositoryMock = module.get(getRepositoryToken(TransactionEntity));
 
   });
 
@@ -36,8 +36,8 @@ describe('TransactionService', () => {
   });
 
   it('should fine one transaction', async () => {
-    const result = new Transaction();
-    result.id = 123;
+    const result = new TransactionEntity();
+    result.txId = 123;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
     expect(await service.findOne(123)).toBe(result);
   });
@@ -61,9 +61,9 @@ describe('TransactionService', () => {
   });
 
   it('should update a transaction', async () => {
-    const trans = new Transaction();
+    const trans = new TransactionEntity();
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
-    expect(await service.update(trans.user_id, trans.item_id, trans.code_id, trans.price)).toBe(true);
+    expect(await service.update(trans.user_id, trans.itemId, trans.codeId, trans.total)).toBe(true);
   });
 
 });

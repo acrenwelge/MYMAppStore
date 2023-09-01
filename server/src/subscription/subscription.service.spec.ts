@@ -1,36 +1,35 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RecordService } from './record.service';
-import { Record } from "./entities/record.entity";
+import { SubscriptionService } from './subscription.service';
+import { SubscriptionEntity } from "./subscription.entity";
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateRecordDto } from './dto/create-record.dto';
+import { SubscriptionDto } from './subscription.dto';
 import { createMock } from '@golevelup/ts-jest';
-import {Item} from "../item/entities/item.entity";
-import {Transaction} from "../transaction/entities/transaction.entity";
+import {ItemEntity} from "../item/item.entity";
 
 describe('RecordService', () => {
-  let service: RecordService;
-  let itemMock: MockType<Repository<Item>>;
-  let repositoryMock: MockType<Repository<Record>>;
+  let service: SubscriptionService;
+  let itemMock: MockType<Repository<ItemEntity>>;
+  let repositoryMock: MockType<Repository<SubscriptionEntity>>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        RecordService,
+        SubscriptionService,
         {
-          provide: getRepositoryToken(Item),
-          useValue: createMock<Item>(),
+          provide: getRepositoryToken(ItemEntity),
+          useValue: createMock<ItemEntity>(),
         },
         {
-          provide: getRepositoryToken(Record),
-          useValue: createMock<Record>(),
+          provide: getRepositoryToken(SubscriptionEntity),
+          useValue: createMock<SubscriptionEntity>(),
         }
       ],
     }).compile();
 
-    service = module.get<RecordService>(RecordService);
-    itemMock = module.get(getRepositoryToken(Item));
-    repositoryMock = module.get(getRepositoryToken(Record));
+    service = module.get<SubscriptionService>(SubscriptionService);
+    itemMock = module.get(getRepositoryToken(ItemEntity));
+    repositoryMock = module.get(getRepositoryToken(SubscriptionEntity));
   });
 
   afterAll(() => {
@@ -42,7 +41,7 @@ describe('RecordService', () => {
   });
 
   it('should create a record', async () => {
-    const rec = new CreateRecordDto();
+    const rec = new SubscriptionDto();
     const msg = `This action adds a new record`;
     jest.spyOn(repositoryMock, 'create').mockImplementation(() => true);
     expect(await service.create(rec)).toBe(msg);
@@ -51,7 +50,7 @@ describe('RecordService', () => {
   it('should find all record', async () => {
     const testid = 1;
     jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
-    expect(await service.findAll(testid)).toBe(true);
+    expect(await service.findAllForUser(testid)).toBe(true);
   });
 
   it('should fine one record', async () => {
@@ -71,24 +70,24 @@ describe('RecordService', () => {
 
 
   it('should update a record', async () => {
-    const updateitem = new Item();
-    const updateRec = new Record();
+    const updateitem = new ItemEntity();
+    const updateRec = new SubscriptionEntity();
     updateRec.expirationDate = new Date("2024-01-01");
 
     jest.spyOn(itemMock, 'findOne').mockImplementation(() => updateitem);
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => updateRec);
     jest.spyOn(itemMock, 'findOne').mockImplementation(() => updateitem);
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
-    expect(await service.update(updateRec.user_id, updateitem.id)).toBe(updateRec);
+    expect(await service.update(updateRec.user.userId, updateitem.itemId)).toBe(updateRec);
   });
 
   it('should check if user purchased item', async () => {
     const checkuserid = 1;
     const checkitemname = "calc";
-    const checkRec = new Record();
+    const checkRec = new SubscriptionEntity();
     checkRec.expirationDate = new Date("2024-01-01");
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => checkRec);
-    expect(await service.checkIfUserPurchaseItem(checkuserid, checkitemname)).toBe(true);
+    expect(await service.userHasValidSubscription(checkuserid, checkitemname)).toBe(true);
   });
 
 

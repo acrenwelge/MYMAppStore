@@ -1,12 +1,13 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
-
 import {TypeOrmModule} from "@nestjs/typeorm";
-import {User} from "./entities/user.entity";
-import {EmailModule} from "../email/email.module";
+import {UserEntity} from "./entities/user.entity";
+import { UserService } from './user.service';
+import { EmailModule } from "../email/email.module";
+import { SubscriptionService } from 'src/subscription/subscription.service';
+import { SubscriptionModule } from 'src/subscription/subscription.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([User]),EmailModule],
+  imports:[TypeOrmModule.forFeature([UserEntity]), EmailModule, SubscriptionModule],
   providers: [UserService],
   exports:[UserService]
 })

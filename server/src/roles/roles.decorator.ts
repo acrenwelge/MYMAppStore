@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
+import { Roles } from './role.enum';
 
-
-
-export const NeedRole = (role:number) => SetMetadata('role', role);
+// sets metadata for the required role of a user when accessing an endpoint
+export const NeedRole = (role: Roles) => SetMetadata('role', role);

@@ -1,38 +1,53 @@
-import {ConflictException, forwardRef, Inject, Injectable, NotFoundException} from '@nestjs/common';
+import {ConflictException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
-import {User} from "./entities/user.entity";
+import {UserEntity} from "./entities/user.entity";
 import {Repository} from "typeorm";
 import {EmailService} from "../email/email.service";
+import {bcrypt} from 'bcrypt';
+import { UserDto } from './user.dto';
+import { Roles } from 'src/roles/role.enum';
+import { SubscriptionService } from 'src/subscription/subscription.service';
 
 @Injectable()
 export class UserService {
 
   constructor(
-      @InjectRepository(User)
-      private readonly userRepo: Repository<User>,
-      @Inject(forwardRef(()=> EmailService)) private readonly emailService: EmailService
+      @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
+      @Inject(forwardRef(()=> EmailService)) private readonly emailService: EmailService,
+      @Inject(forwardRef(()=> SubscriptionService)) private readonly subscrService: SubscriptionService,
   ) {}
 
-  async localSignUp(createUser: User) {
-    const email = createUser.email
-    const user = await this.userRepo.findOne({where: {email}})
-    if (user != null) {
+  /**
+   * Inserts a new user into the database after checking that the email address is not already in use
+   **/
+  async localSignUp(userFromClient: UserDto) {
+    const email = userFromClient.email
+    const exists = await this.userRepo.exist({where: {email}})
+    if (exists) {
       console.log(`User email address ${email} already exists`)
       throw new ConflictException("User email address already exists")
-    } else {
-      createUser.role = 2
-      createUser.activatedAccount = false
-      createUser.activationCode = this.generateActivationCode(createUser.name)
-      const createResult = await this.userRepo.save(createUser)
-      return await this.emailService.sendActivateAccountEmail(createResult)
     }
+    const newUserToCreate = new UserEntity()
+    bcrypt.hash(userFromClient.password, function(err, hash) {
+        if (err) {
+          console.log(err);
+          throw new Error("Error hashing password");
+        }
+        newUserToCreate.passwordHash = hash
+    });
+    newUserToCreate.role = Roles.User // default to regular user. TODO: allow admin/instructor roles
+    newUserToCreate.activatedAccount = false
+    newUserToCreate.activationCode = this.generateActivationCode(userFromClient.firstName + userFromClient.lastName)
+    const retUserEntity = await this.userRepo.save(newUserToCreate)
+    const retUserDTO = this.convertToUserDTO(retUserEntity)
+    return await this.emailService.sendActivateAccountEmail(retUserDTO)
   }
 
   /**
    * Creates an entire group of users at once
    * Used by instructors to create a class of students
    **/
-  async localSignUpForClass(createUsers: User[]) {
+  async localSignUpForClass(createUsers: UserDto[]) {
     const createResults: Promise<void>[] = []
     console.log(createUsers)
     for (const newUser of createUsers) {
@@ -50,14 +65,19 @@ export class UserService {
     }
   }
 
-  async authenticate(loginUser: User): Promise<User> {
+  async authenticate(loginUser: UserDto): Promise<UserEntity> {
     const email = loginUser.email
     const password = loginUser.password
-    const user = await this.userRepo.findOne({ where:{email,password} });
-    return user || null;
+    const user = await this.userRepo.findOne({ where:{email} });
+    return bcrypt.compare(password, user.passwordHash, function(err, result) {
+      if (err) {
+        throw new Error("Error comparing provided password to database hash")
+      }
+      return result ? user : Promise.reject(new UnauthorizedException("Incorrect email or password"))
+    });
   }
 
-  async activateAccount(activationCode: string): Promise<User | null> {
+  async activateAccount(activationCode: string): Promise<UserEntity | null> {
     const user = await this.userRepo.findOne({ where: { activationCode:activationCode} });
     if (user === null) {
       throw new NotFoundException;
@@ -67,52 +87,88 @@ export class UserService {
     return user
   }
 
-  async findAll() {
+  async deactivateAccount(userId: number): Promise<UserEntity | null> {
+    const user = await this.userRepo.findOne({ where: { userId:userId} });
+    if (user === null) {
+      throw new NotFoundException;
+    }
+    user.activatedAccount = false;
+    await this.userRepo.save(user);
+    return user
+  }
+
+  async findAll(): Promise<UserDto[]> {
     const users = await this.userRepo.find({
       select:{
-        id: true,
-        name: true,
+        userId: true,
+        firstName: true,
         email: true,
         activatedAccount: true,
         createdAt: true,
         role: true,
       }
     })
-    return users
+    const dtoArr = users.map(user => this.convertToUserDTO(user))
+    return Promise.resolve(dtoArr)
   }
 
-  async findOneByEmail(email: string): Promise<User | undefined> {
+  async findOneByEmail(email: string): Promise<UserEntity | undefined> {
     const user = await this.userRepo.findOne({where: {email}});
     return user || null;
   }
 
-  async findOneById(id: number): Promise<User | undefined> {
-    const user = await this.userRepo.findOne({where: {id}});
+  async findOneById(id: number): Promise<UserEntity | undefined> {
+    const user = await this.userRepo.findOne({where: {userId: id}});
     return user || null;
-  }
-
-  /**
-   * Updates a user, with only the fields that are provided
-   */
-  async updateOne(user: User): Promise<User | undefined> {
-    const id = user.id;
-    const userToUpdate = await this.userRepo.findOne({where: {id}});
-    if (userToUpdate === null) {
-      throw new NotFoundException;
-    }
-    userToUpdate.name = user.name || userToUpdate.name;
-    userToUpdate.email = user.email || userToUpdate.email;
-    userToUpdate.role = user.role || userToUpdate.role;
-    userToUpdate.activatedAccount = user.activatedAccount === undefined ? userToUpdate.activatedAccount : user.activatedAccount;
-    userToUpdate.activationCode = user.activationCode || userToUpdate.activationCode;
-    userToUpdate.password = user.password || userToUpdate.password;
-    console.log(userToUpdate);
-    await this.userRepo.update(id,userToUpdate);
-    return userToUpdate
   }
 
   async deleteOne(id: number): Promise<void> {
     (await this.userRepo.delete(id))
+  }
+
+  /**
+   * Updates a user's profile information, with only the fields that are provided.
+   * User email updates are not currently supported because email is a unique user identifier.
+   * Account activation/deactivation is not supported here - it must be done through 
+   * the {@link UserService.activateAccount} and {@link UserService.deactivateAccount} methods.
+   */
+  async updateOne(user: UserDto): Promise<UserEntity | undefined> {
+    const email = user.email;
+    const userToUpdate = await this.userRepo.findOne({where: {email: email}});
+    if (userToUpdate === null) {
+      throw new NotFoundException;
+    }
+    if (user.email && user.email !== userToUpdate.email) {
+      throw new Error("Unsupported Operation: cannot update user email")
+    }
+    userToUpdate.firstName = user.firstName || userToUpdate.firstName;
+    userToUpdate.lastName = user.lastName || userToUpdate.lastName;
+    userToUpdate.role = user.role || userToUpdate.role;
+    if (user.password) {
+      bcrypt.hash(user.password, function(err, hash) {
+        if (err) {
+          console.log(err);
+          throw new Error("Error hashing new password");
+        }
+        console.log(`new password set for user ${user.firstName} ${user.lastName}`, hash);
+        userToUpdate.passwordHash = hash
+      });
+    }
+    await this.userRepo.update(userToUpdate.userId,userToUpdate);
+    return userToUpdate
+  }
+
+  // password will not be included in the returned DTO
+  private convertToUserDTO(user: UserEntity): UserDto {
+    let result = new UserDto()
+    result.userId = user.userId
+    result.firstName = user.firstName
+    result.lastName = user.lastName
+    result.email = user.email
+    result.role = user.role
+    result.activatedAccount = user.activatedAccount
+    result.createdAt = user.createdAt
+    return result
   }
 
 }

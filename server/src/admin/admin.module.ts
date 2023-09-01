@@ -4,11 +4,11 @@ import {UserModule} from "../user/user.module";
 import {RolesGuard} from "../auth/guards/roles.guard";
 import { PurchaseCodeModule } from 'src/purchaseCode/purchaseCode.module';
 import { TransactionModule } from 'src/transaction/transaction.module';
-import {EmailSubscriptionModule} from "../email-subscription/email-subscription.module";
+import {FreeSubscriptionModule} from "../free-subscription/free-subscription.module";
 import { EmailModule } from 'src/email/email.module';
 
 @Module({
-  imports:[UserModule, PurchaseCodeModule, TransactionModule,EmailSubscriptionModule,EmailModule],
+  imports:[UserModule, PurchaseCodeModule, TransactionModule,FreeSubscriptionModule,EmailModule],
   controllers: [AdminController],
   providers:[RolesGuard]
 })

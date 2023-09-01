@@ -1,60 +1,45 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTransactionDto } from './dto/create-transaction.dto';
+import { TransactionDto } from './transaction.dto';
 import {InjectRepository} from "@nestjs/typeorm";
-import {Transaction} from "./entities/transaction.entity";
+import {TransactionEntity} from "./entities/transaction.entity";
 import {Repository} from "typeorm";
+import { TransactionDetailEntity } from './entities/transaction-detail.entity';
 
 @Injectable()
 export class TransactionService {
 
   constructor(
-    @InjectRepository(Transaction)
-    private transactionRepo: Repository<Transaction>,  // 使用泛型注入对应类型的存储库实例
+    @InjectRepository(TransactionEntity)
+    private txRepo: Repository<TransactionEntity>,
+    @InjectRepository(TransactionDetailEntity)
+    private txDetailRepo: Repository<TransactionDetailEntity>,
 ) {}
 
-  create(createTransactionDto: CreateTransactionDto) {
-    return this.transactionRepo.save(createTransactionDto)
-    //return 'This action adds a new transaction';
+  create(newTx: TransactionDto) {
+    // is this needed?
+    // for (const detail of newTx.transactionDetails) {
+    //   const detailEnt = this.txDetailRepo.create(detail);
+    // }
+    const newTxEnt = this.txRepo.create(newTx)
+    return this.txRepo.save(newTxEnt)
   }
 
   async findAll() {
-    const transactions = await this.transactionRepo.find({
-      relations: ["item", "purchasecode", "user"],
-      select:{
-        id: true,
-        item_id: true,
-        code_id: true,
-        user_id: true,
-        createdAt: true,
-        price: true
-      }
-    })
+    const transactions = await this.txRepo.find();
+    // is this needed?
+    //   {
+    //   relations: ["item", "purchasecode", "user"],
+    //   select:{
+    //     txId: true,
+    //     date: true,
+    //     total: true
+    //   }
+    // })
     return transactions
-
-    //return `This action returns all transaction`;
   }
 
   async findOne(id: number) {
-    const transaction = await this.transactionRepo.findOne({where: {id}});
-    return transaction || null;
-    //return `This action returns a #${id} transaction`;
+    return await this.txRepo.findOne({where: {txId: id}});
   }
 
-  async update(user_id:number, item_id:number, code_id:number, price:number) {
-    const transaction = new Transaction();
-    transaction.code_id = code_id;
-    transaction.createdAt = new Date(Date.now());
-    transaction.item_id = item_id;
-    transaction.price = price;
-    transaction.user_id = user_id;
-    // console.log("Add transaction");
-    // console.log(transaction);
-    const newtrans = await this.transactionRepo.save(transaction);
-    return newtrans;
-    //return `This action updates a #${id} transaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} transaction`;
-  }
 }

@@ -1,0 +1,23 @@
+version: '1'
+
+services:
+
+  mysql:
+    image: mysql:8
+    container_name: local-db
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+
+  backend:
+    build: ./server
+    container_name: myma-backend-server
+    ports:
+      - 6324:6324
+    depends_on:
+      - mysql
+    env_file:
+      - ./server/.env.dev

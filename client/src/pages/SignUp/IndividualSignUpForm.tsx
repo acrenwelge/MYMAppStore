@@ -1,6 +1,5 @@
 import React, { useState, useCallback, useReducer, Reducer } from "react";
 import {Form, FormProps, Button, Message, Loader, Container} from "semantic-ui-react";
-import CryptoJS from "crypto-js";
 import {localSignupApi} from "../../api/auth";
 
 type FormValues = {
@@ -66,7 +65,7 @@ const formStateReducer = (state: FormActionState, action: FormAction): FormActio
 	}
 };
 
-const LocalSignUpForm: React.FC = (props): JSX.Element => {
+const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 	const emptyVals: FormValues = {
 		name: "",
 		email: "",
@@ -181,7 +180,7 @@ const LocalSignUpForm: React.FC = (props): JSX.Element => {
 				{/*<Form.Checkbox id="termsAndConditions" label="I agree to the terms and conditions" required />*/}
 
 				<Message
-					content="Your account has been successfully created. Please login to your email to confirm your account."
+					content="Your account has been successfully created. To login, first confirm your email using the link that was sent to the email address you provided."
 					header="SUCCESS"
 					success
 				/>
@@ -202,4 +201,4 @@ const LocalSignUpForm: React.FC = (props): JSX.Element => {
 	);
 };
 
-export default LocalSignUpForm;
+export default IndividualSignUpForm;

@@ -1,0 +1,9 @@
+<h2> Dear {{name}},</h2>
+
+<p>
+  Your MYMathApps account subscription is about to expire on {{expireDate}}. If you would like to maintain access to your MYMathApps products, please login and review the options to extend your subscription.
+</p>
+<p>
+  Sincerely,
+  The MYMathApps Team
+</p>

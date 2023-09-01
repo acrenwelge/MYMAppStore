@@ -2,17 +2,17 @@ import {Controller, ForbiddenException, Get, Injectable, Res} from '@nestjs/comm
 import { Response } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
-import {RecordService} from "../record/record.service";
-import {EmailSubscriptionService} from "../email-subscription/email-subscription.service";
+import {SubscriptionService} from "../subscription/subscription.service";
+import {FreeSubscriptionService} from "../free-subscription/free-subscription.service";
 import { UserService } from 'src/user/user.service';
-import { Role } from 'src/roles/role.enum';
+import { Roles } from 'src/roles/role.enum';
 
 @Injectable()
 export class BookService {
 
-    constructor(readonly recordService:RecordService,
-        readonly emailSubscriptionService:EmailSubscriptionService,
-        readonly userService:UserService) {
+    constructor(readonly subscriptionService: SubscriptionService,
+        readonly freeSubsService: FreeSubscriptionService,
+        readonly userService: UserService) {
     }
 
     // async getBookContent() {
@@ -23,20 +23,18 @@ export class BookService {
     //    return fileContent
     // }
 
-    async getBookURL(userID: number, itemName: string) {
+    async getBookURL(userID: number, itemId: number) {
         const user = await this.userService.findOneById(userID);
-        const ifPurchase = await this.recordService.checkIfUserPurchaseItem(userID, itemName);
-        const ifEmailSub = await this.emailSubscriptionService.checkIfUserEmailSubItem(user.email);
-        const allowableUserEmails = ["tamu.edu", "sc.edu"]
-        console.log(allowableUserEmails.includes(user.email.split("@")[1]));
-        if (ifPurchase || ifEmailSub || user.role == Role.Admin || allowableUserEmails.includes(user.email.split("@")[1])) {
+        const hasSubscription = await this.subscriptionService.userHasValidSubscription(userID, itemId);
+        const hasFreeAccess = await this.freeSubsService.userEmailHasFreeSubscription(user.email);
+        if (hasSubscription || hasFreeAccess || user.role == Roles.Admin) {
             return  {
                 bookURL: process.env.BOOK_ROOT_PATH,
-                ifPurchase:ifPurchase,
-                ifEmailSub:ifEmailSub
+                hasSubscription: hasSubscription,
+                hasFreeAccess: hasFreeAccess,
             }
         } else {
-            throw new ForbiddenException()
+            throw new ForbiddenException("User does not have a subscription or free access to this item.")
         }
     }
 }

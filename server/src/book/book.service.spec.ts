@@ -1,28 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BookService } from './book.service';
 import {createMock} from "@golevelup/ts-jest";
-import {RecordService} from "../record/record.service";
-import {EmailSubscriptionService} from "../email-subscription/email-subscription.service";
+import {SubscriptionService} from "../subscription/subscription.service";
+import {FreeSubscriptionService} from "../free-subscription/free-subscription.service";
 import { UserService } from 'src/user/user.service';
-import { User } from 'src/user/entities/user.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 import { ForbiddenException } from '@nestjs/common';
 
 describe('BookService', () => {
   let service: BookService;
-  let recordService: RecordService;
-  let emailSubscriptionService: EmailSubscriptionService;
+  let recordService: SubscriptionService;
+  let emailSubscriptionService: FreeSubscriptionService;
   let userService: UserService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [BookService,
         {
-          provide: RecordService,
-          useValue: createMock<RecordService>(),
+          provide: SubscriptionService,
+          useValue: createMock<SubscriptionService>(),
         },
         {
-          provide: EmailSubscriptionService,
-          useValue: createMock<EmailSubscriptionService>(),
+          provide: FreeSubscriptionService,
+          useValue: createMock<FreeSubscriptionService>(),
         },
         {
           provide: UserService,
@@ -31,8 +31,8 @@ describe('BookService', () => {
       ],
     }).compile();
     service = module.get<BookService>(BookService);
-    recordService = module.get<RecordService>(RecordService);
-    emailSubscriptionService = module.get<EmailSubscriptionService>(EmailSubscriptionService);
+    recordService = module.get<SubscriptionService>(SubscriptionService);
+    emailSubscriptionService = module.get<FreeSubscriptionService>(FreeSubscriptionService);
     userService = module.get<UserService>(UserService);
   });
 
@@ -46,12 +46,12 @@ describe('BookService', () => {
 
   it ('should allow A&M users to access any book', async () => {
     jest.spyOn(userService, 'findOneById').mockImplementation(async () => {
-      let user = new User();
+      let user = new UserEntity();
       user.email = "abc@tamu.edu"
       return user;
     });
     jest.spyOn(recordService, 'checkIfUserPurchaseItem').mockImplementation(async () => false);
-    jest.spyOn(emailSubscriptionService, 'checkIfUserEmailSubItem').mockImplementation(async () => false);
+    jest.spyOn(emailSubscriptionService, 'userEmailHasFreeSubscription').mockImplementation(async () => false);
     expect(await service.getBookURL(1,"dummyValue")).toStrictEqual(
       {bookURL: process.env.BOOK_ROOT_PATH,
       ifPurchase: false,
@@ -60,12 +60,12 @@ describe('BookService', () => {
 
   xit ('should not allow unauthorized users to access any book', async () => {
     jest.spyOn(userService, 'findOneById').mockImplementation(async () => {
-      let user = new User();
+      let user = new UserEntity();
       user.email = "abc@otherschool.com"
       return user;
     });
     jest.spyOn(recordService, 'checkIfUserPurchaseItem').mockImplementation(async () => false);
-    jest.spyOn(emailSubscriptionService, 'checkIfUserEmailSubItem').mockImplementation(async () => false);
+    jest.spyOn(emailSubscriptionService, 'userEmailHasFreeSubscription').mockImplementation(async () => false);
     expect(service.getBookURL(1,"dummyValue")).toThrowError(ForbiddenException);
   });
 

@@ -2,8 +2,7 @@ import {Body, Controller, Post, Req, Res, UseGuards, Request, HttpCode} from '@n
 import { PaymentService } from './payment.service';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import {Transaction} from "../transaction/entities/transaction.entity";
-import { User } from 'src/user/entities/user.entity';
+import {TransactionEntity} from "../transaction/entities/transaction.entity";
 
 @Controller('payment')
 export class PaymentController {
@@ -26,8 +25,9 @@ export class PaymentController {
     @HttpCode(200)
     @UseGuards(JwtAuthGuard)
     @Post('finish-purchasing')
-    async finishPurchasing(@Request() req, @Body() body: Transaction) {
-        return this.paymentService.finishPurchasing(req.user.user_id, body.code_id, body.item_id, body.price)
+    async finishPurchasing(@Request() req, @Body() body: TransactionEntity) {
+        // TODO: implement
+        return this.paymentService.recordPurchase()
     }
 }
 

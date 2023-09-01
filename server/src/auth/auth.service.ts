@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserService } from './../user/user.service';
 import { JwtService} from "@nestjs/jwt";
-import {Exclude, plainToClass, Transform} from "@nestjs/class-transformer";
-import {User} from "../user/entities/user.entity";
-
+import { UserDto } from 'src/user/user.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,20 +10,20 @@ export class AuthService {
         private jwtService:JwtService
     ) {}
 
-    async validateUserByEmail(email: string, password: string): Promise<any> {
+    async validateUserByEmail(email: string, hash: string): Promise<any> {
         const user = await this.userService.findOneByEmail(email);
-        // todo fix @exclude
-        if (user && user.password === password) {
-           const { password, googleAccessToken, temporaryPassword, activationCode, ...result} = user
-            return result
+        if (user && user.passwordHash === hash) {
+            return user
         }
         return null;
     }
 
-    async login(user:any) {
-        const payload = {email: user.email, sub: user.id, role:user.role}
+    async login(user: UserDto) {
+        console.log("logging in user:",user)
+        const userEntity = await this.userService.findOneByEmail(user.email);
+        const payload = {email: userEntity.email, sub: userEntity.userId, role: userEntity.role}
         return {
-            user:user,
+            user: userEntity,
             access_token: this.jwtService.sign(payload)
         }
     }

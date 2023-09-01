@@ -1,19 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PaymentService } from './payment.service';
-import { RecordService } from 'src/record/record.service';
+import { SubscriptionService } from 'src/subscription/subscription.service';
 import {TransactionService} from "../transaction/transaction.service";
 import * as paypal from "./paypal-api";
 import {EmailService} from "../email/email.service";
 import {createMock} from "@golevelup/ts-jest";
-import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
-import {Record} from "../record/entities/record.entity";
-import {Transaction} from "../transaction/entities/transaction.entity";
-
-
+import {CreateTransactionDto} from "../transaction/transaction.dto";
+import {SubscriptionEntity} from "../subscription/subscription.entity";
+import {TransactionEntity} from "../transaction/entities/transaction.entity";
 
 describe('PaymentService', () => {
   let service: PaymentService;
-  let recservice: RecordService;
+  let recservice: SubscriptionService;
   let transervice: TransactionService;
 
   beforeAll(async () => {
@@ -21,8 +19,8 @@ describe('PaymentService', () => {
       providers: [
           PaymentService,
         {
-          provide: RecordService,
-          useValue: createMock<RecordService>(),
+          provide: SubscriptionService,
+          useValue: createMock<SubscriptionService>(),
         },
         {
           provide: TransactionService,
@@ -32,7 +30,7 @@ describe('PaymentService', () => {
     }).compile();
 
     service = module.get<PaymentService>(PaymentService);
-    recservice = module.get<RecordService>(RecordService);
+    recservice = module.get<SubscriptionService>(SubscriptionService);
     transervice = module.get<TransactionService>(TransactionService);
   });
 
@@ -49,11 +47,11 @@ describe('PaymentService', () => {
     const codeid = 1;
     const itemid = 1;
     const price = 1;
-    const recordResult = new Record();
-    const transactionResult = new Transaction();
+    const recordResult = new SubscriptionEntity();
+    const transactionResult = new TransactionEntity();
     jest.spyOn(recservice, 'update').mockImplementation(async () => recordResult);
     jest.spyOn(transervice, 'update').mockImplementation(async () => transactionResult);
-    expect(await service.finishPurchasing(userid, codeid, itemid, price)).toEqual({recordResult, transactionResult});
+    expect(await service.recordPurchase(userid, codeid, itemid, price)).toEqual({recordResult, transactionResult});
   });
 
 

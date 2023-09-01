@@ -4,9 +4,9 @@ import { JwtService} from "@nestjs/jwt";
 import { UserService } from './../user/user.service';
 import {MockType} from "../transaction/transaction.service.spec";
 import {Repository} from "typeorm";
-import {User} from "../user/entities/user.entity";
+import {UserEntity} from "../user/entities/user.entity";
 import {createMock} from "@golevelup/ts-jest";
-import {Transaction} from "../transaction/entities/transaction.entity";
+import {TransactionEntity} from "../transaction/entities/transaction.entity";
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -37,8 +37,8 @@ describe('AuthService', () => {
   });
 
   it('should login', async () => {
-    const user = new User();
-    const payload = {email: user.email, sub: user.id, role:user.role};
+    const user = new UserEntity();
+    const payload = {email: user.email, sub: user.userId, role:user.role};
     const result = {user: user, access_token: jwtservice.sign(payload)};
     expect(await service.login(user)).toStrictEqual(result);
   });

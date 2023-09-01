@@ -1,30 +1,30 @@
 import { ItemService } from './item.service';
-import { Item } from "./entities/item.entity";
+import { ItemEntity } from "./item.entity";
 import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateItemDto } from './dto/create-item.dto';
+import { ItemDto } from './item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
 import { createMock } from '@golevelup/ts-jest';
 import {MockType} from "../transaction/transaction.service.spec";
 
 describe('ItemService', () => {
   let service: ItemService;
-  let repositoryMock: MockType<Repository<Item>>;
+  let repositoryMock: MockType<Repository<ItemEntity>>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ItemService,
         {
-          provide: getRepositoryToken(Item),
-          useValue: createMock<Item>(),
+          provide: getRepositoryToken(ItemEntity),
+          useValue: createMock<ItemEntity>(),
         }
       ],
     }).compile();
 
     service = module.get<ItemService>(ItemService);
-    repositoryMock = module.get(getRepositoryToken(Item));
+    repositoryMock = module.get(getRepositoryToken(ItemEntity));
   });
 
   afterAll(() => {
@@ -36,7 +36,7 @@ describe('ItemService', () => {
   });
 
   it('should create an item', async () => {
-    const item = new CreateItemDto();
+    const item = new ItemDto();
     const msg = `This action adds a new item`;
     expect(await service.create(item)).toBe(msg);
   });
@@ -47,8 +47,8 @@ describe('ItemService', () => {
   });
 
   it('should fine one item', async () => {
-    const result = new Item();
-    result.id = 123;
+    const result = new ItemEntity();
+    result.itemId = 123;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
     expect(await service.findOne(123)).toBe(result);
   });

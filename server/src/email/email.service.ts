@@ -4,8 +4,8 @@ import { createTransport, getTestMessageUrl } from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 import Handlebars from "handlebars";
 import {UserService} from "../user/user.service";
-import { User } from "../user/entities/user.entity";
 import * as path from "path";
+import { UserDto } from 'src/user/user.dto';
 
 type ActivateAccountParams = {
     name: string;
@@ -16,11 +16,25 @@ type ActivateAccountParams = {
     contactMailAddress: string;
 };
 
+type ReminderParams = {
+    name: string;
+    expireDate: string;
+}
+
+/**
+ * @description Service for sending emails to users. Initializes based on the EMAIL_ENABLE environment variable which
+ * can be one of three values:
+ * - "true" - emails are sent to users
+ * - "false" - emails are not sent to users
+ * - "test" - emails are not sent to users, but a preview URL is printed to the console for a dummy email
+ * Generally, "false" or "test" are used for development and "true" is used for production.
+ */
 @Injectable()
 export class EmailService implements OnModuleDestroy {
 
     private readonly transporter: Mail;
     private readonly activateAccountTemplateDelegate: HandlebarsTemplateDelegate<ActivateAccountParams>;
+    private readonly remindExpirationTemplateDelegate: HandlebarsTemplateDelegate<ReminderParams>;
     private readonly from?: string;
 
     private readonly logger = new Logger("EmailService");
@@ -32,6 +46,9 @@ export class EmailService implements OnModuleDestroy {
             const appDirectory = process.cwd();
             this.activateAccountTemplateDelegate = Handlebars.compile(
                 readFileSync(path.resolve(appDirectory,"src","email","templates","activate-account.template.txt")).toString()
+            );
+            this.remindExpirationTemplateDelegate = Handlebars.compile(
+                readFileSync(path.resolve(appDirectory,"src","email","templates","expiration-reminder.template.txt")).toString()
             );
             this.from = `MYMathApps <${process.env.EMAIL_USERNAME}>`;
             if (process.env.EMAIL_ENABLE === 'true' || process.env.EMAIL_ENABLE === 'test') {
@@ -62,35 +79,33 @@ export class EmailService implements OnModuleDestroy {
         }
     }
 
-    public async sendActivateAccountEmail(user: User): Promise<void> {
+    public async sendActivateAccountEmail(user: UserDto): Promise<void> {
+        const dbUser = await this.userService.findOneByEmail(user.email);
         if (process.env.EMAIL_ENABLE === 'false') {
-            await this.userService.activateAccount(user.activationCode!);
+            await this.userService.activateAccount(dbUser.activationCode!);
             this.logger.log("Mail disabled. Activate account manually.");
             return;
         }
         const htmlText = this.activateAccountTemplateDelegate({
-            name: user.name,
-            email: user.email,
+            name: dbUser.firstName + " " + dbUser.lastName,
+            email: dbUser.email,
             storeDomain: process.env.MYMASTORE_DOMAIN,
             activateAccountRoute: process.env.MYMA_ACTIVATE_ACCOUNT_ROUTE,
-            activationCode: user.activationCode!,
+            activationCode: dbUser.activationCode!,
             contactMailAddress: process.env.CONTACT_MAIL_ADDRESS
         });
-        this.sendEmail(user.email, "Activate MYMathApps Account", htmlText)
+        this.sendEmail(dbUser.email, "Activate MYMathApps Account", htmlText)
     }
 
     /**
      * TODO: retrieve subscription expiration date from database
      **/
-    public async sendReminderEmail(user: User): Promise<void> {
-        const text = `
-        Dear ${user.name},
-        Your MYMathApps account subscription is about to expire. If you would like to maintain access to your MYMathApps
-        products, please login and review the options to extend your subscription.
-        Sincerely,
-        The MYMathApps Team
-        `;
-        this.sendEmail(user.email, "MYMathApps Account About to Expire", text);
+    public async sendReminderEmail(user: UserDto): Promise<void> {
+        const htmlText = this.remindExpirationTemplateDelegate({
+            name: user.firstName + " " + user.lastName,
+            expireDate: "TODO"
+        });
+        this.sendEmail(user.email, "MYMathApps Account About to Expire", htmlText);
     }
 
     public async sendEmail(email: string, subject: string, text: string): Promise<void> {
@@ -106,10 +121,10 @@ export class EmailService implements OnModuleDestroy {
         })
         .then((info) => {
             console.log(`Sent email to ${email} from ${this.from}`);
-                if (process.env.EMAIL_ENABLE === 'test') {
-                    console.log('TESTING MODE - no email was sent');
-                    console.log('Preview URL: ' + getTestMessageUrl(info));
-                }
+            if (process.env.EMAIL_ENABLE === 'test') {
+                console.log('TESTING MODE - no email was sent');
+                console.log('Preview URL: ' + getTestMessageUrl(info));
+            }
         })
         .catch((e: Error) => {
             this.logger.error(e.message);

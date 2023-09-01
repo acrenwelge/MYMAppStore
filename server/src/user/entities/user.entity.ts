@@ -1,38 +1,38 @@
 import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany} from "typeorm";
 import {Exclude} from '@nestjs/class-transformer'
-import { Transaction } from "src/transaction/entities/transaction.entity";
+import {TransactionEntity} from "src/transaction/entities/transaction.entity";
+import { Roles } from "src/roles/role.enum";
 
-@Entity()
-export class User {
+/**
+ * @description Represents the User table in the database
+ * @property {number} id - unique user identifier
+ * @property {string} first_name - user's first name
+ * @property {string} last_name - user's last name
+ * @property {string} email - user's email address
+ * @property {string} passwordHash - user's hashed password
+ * @property {boolean} activatedAccount - whether or not the user has activated their account
+ * @property {string} activationCode - user must enter this to activate account; deleted after account activation
+ * @property {Date} createdAt - date user was created
+ * @property {Date} updatedAt - date user information was last updated
+ * @property {@link Roles} role - user's role (admin, user, instructor)
+ */
+@Entity("user")
+export class UserEntity {
     @PrimaryGeneratedColumn({name: "user_id"})
-    public readonly id: number;
+    public readonly userId: number;
 
     @Column()
-    public name: string;
+    public firstName: string;
 
+    @Column()
+    public lastName: string;
 
-    @Column({unique: true})
+    @Column({name: "email_address", unique: true})
     public email: string;
 
     @Exclude()
-    @Column({name: "google_access_token", nullable: true})
-    public googleAccessToken?: string;
-
-    @Exclude()
-    @Column({nullable: true, name: "password"})
-    public password?: string;
-
-    @Exclude()
-    @Column({default: false, name: "requested_temporary_password"})
-    public requestedTemporaryPassword?: boolean;
-
-    @Exclude()
-    @Column({nullable: true, name: "temporary_password", length: 16})
-    public temporaryPassword?: string;
-
-    @Exclude()
-    @Column({nullable: true, name: "temporary_password_requested_at"})
-    public temporaryPasswordRequestedAt?: Date;
+    @Column({nullable: true, name: "user_pw_hash"})
+    public passwordHash: string;
 
     @Exclude()
     @Column({default: false, name: "activated_account"})
@@ -49,9 +49,8 @@ export class User {
     public readonly updatedAt: Date;
 
     @Column()
-    public role: number;
+    public role: Roles;
 
-    @OneToMany(() => Transaction, transaction => transaction.user)
-    transaction: Transaction[]
-
+    @OneToMany(() => TransactionEntity, transaction => transaction.user)
+    transactions: TransactionEntity[]
 }

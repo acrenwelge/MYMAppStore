@@ -1,6 +1,7 @@
 import { request } from "./baseRequest"
 
 export function localLoginApi(data:any):Promise<any> {
+    console.log(data);
     return request({
         method: 'post',
         url: `api/auth/local-login`,

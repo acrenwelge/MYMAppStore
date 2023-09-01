@@ -1,32 +1,32 @@
-import { EmailSubscriptionService } from './email-subscription.service';
-import {EmailSubscription} from "./email-subscription.entity";
+import { FreeSubscriptionService } from './free-subscription.service';
+import {FreeSubscriptionEntity} from "./free-subscription.entity";
 import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
-import {Transaction} from "../transaction/entities/transaction.entity";
+import {TransactionEntity} from "../transaction/entities/transaction.entity";
 import {MockType} from "../transaction/transaction.service.spec";
-import {CreateTransactionDto} from "../transaction/dto/create-transaction.dto";
+import {CreateTransactionDto} from "../transaction/transaction.dto";
 import {PurchaseCodeEntity} from "../purchaseCode/purchaseCode.entity";
 
 
-describe('EmailSubscriptionService', () => {
-  let service: EmailSubscriptionService;
-  let repositoryMock: MockType<Repository<EmailSubscription>>;
+describe('FreeSubscriptionService', () => {
+  let service: FreeSubscriptionService;
+  let repositoryMock: MockType<Repository<FreeSubscriptionEntity>>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        EmailSubscriptionService,
+        FreeSubscriptionService,
         {
-          provide: getRepositoryToken(EmailSubscription),
-          useValue: createMock<EmailSubscription>(),
+          provide: getRepositoryToken(FreeSubscriptionEntity),
+          useValue: createMock<FreeSubscriptionEntity>(),
         }
       ],
     }).compile();
 
-    service = module.get<EmailSubscriptionService>(EmailSubscriptionService);
-    repositoryMock = module.get(getRepositoryToken(EmailSubscription));
+    service = module.get<FreeSubscriptionService>(FreeSubscriptionService);
+    repositoryMock = module.get(getRepositoryToken(FreeSubscriptionEntity));
   });
 
   afterAll(() => {
@@ -38,7 +38,7 @@ describe('EmailSubscriptionService', () => {
   });
 
   it('should create a EmailSubscription', async () => {
-    const emailsub = new EmailSubscription();
+    const emailsub = new FreeSubscriptionEntity();
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
     expect(await service.create(emailsub)).toBe(true);
   });
@@ -49,7 +49,7 @@ describe('EmailSubscriptionService', () => {
   });
 
   it('should find one EmailSubscription', async () => {
-    const result = new EmailSubscription();
+    const result = new FreeSubscriptionEntity();
     result.suffix = '123';
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
     expect(await service.findOne('123')).toBe(result);
@@ -57,7 +57,7 @@ describe('EmailSubscriptionService', () => {
 
   it('should add a email subscription if it does not exist', async () => {
     const oldSub = null;
-    const newSub = new EmailSubscription();
+    const newSub = new FreeSubscriptionEntity();
     const suffix = '456';
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldSub);
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => newSub);
@@ -66,7 +66,7 @@ describe('EmailSubscriptionService', () => {
 
   it('should remove a email sub', async () => {
     const id= 1;
-    const tmpCode = new EmailSubscription();
+    const tmpCode = new FreeSubscriptionEntity();
     tmpCode.email_sub_id = id;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => tmpCode);
     jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
@@ -77,7 +77,7 @@ describe('EmailSubscriptionService', () => {
   it('should update a email sub', async () => {
     const updateid = 1;
     const updatesuffix = "AAA";
-    const update = new EmailSubscription();
+    const update = new FreeSubscriptionEntity();
     update.email_sub_id = updateid;
     update.suffix = updatesuffix;
 
@@ -87,10 +87,10 @@ describe('EmailSubscriptionService', () => {
   });
 
   it('should validate a email sub', async () => {
-    const findemailsub = new EmailSubscription();
+    const findemailsub = new FreeSubscriptionEntity();
     findemailsub.suffix = "VALIDATE";
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => findemailsub);
-    expect(await service.checkIfUserEmailSubItem(findemailsub.suffix)).toBe(true);
+    expect(await service.userEmailHasFreeSubscription(findemailsub.suffix)).toBe(true);
   });
 
 });

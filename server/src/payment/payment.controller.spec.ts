@@ -4,7 +4,7 @@ import {PaymentService} from "./payment.service";
 import {createMock} from "@golevelup/ts-jest";
 import { createRequest } from 'node-mocks-http';
 import { createResponse} from 'node-mocks-http';
-import {Transaction} from "../transaction/entities/transaction.entity";
+import {TransactionEntity} from "../transaction/entities/transaction.entity";
 
 
 describe('PaymentController', () => {
@@ -58,9 +58,9 @@ describe('PaymentController', () => {
         user_id: 1,
       }
     });
-    const temp = new Transaction();
+    const temp = new TransactionEntity();
     controller.finishPurchasing(req, temp);
-    expect(service.finishPurchasing).toBeCalledTimes(1);
+    expect(service.recordPurchase).toBeCalledTimes(1);
   });
 
 
