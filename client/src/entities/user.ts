@@ -1,7 +1,10 @@
 export default interface User {
-	readonly id: number;
-	readonly firstName: string;
-	readonly lastName: string;
-	readonly email: string;
-	readonly role: string;
+	readonly userId: number;
+	firstName: string;
+	lastName: string;
+	email: string;
+	role: string;
+	readonly createdAt: Date;
+	readonly updatedAt: Date;
+	activatedAccount: boolean;
 }

@@ -1,4 +1,3 @@
-import Subscription from "./subscription";
 import Company from "./company";
 import User from "./user";
 
@@ -8,7 +7,7 @@ export default interface Product {
 	readonly codeName: string;
 	readonly tagLine: string;
 	readonly startPage: string;
-	readonly subscriptions?: Subscription[];
+	readonly lengthInMonths: number;
 	readonly company: Company;
 	readonly authors?: User[];
 	readonly createdAt: string;

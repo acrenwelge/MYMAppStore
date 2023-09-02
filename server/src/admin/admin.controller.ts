@@ -51,29 +51,6 @@ export class AdminController {
         return this.transactionService.findAll()
     }
 
-    @Get("purchaseCode")
-    findAllPurchaseCode() {
-        return this.purchaseCodeService.findAll();
-    }
-
-    @Post("add-code")
-    @HttpCode(200)
-    public async addCode(@Body() newPurchaseCode: PurchaseCodeDto) {
-        return this.purchaseCodeService.addOne(newPurchaseCode)
-    }
-
-    @Post("delete-code")
-    @HttpCode(200)
-    public async deleteCode(@Body() newPurchaseCode: PurchaseCodeDto) {
-        return this.purchaseCodeService.deleteCode(newPurchaseCode.codeId)
-    }
-
-    @Post("update-code")
-    @HttpCode(200)
-    public async updateCode(@Body() newPurchaseCode: PurchaseCodeDto) {
-        return this.purchaseCodeService.update(newPurchaseCode)
-    }
-
     @Get("free-subscription")
     findAllFreeEmailSub() {
         return this.emailSubscriptionService.findAll();

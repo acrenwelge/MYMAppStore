@@ -18,4 +18,5 @@ export class UserDto {
   role?: Roles;
   activatedAccount?: boolean;
   createdAt?: Date;
+  updatedAt?: Date;
 }

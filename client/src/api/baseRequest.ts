@@ -1,13 +1,11 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
-const baseURL = process.env.REACT_APP_API_PATH
-
-const service = axios.create({
-    baseURL:baseURL,
-    timeout:10000,
+const http = axios.create({
+    baseURL: process.env.REACT_APP_API_PATH,
+    timeout: 10000,
 })
 
-service.interceptors.request.use(
+http.interceptors.request.use(
     config => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -23,7 +21,7 @@ service.interceptors.request.use(
     }
 )
 
-service.interceptors.response.use(
+http.interceptors.response.use(
     response => {
         return response
     },
@@ -33,8 +31,8 @@ service.interceptors.response.use(
     }
 )
 
-export function request(config:AxiosRequestConfig):Promise<AxiosResponse> {
+export function request<ResponseType>(config: AxiosRequestConfig): Promise<AxiosResponse<ResponseType>> {
     console.log("REQUEST BODY: ",config.data)
-    return service(config)
+    return http(config)
 }
 

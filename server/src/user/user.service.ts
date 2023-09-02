@@ -93,16 +93,7 @@ export class UserService {
   }
 
   async findAll(): Promise<UserDto[]> {
-    const users = await this.userRepo.find({
-      select:{
-        userId: true,
-        firstName: true,
-        email: true,
-        activatedAccount: true,
-        createdAt: true,
-        role: true,
-      }
-    })
+    const users = await this.userRepo.find()
     const dtoArr = users.map(user => this.convertToUserDTO(user))
     return Promise.resolve(dtoArr)
   }
@@ -124,8 +115,6 @@ export class UserService {
   /**
    * Updates a user's profile information, with only the fields that are provided.
    * User email updates are not currently supported because email is a unique user identifier.
-   * Account activation/deactivation is not supported here - it must be done through 
-   * the {@link UserService.activateAccount} and {@link UserService.deactivateAccount} methods.
    */
   async updateOne(user: UserDto): Promise<UserEntity | undefined> {
     const email = user.email;
@@ -139,6 +128,7 @@ export class UserService {
     userToUpdate.firstName = user.firstName || userToUpdate.firstName;
     userToUpdate.lastName = user.lastName || userToUpdate.lastName;
     userToUpdate.role = user.role || userToUpdate.role;
+    userToUpdate.activatedAccount = user.activatedAccount;
     if (user.password) {
         const hashed = await hash(user.password, 10)
         userToUpdate.passwordHash =  hashed
@@ -158,6 +148,7 @@ export class UserService {
     result.role = user.role
     result.activatedAccount = user.activatedAccount
     result.createdAt = user.createdAt
+    result.updatedAt = user.updatedAt
     return result
   }
 

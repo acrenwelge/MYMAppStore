@@ -1,4 +1,3 @@
-//import React from "react";
 import { Button } from "semantic-ui-react";
 import { GoogleLogin, GoogleLogout } from "react-google-login";
 import { gapi } from "gapi-script";
@@ -15,7 +14,7 @@ const ThirdPartyAuthenticators: React.FC<ThirdPartyAuthenticatorsProps> = (props
 	const ctx = useContext(ApplicationContext);
 	const onSuccess = (res: any) => {
 		console.log("success:", res);
-		const user: User = {
+		const user: any = {
 			id: res.profileObj.googleId,
 			firstName: res.profileObj.firstName,
 			lastName: res.profileObj.lastName,

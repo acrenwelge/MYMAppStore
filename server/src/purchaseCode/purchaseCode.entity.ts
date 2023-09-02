@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Unique } from "typeorm";
 import { TransactionEntity } from "../transaction/entities/transaction.entity";
 import { ItemEntity } from "src/item/item.entity";
 
@@ -17,6 +17,7 @@ export class PurchaseCodeEntity {
     public code_id: number;
 
     @Column()
+    @Unique("purchaseCode_name_unique", ["name"])
     public name: string;
 
     @ManyToOne(() => ItemEntity, item => item.itemId)

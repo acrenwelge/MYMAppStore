@@ -4,7 +4,7 @@ import { UserDto } from "src/user/user.dto";
 
 export class SubscriptionDto {
   @ApiProperty()
-  subscriptionId: number;
+  id: number;
 
   @ApiProperty()
   expirationDate: Date;

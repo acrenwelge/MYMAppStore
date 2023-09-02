@@ -1,20 +1,20 @@
-import { AxiosResponse } from "axios";
+import { Axios, AxiosResponse } from "axios";
 import PurchaseCode from "../entities/purchaseCode";
 import { PurchaseCodeFormValues } from "../pages/Admin/PurchaseCode";
 import { request } from "./baseRequest"
-import { METHODS } from "http";
+import User from "../entities/user";
 
-export function getAllUserData():Promise<any> {
-    return request({
+export function getAllUserData(): Promise<AxiosResponse<User[]>> {
+    return request<User[]>({
         method: 'GET',
         url: `api/admin/user`,
     })
 }
 
-export function updateUser(data: any):Promise<any> {
-    return request({
+export function updateUser(data: User): Promise<AxiosResponse<User>> {
+    return request<User>({
         method: 'PUT',
-        url: `api/admin/user/${data.id}`,
+        url: `api/admin/user/${data.userId}`,
         data: data
     });
 }
@@ -38,7 +38,7 @@ export function deleteUser(id: number):Promise<any> {
 export function getAllPurchaseCodeData():Promise<any>{
     return request({
         method: 'GET',
-        url: 'api/admin/purchaseCode',
+        url: 'api/purchaseCode',
     })
 }
 
@@ -66,16 +66,15 @@ export function getAllItemData():Promise<any>{
 export function addCodeApi(data:any):Promise<any> {
     return request({
         method: 'POST',
-        url: `api/admin/add-code`,
+        url: `api/purchaseCode`,
         data:data
     })
 }
 
-export function deleteCodeApi(data:any):Promise<any> {
+export function deleteCodeApi(id: number): Promise<any> {
     return request({
-        method: 'POST',
-        url: `api/admin/delete-code`,
-        data:data
+        method: 'DELETE',
+        url: `api/purchaseCode/${id}`
     })
 }
 

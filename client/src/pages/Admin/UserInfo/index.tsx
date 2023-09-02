@@ -14,25 +14,25 @@ import {getAllUserData, updateUser, deleteUser, sendAccountActivationEmail} from
 import {useHistory} from "react-router-dom";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.min.css';
+import User from "../../../entities/user";
 
-interface UserData {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    activatedAccount: boolean;
-    createdAt: string;
-    role: string;
-}
+// interface UserData {
+//     id: number;
+//     email: string;
+//     firstName: string;
+//     lastName: string;
+//     activatedAccount: boolean;
+//     createdAt: Date;
+//     role: string;
+// }
 
 interface localUser {
     role: string;
 }
-const formatDate = (dateTime:string):string =>{
-    const date= new Date(new Date(dateTime).toLocaleString())
-    return date.toISOString()     // format: 2020-04-20T20:08:18.966Z
-        .replace(/T/, ' ')       // replace T with a space
-        .replace(/\..+/, '')     // delete the dot and everything after
+const formatDate = (dateObj: Date): string => {
+    return new Date(dateObj).toISOString()    // format: 2020-04-20T20:08:18.966Z
+        .replace(/T/, ' ')          // replace T with a space
+        .replace(/\..+/, '')        // delete the dot and everything after
 }
 
 interface localState {
@@ -45,15 +45,15 @@ interface localState {
 
 const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     const history = useHistory()
-    const user: localUser | null = JSON.parse(localStorage.getItem('user') || 'null');
+    const loggedInUser: localUser | null = JSON.parse(localStorage.getItem('user') || 'null');
     
-    if (!user || user.role !== "admin") {
+    if (!loggedInUser || loggedInUser.role !== "admin") {
         // Redirect to main page
         history.push('/');
         return null;
     }
     
-    const [userData, setUserData] = useState<UserData[]>([]);
+    const [userData, setUserData] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [confirmBoxOpen, setConfirmBoxOpen] = useState(false);
     const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -88,7 +88,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 sortedUsers = sortedUsers.sort((a, b) => a['firstName'].localeCompare(b['firstName']));
                 break;
             case 'createdAt':
-                sortedUsers = sortedUsers.sort((a, b) => a['createdAt'].localeCompare(b['createdAt']));
+                // sortedUsers = sortedUsers.sort((a, b) => a['createdAt'].toISOString().localeCompare(b['createdAt'].toISOString()));
                 break;
         }
     } else if (state.sortBy != '' && state.sortDirection === 'descending') {
@@ -100,7 +100,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 sortedUsers = sortedUsers.sort((a, b) => b['firstName'].localeCompare(a['firstName']));
                 break;
             case 'createdAt':
-                sortedUsers = sortedUsers.sort((a, b) => b['createdAt'].localeCompare(a['createdAt']));
+                // sortedUsers = sortedUsers.sort((a, b) => b['createdAt'].toISOString().localeCompare(a['createdAt'].toISOString()));
                 break;
         }
     }
@@ -172,7 +172,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
     }, []);
     
     const sendVerificationEmail = (id: number) => {
-        const user = userData.find(user => user.id === id);
+        const user = userData.find(user => user.userId === id);
         if (!user) {
             console.error("Attempted to send verification email but no user found in local data");
             toast.error("Verification email failed - are you logged in?");
@@ -188,12 +188,15 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         }
     }
     const toggleUserActive = (id: number) => {
-        const user = userData.find(user => user.id === id);
+        console.log("ID:",id);
+        console.log("USERDATA:",userData);
+        const user = userData.find(user => user.userId === id);
         if (!user) {
             console.error("Attempted to activate user but no user found in local data");
             toast.error("User activation failed");
         } else {
             user.activatedAccount = !user.activatedAccount;
+            console.log("TEST:",user);
             updateUser(user)
             .then(res => {
                 if (user.activatedAccount) {
@@ -202,8 +205,8 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                     toast.warn("User deactivated successfully");
                 }
                 setUserData(userData.map(u => {
-                    if (u.id === id) {
-                        u.activatedAccount = user.activatedAccount;
+                    if (u.userId === id) {
+                        u = res.data;
                     }
                     return u;
                 }));
@@ -228,7 +231,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             deleteUser(selectedUserId).then(res => {
                 toast.success("User deleted successfully");
                 setConfirmBoxOpen(false);
-                setUserData(userData.filter(user => user.id !== selectedUserId));
+                setUserData(userData.filter(user => user.userId !== selectedUserId));
             }).catch(error => {
                 console.error(error);
                 setConfirmBoxOpen(false);
@@ -292,7 +295,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                 </Table.Header>
                                 <Table.Body>
                                     {sortedUsers.map(user => (
-                                        <Table.Row key={user.id}>
+                                        <Table.Row key={user.userId}>
                                             <Table.Cell>{user.email}</Table.Cell>
                                             <Table.Cell>{user.firstName}</Table.Cell>
                                             <Table.Cell>{user.lastName}</Table.Cell>
@@ -308,15 +311,15 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                                                    <div></div>}
                                             </Table.Cell>
                                             <Table.Cell>
-                                                <Button compact size='medium' color="green" onClick={() => sendVerificationEmail(user.id)}>Resend Verification Email</Button>
+                                                <Button compact size='medium' color="green" onClick={() => sendVerificationEmail(user.userId)}>Resend Verification Email</Button>
                                             </Table.Cell>
                                             <Table.Cell>
                                                 {user.activatedAccount ?
-                                                <Button compact size='medium' color="orange" onClick={() => toggleUserActive(user.id)}>Deactivate User</Button>
-                                                : <Button compact size='medium' color="blue" onClick={() => toggleUserActive(user.id)}>Activate User</Button>
+                                                <Button compact size='medium' color="orange" onClick={() => toggleUserActive(user.userId)}>Deactivate User</Button>
+                                                : <Button compact size='medium' color="blue" onClick={() => toggleUserActive(user.userId)}>Activate User</Button>
                                                 }
                                             </Table.Cell>
-                                            <Table.Cell><Button compact color="red" onClick={() => confirmUserDelete(user.id)}>Delete User</Button></Table.Cell>
+                                            <Table.Cell><Button compact color="red" onClick={() => confirmUserDelete(user.userId)}>Delete User</Button></Table.Cell>
                                            </Table.Row>
                                     ))}
                                 </Table.Body>

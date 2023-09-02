@@ -7,15 +7,20 @@ import {
     GridColumn,
     Container,
     Button,
-    Modal, Dimmer, Loader, Message
+    Modal, Dimmer, Loader, Message, Dropdown
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
 import {addCodeApi, deleteCodeApi, getAllPurchaseCodeData, updateCodeApi} from "../../../api/admin";
+import Product from "../../../entities/product";
 
 interface PurchaseCode {
-    readonly code_id: number;
+    readonly codeId: number;
     name: string;
     priceOff: number;
+    item: {
+        readonly itemId: number;
+        itemName: string;
+    }
 }
 
 export type PurchaseCodeFormValues = {
@@ -27,6 +32,12 @@ export type PurchaseCodeFormValues = {
 type MessageValues = {
     type: string,
     message: string
+}
+
+interface ProductSelection {
+    key: number;
+    text: string;
+    value: number;
 }
 
 const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
@@ -42,6 +53,17 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
     const [purchaseData, setPurchaseCodeData] = useState<PurchaseCode[]>([]);
     const [loading, setLoading] = useState(false);
     const [buttonLoading, setButtonLoading] = useState(false);
+    const [products, setProducts] = useState<ProductSelection[]>([{
+            key: 1,
+            value: 1,
+            text: 'Calc 1',
+        }, {
+            key: 2,
+            value: 2,
+            text: 'Calc 2',
+        }
+    ]);
+    const [selectedProduct, setSelectedProduct] = useState<number>(1);
 
     const [message, setMessage] = useState<MessageValues>({
         type:'none',
@@ -66,8 +88,12 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
 
     const handleAdd = () => {
         setButtonLoading(true)
+        const itemId = products.find((product) => product.value === selectedProduct)?.value
         addCodeApi({
             name: formValues.name,
+            item: {
+                itemId
+            },
             priceOff: Number(formValues.priceOff)
         }).then(async (res) => {
             const purchaseCode = res.data.purchaseCode
@@ -80,7 +106,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
             console.log(err)
             setButtonLoading(false)
             setAddModalOpen(false)
-            setMessage({type:'fail',message:`Purchase code ${formValues.name} is already used for another purchase code. Please use a new code.`})
+            setMessage({type:'fail',message:`Error: Purchase code ${formValues.name} not added`})
         });
     };
 
@@ -91,13 +117,13 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
     }
 
     const handleDelete = (code: PurchaseCode) => {
+        console.log(code)
         setButtonLoading(true)
-        deleteCodeApi({code_id: code.code_id})
+        deleteCodeApi(code.codeId)
             .then(res => {
                 setButtonLoading(false)
                 getPurchaseCode()
                 setMessage({type:'success',message:`Purchase code ${code.name} has been deleted successfully.`})
-
             })
             .catch(error => {
                 setButtonLoading(false)
@@ -110,7 +136,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
         console.log(code)
         setFormValues({
             ...formValues,
-            code_id: code.code_id,
+            code_id: code.codeId,
             name: code.name,
             priceOff: code.priceOff
         })
@@ -179,27 +205,25 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                             <Table>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>Code ID</Table.HeaderCell>
                                         <Table.HeaderCell>Code</Table.HeaderCell>
+                                        <Table.HeaderCell>Product</Table.HeaderCell>
                                         <Table.HeaderCell>Percent Off</Table.HeaderCell>
                                         <Table.HeaderCell>Operation</Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
                                     {purchaseData.map(purchaseCode => (
-                                        <Table.Row key={purchaseCode.code_id}>
-                                            <Table.Cell>{purchaseCode.code_id}</Table.Cell>
+                                        <Table.Row key={purchaseCode.codeId}>
                                             <Table.Cell>{purchaseCode.name}</Table.Cell>
+                                            <Table.Cell>{purchaseCode.item.itemName}</Table.Cell>
                                             <Table.Cell>{purchaseCode.priceOff}</Table.Cell>
                                             <Table.Cell>
                                                 <Button ui primary basic
-                                                        onClick={() => handleEditOpen(purchaseCode)}
-                                                >
+                                                    onClick={() => handleEditOpen(purchaseCode)}>
                                                     EDIT
                                                 </Button>
                                                 <Button ui negative basic loading={buttonLoading}
-                                                        onClick={() => handleDelete(purchaseCode)}
-                                                >
+                                                    onClick={() => handleDelete(purchaseCode)}>
                                                     DELETE
                                                 </Button>
                                             </Table.Cell>
@@ -217,6 +241,13 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                             <Modal.Header>Add New Purchase Code</Modal.Header>
                             <Modal.Content>
                                 <Form>
+                                    <Dropdown
+                                        placeholder='Select Item'
+                                        fluid
+                                        selection
+                                        onChange={(event, data) => setSelectedProduct(Number(data.value))}
+                                        options={products}
+                                    />
                                     <Form.Input
                                         id="name"
                                         label="Code"

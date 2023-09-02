@@ -28,7 +28,10 @@ export class PurchaseCodeService {
   }
 
   async findAll(): Promise<PurchaseCodeDto[]> {
-    const entities = await this.purchaseCodeRepo.find();
+    const entities = await this.purchaseCodeRepo.find({
+      relations: ["item"]
+    });
+    console.log(entities);
     return entities.map(purchaseCode => this.convertToDto(purchaseCode));
   }
 
@@ -42,7 +45,7 @@ export class PurchaseCodeService {
 
   // adds new purchase code and links to item if code name does not already exist
   async addOne(codeToAdd: PurchaseCodeDto): Promise<PurchaseCodeDto> {
-    const existsAlready = this.purchaseCodeRepo.exist({ where: {name: codeToAdd.name}});
+    const existsAlready = await this.purchaseCodeRepo.exist({ where: {name: codeToAdd.name}});
     if (!existsAlready) {
       const newCode = new PurchaseCodeEntity();
       newCode.name = codeToAdd.name;
@@ -55,13 +58,13 @@ export class PurchaseCodeService {
     }
   }
 
-  async deleteCode(code_id: number): Promise<PurchaseCodeDto>{
+  async deleteCode(code_id: number): Promise<boolean> {
     const findCode = await this.purchaseCodeRepo.findOne({where: {code_id}});
     if (findCode != null) {
       await this.purchaseCodeRepo.remove(findCode);
-      return Promise.resolve(this.convertToDto(findCode));
+      return Promise.resolve(true);
     } else {
-      throw new ConflictException("Purchase code doesn't exist!");
+      Promise.reject(new NotFoundException("Purchase code doesn't exist!"));
     }
   }
 
@@ -74,14 +77,16 @@ export class PurchaseCodeService {
     }
   }
 
-  async update(code: PurchaseCodeDto): Promise<PurchaseCodeDto> {
-    const findCode = await this.purchaseCodeRepo.findOne({where: {code_id: code.codeId}});
+  async update(id: number, code: PurchaseCodeDto): Promise<PurchaseCodeDto> {
+    console.log("updating purchase code:", code);
+    const findCode = await this.purchaseCodeRepo.findOne({where: {code_id: id}});
     if (findCode === null) {
       throw new NotFoundException("Purchase code doesn't exist!");
     }
     findCode.priceOff = code.priceOff;
     findCode.name = code.name;
-    findCode.item = await this.itemRepo.findOne({where: {itemId: code.item.itemId}});
+    const itemId = findCode.item?.itemId;
+    findCode.item = await this.itemRepo.findOne({where: {itemId: itemId}});
     if (findCode.item === null) {
       throw new NotFoundException("Item for the purchase code does not exist!");
     }
