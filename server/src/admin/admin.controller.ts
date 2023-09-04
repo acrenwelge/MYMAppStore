@@ -18,7 +18,7 @@ export class AdminController {
     constructor(private readonly userService: UserService,
         private readonly purchaseCodeService: PurchaseCodeService,
         private readonly transactionService: TransactionService,
-        private readonly emailSubscriptionService: FreeSubscriptionService,
+        private readonly freeSubService: FreeSubscriptionService,
         private readonly emailService: EmailService) {}
 
     @Get("user")
@@ -53,19 +53,25 @@ export class AdminController {
 
     @Get("free-subscription")
     findAllFreeEmailSub() {
-        return this.emailSubscriptionService.findAll();
+        return this.freeSubService.findAll();
     }
 
-    @Post("add-emailsub")
+    @Post("free-subscription")
     @HttpCode(200)
     public async addEmailSub(@Body() obj: {suffix: string}) {
-        return this.emailSubscriptionService.addOne(obj.suffix)
+        return this.freeSubService.addOne(obj.suffix)
     }
 
-    @Post("delete-emailsub")
+    @Put("free-subscription/:id")
     @HttpCode(200)
-    public async deleteEmailSub(@Body() obj: {suffix: string}) {
-        return this.emailSubscriptionService.deleteEmailSub(obj.suffix)
+    public async updateFreeSub(@Param('id') id: number, @Body() obj: {suffix: string}) {
+        return this.freeSubService.updateEmailSub(id, obj.suffix)
+    }
+
+    @Delete("free-subscription/:id")
+    @HttpCode(200)
+    public async deleteEmailSub(@Param("id") id: number) {
+        return this.freeSubService.deleteEmailSub(id)
     }
 
 }

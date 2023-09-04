@@ -11,41 +11,26 @@ import {
 } from "semantic-ui-react";
 import AdminMenu from "../../../components/AdminMenu";
 import {
-    addEmailSubApi,
-    deleteEmailSubApi,
-    getAllEmailSubscriptionData,
-    updateEmailSubApi
+    addFreeSub,
+    deleteFreeSub,
+    getAllFreeSubs,
+    updateFreeSub
 } from "../../../api/admin";
-
-
-interface EmailSubscription {
-    readonly email_sub_id: number;
-    suffix: string;
-}
-
-type FormValues = {
-    email_sub_id: string,
-    suffix: string;
-};
+import FreeSubscription from "../../../entities/freeSubscription";
 
 type MessageValues = {
-    type:string,
-    message:string
+    type: string,
+    message: string
 }
 
 const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
-
-    const [formValues, setFormValues] = useState<FormValues>({
-        email_sub_id: "",
-        suffix:""
-    });
-
+    const [newSuffix, setNewSuffix] = useState("");
+    const [updateSuffixData, setUpdateSuffix] = useState<FreeSubscription>({email_sub_id: NaN, suffix: ''});
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
-    const [emailSubscriptionData, setEmailSubscriptionData] = useState<EmailSubscription[]>([]);
+    const [freeSubscriptionData, setfreeSubscriptionData] = useState<FreeSubscription[]>([]);
     const [loading, setLoading] = useState(false);
     const [buttonLoading, setButtonLoading] = useState(false);
-
 
     const [message, setMessage] = useState<MessageValues>({
         type:'none',
@@ -54,9 +39,9 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
 
     const getEmailSubscription = () => {
         setLoading(true)
-        getAllEmailSubscriptionData()
+        getAllFreeSubs()
             .then(res => {
-                setEmailSubscriptionData(res.data)
+                setfreeSubscriptionData(res.data)
                 setLoading(false)
             })
             .catch(error => {
@@ -70,76 +55,71 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
 
     const handleAdd = () => {
         setButtonLoading(true)
-        addEmailSubApi({
-            suffix: formValues.suffix,
+        addFreeSub({
+            suffix: newSuffix,
         }).then(async (res) => {
-            const emailSubscription = res.data.emailSubscription
-            localStorage.setItem('emailSubscription', JSON.stringify(emailSubscription));
             setButtonLoading(false)
             setAddModalOpen(false)
-            setMessage({type:'success',message:`Email Subscription with suffix ${formValues.suffix} has been added successfully.`})
+            setMessage({type:'success',message:`Free subscription with suffix "${newSuffix}" has been added successfully. All users with emails that match this suffix will be able to access all textbooks for free.`})
             getEmailSubscription()
-        })
-            .catch((err) => {
-                console.log(err)
-                setButtonLoading(false)
-                setAddModalOpen(false)
-                setMessage({type:'fail',message:`Email Subscription with suffix ${formValues.suffix} is already used for another purchase code. Please use a new code.`})
-            });
-
+        }).catch((err) => {
+            console.log(err)
+            setButtonLoading(false)
+            setAddModalOpen(false)
+            setMessage({type:'fail',message:`Unable to add free subscriptions for users with email suffix ${newSuffix}`})
+        });
     };
 
     const handleCancel = () => {
         setAddModalOpen(false)
         setUpdateModalOpen(false)
-        setFormValues({ ...formValues, suffix: ''})
+        setNewSuffix('')
+        setUpdateSuffix({
+            email_sub_id: NaN,
+            suffix: ''
+        })
     }
 
-    const handleDelete = (code: EmailSubscription) => {
+    const handleDelete = (sub: FreeSubscription) => {
         setButtonLoading(true)
-        deleteEmailSubApi({email_sub_id: code.email_sub_id})
+        deleteFreeSub(sub.email_sub_id)
             .then(res => {
                 setButtonLoading(false)
                 getEmailSubscription()
-                setMessage({type:'success',message:`Email Subscription with suffix ${code.suffix} has been deleted successfully.`})
-
+                setMessage({type:'success',message:`Free subscriptions for users with suffix ${sub.suffix} have been deleted successfully. These users will no longer have free access.`})
             })
             .catch(error => {
                 setButtonLoading(false)
                 console.error(error)
-                setMessage({type:'fail',message:`Fail to delete email subscription with suffix ${code.suffix}. Please try again.`})
+                setMessage({type:'fail',message:`Unable to delete free subscriptions for with suffix ${sub.suffix}. Please try again.`})
             });
     };
 
-    const handleEditOpen = (code: EmailSubscription) => {
-        setFormValues({
-            ...formValues,
-            email_sub_id: code.email_sub_id.toString(),
-            suffix:code.suffix
+    const handleEditOpen = (sub: FreeSubscription) => {
+        setUpdateSuffix({
+            ...updateSuffixData,
+            email_sub_id: sub.email_sub_id,
+            suffix: sub.suffix
         })
         setUpdateModalOpen(true)
     };
 
     const handleEdit = () => {
         setButtonLoading(true)
-        updateEmailSubApi({
-            email_sub_id: formValues.email_sub_id,
-            suffix: formValues.suffix
+        updateFreeSub({
+            email_sub_id: updateSuffixData.email_sub_id,
+            suffix: updateSuffixData.suffix
         }).then(async (res) => {
-            const emailSubscription = res.data.emailSubscription
-            localStorage.setItem('emailSubscription', JSON.stringify(emailSubscription));
             setButtonLoading(false)
             setUpdateModalOpen(false)
-            setMessage({type:'success',message:`Email Subscription with suffix ${formValues.suffix} has been updated successfully.`})
+            setMessage({type:'success',message:`Free subscription with suffix ${updateSuffixData.suffix} has been updated successfully.`})
             getEmailSubscription()
-        })
-            .catch((err) => {
-                    console.log(err)
-                    setButtonLoading(false)
-                    setUpdateModalOpen(false)
-                    setMessage({type:'fail',message:`Fail to update email subscription with suffix ${formValues.suffix}. Please try again.`})
-                }
-            );
+        }).catch((err) => {
+            console.log(err)
+            setButtonLoading(false)
+            setUpdateModalOpen(false)
+            setMessage({type:'fail',message:`Unable to update email subscription with suffix ${updateSuffixData.suffix}. Please try again.`})
+        });
     }
 
     return (
@@ -170,11 +150,29 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
                             )}
 
                             <Button icon="add" labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
-                                <Icon name="add circle"/>Add New Email Subscription
+                                <Icon name="add circle"/>Add New Free Email Subscription
                             </Button>
                         </div>
-
-
+                        <div style={{marginTop: '10px'}}>
+                            <h2>Free Subscriptions by Email Suffix</h2>
+                            <p>
+                                User accounts with emails that match the suffixes in the table below will have free access to all textbooks.
+                                The <strong>end of the user&apos;s email must match exactly with the suffix provided</strong>. 
+                                For example, if the suffix &quot;<strong>tamu.edu</strong>&quot; is listed, the following users will have free access:
+                            </p>
+                            <ul>
+                                <li>student@tamu.edu</li>
+                                <li>student@email.tamu.edu</li>
+                                <li>student@tamu.edu</li>
+                            </ul>
+                            <p>
+                                The following users would <strong>NOT</strong> have free access:
+                            </p>
+                            <ul>
+                                <li>student@tamu.email.edu</li>
+                                <li>tamu.edu@gmail.com</li>
+                            </ul>
+                        </div>
                         <div style={{marginTop: '10px', height: '80vh', overflowY: 'auto'}}>
                             {loading == true ? <Dimmer active inverted>
                                 <Loader inverted>Loading Email Subscription</Loader>
@@ -183,7 +181,6 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
                             <Table>
                                 <Table.Header>
                                     <Table.Row>
-                                        <Table.HeaderCell>ID</Table.HeaderCell>
                                         <Table.HeaderCell>Email Suffix</Table.HeaderCell>
                                         {/*<Table.HeaderCell>Begin Date</Table.HeaderCell>*/}
                                         {/*<Table.HeaderCell>End Date</Table.HeaderCell>*/}
@@ -191,20 +188,19 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {emailSubscriptionData.map(emailSubscription => (
-                                        <Table.Row key={emailSubscription.email_sub_id}>
-                                            <Table.Cell>{emailSubscription.email_sub_id}</Table.Cell>
-                                            <Table.Cell>{emailSubscription.suffix}</Table.Cell>
+                                    {freeSubscriptionData.map(sub => (
+                                        <Table.Row key={sub.email_sub_id}>
+                                            <Table.Cell>{sub.suffix}</Table.Cell>
                                             {/*<Table.Cell></Table.Cell>*/}
                                             {/*<Table.Cell></Table.Cell>*/}
                                             <Table.Cell>
                                                 <Button ui primary basic
-                                                        onClick={() => handleEditOpen(emailSubscription)}
+                                                        onClick={() => handleEditOpen(sub)}
                                                 >
                                                     EDIT
                                                 </Button>
                                                 <Button ui negative basic loading={buttonLoading}
-                                                        onClick={() => handleDelete(emailSubscription)}
+                                                        onClick={() => handleDelete(sub)}
                                                 >
                                                     DELETE
                                                 </Button>
@@ -220,13 +216,13 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
                             onOpen={() => setAddModalOpen(true)}
                             open={addModalOpen}
                         >
-                            <Modal.Header>Add New Email Subscription</Modal.Header>
+                            <Modal.Header>Add New Free Subscription</Modal.Header>
                             <Modal.Content>
                                 <Form>
                                     <Form.Input
                                         id="name"
-                                        label="Email Suffix (eg:tamu.edu)"
-                                        onChange={(event, data) => setFormValues({...formValues, suffix: data.value})}
+                                        label="Email Suffix (eg: tamu.edu)"
+                                        onChange={(event, data) => setNewSuffix(data.value)}
                                         required
                                     />
                                 </Form>
@@ -243,7 +239,8 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
                                     positive
                                     loading={buttonLoading}
                                 />
-                            </Modal.Actions></Modal>
+                            </Modal.Actions>
+                        </Modal>
 
                         <Modal
                             onClose={() => setUpdateModalOpen(false)}
@@ -256,8 +253,8 @@ const AdminEmailSubscriptionPage: React.FC = (props): JSX.Element => {
                                     <Form.Input
                                         id="name"
                                         label="Email Suffix (eg:tamu.edu)"
-                                        value={formValues.suffix}
-                                        onChange={(event, data) => setFormValues({...formValues, suffix: data.value})}
+                                        value={updateSuffixData.suffix}
+                                        onChange={(event, data) => setUpdateSuffix({...updateSuffixData, suffix: data.value})}
                                         required
                                     />
                                 </Form>

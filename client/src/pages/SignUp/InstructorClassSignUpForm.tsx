@@ -1,28 +1,24 @@
 import React, { useState, useRef } from 'react';
-import { Button, Container, Form, List, Ref } from 'semantic-ui-react';
+import { Button, Container, Form, Grid, List, Ref, Segment } from 'semantic-ui-react';
 import {localSignupApiClass} from "../../api/auth";
 import { ToastContainer, toast } from 'react-toastify';
 
 function InstructorClassSignUpForm() {
   interface Student {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
   }
-  const [currStudent, setCurrStudent] = useState({ name: '', email: '' });
+  const [currStudent, setCurrStudent] = useState({ firstName: '', lastName: '', email: '' });
   const [students, setStudents] = useState<Student[]>([]);
 
-  const handleNameChange = (value: string) => {
-    console.log(value);
-    setCurrStudent({ ...currStudent, name: value });
-  };
-
-  const handleEmailChange = (value: string) => {
-    setCurrStudent({ ...currStudent, email: value });
+  const handleStudentInfoChange = (field: string, value: string) => {
+    setCurrStudent({ ...currStudent, [field]: value });
   };
 
   const addStudent = () => {
     setStudents([...students, currStudent]);
-    setCurrStudent({ name: '', email: '' });
+    setCurrStudent({ firstName: '', lastName: '', email: '' });
     // NOTE: This is a hacky way to focus on the first input field because Refs and/or the autoFocus prop doesn't work
     document.getElementById('focus-me')?.focus();
   };
@@ -38,7 +34,7 @@ function InstructorClassSignUpForm() {
       return;
     }
     localSignupApiClass(students).then((res) => {
-        setCurrStudent({ name: '', email: '' });
+        setCurrStudent({ firstName: '', lastName: '', email: '' });
         setStudents([]);
         toast.success("Successfully signed up all students!");
     }).catch((err) => {
@@ -55,67 +51,83 @@ function InstructorClassSignUpForm() {
 
   return (
     <Container>
-      <h1>Student List</h1>
-        <Container>
-          <List>
-            {students.map((student, index) => (
-              <List.Item key={index}>
-                <List.Content floated="left">
-                  <List.Header>{student.name}</List.Header>
-                  {student.email}
-                </List.Content>
-                <List.Content floated="right">
-                  <Button type="button" onClick={() => removeStudent(index)}>
-                    Remove
-                  </Button>
-                </List.Content>
-              </List.Item>
-            ))}
-          </List>
-          {/* {students.map((student, index) => (
-            <Form.Group key={index} widths="equal">
-              <Form.Input
-                style={{ fontColor: 'black', fontWeight: 'bold' }}
-                disabled
-                type="text" fluid
-                placeholder="Name"
-                value={student.name}
-              />
-              <Form.Input
-                disabled
-                type="email" fluid
-                placeholder="Email"
-                value={student.email}
-              />
+      <h1>Instructor Sign Up</h1>
+      <p>
+        First, provide your name and email to create an instructor account.
+        Then provide a list of names and emails for your students, and we will email them a link to activate their accounts
+        and assign them to your class. When you sign in, you can manage your class by adding and removing students and purchasing 
+        subscriptions for them.
+      </p>
+      <h2>Student List</h2>
+      <List>
+        {students.map((student, index) => (
+          <List.Item key={index}>
+            <List.Content floated="left">
+              <List.Header>{student.firstName} {student.lastName}</List.Header>
+              {student.email}
+            </List.Content>
+            <List.Content floated="right">
               <Button type="button" onClick={() => removeStudent(index)}>
                 Remove
               </Button>
-            </Form.Group>
-          ))} */}
-        </Container>
-        <Container>
-          <Form>
-            <Form.Group widths="equal">
-              <Form.Input
-                id="focus-me"
-                type="text" fluid
-                placeholder="Name"
-                value={currStudent.name}
-                onChange={(e) => handleNameChange(e.target.value)}
-                autoFocus
-              />
-              <Form.Input
-                type="email" fluid
-                placeholder="Email"
-                value={currStudent.email}
-                onChange={(e) => handleEmailChange(e.target.value)}
-                onKeyPress={(e: { key: string; }) => e.key === 'Enter' ? addStudent() : null}
-              />
-              <Button color="blue" type="button" onClick={() => addStudent()}>Add</Button>
-            </Form.Group>
-            <Button color="green" fluid type="submit" onClick={signUpClass}>Submit</Button>
-        </Form>
-      </Container>
+            </List.Content>
+          </List.Item>
+        ))}
+      </List>
+      {/* {students.map((student, index) => (
+        <Form.Group key={index} widths="equal">
+          <Form.Input
+            style={{ fontColor: 'black', fontWeight: 'bold' }}
+            disabled
+            type="text" fluid
+            placeholder="Name"
+            value={student.name}
+          />
+          <Form.Input
+            disabled
+            type="email" fluid
+            placeholder="Email"
+            value={student.email}
+          />
+          <Button type="button" onClick={() => removeStudent(index)}>
+            Remove
+          </Button>
+        </Form.Group>
+      ))} */}
+      <Form>
+        <Form.Group>
+          <Form.Input
+            width={6}
+            id="focus-me"
+            type="text" fluid
+            // label="First Name"
+            placeholder="First Name"
+            value={currStudent.firstName}
+            onChange={(e) => handleStudentInfoChange("firstName",e.target.value)}
+            autoFocus
+          />
+          <Form.Input
+            width={6}
+            type="text" fluid
+            // label="Last Name"
+            placeholder="Last Name"
+            value={currStudent.lastName}
+            onChange={(e) => handleStudentInfoChange("lastName",e.target.value)}
+            autoFocus
+          />
+          <Form.Input
+            width={8}
+            type="email" fluid
+            // label="Email"
+            placeholder="Email"
+            value={currStudent.email}
+            onChange={(e) => handleStudentInfoChange("email",e.target.value)}
+            onKeyPress={(e: { key: string; }) => e.key === 'Enter' ? addStudent() : null}
+          />
+          <Button color="blue" type="button" onClick={() => addStudent()}>Add</Button>
+        </Form.Group>
+        <Button color="green" fluid type="submit" onClick={signUpClass}>Submit</Button>
+      </Form>
       <ToastContainer position="bottom-right" />
     </Container>
   );

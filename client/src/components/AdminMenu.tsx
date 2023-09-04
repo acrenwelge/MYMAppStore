@@ -21,9 +21,9 @@ const AdminMenu: React.FC = (): JSX.Element => {
 		<Menu pointing vertical>
 			<Menu.Item as={Link} header to="/admin/user" name="Users"/>
 			<Menu.Item as={Link} header to="/admin/transaction" name="Transactions"/>
-			{/*<Menu.Item as={Link} header to="/admin/products" name="Products"/>*/}
-			<Menu.Item as={Link} header to="/admin/purchase-code" name="PurchaseCode"/>
-			<Menu.Item as={Link} header to="/admin/email-subscription" name="Email Subscription"/>
+			<Menu.Item as={Link} header to="/admin/products" name="Products"/>
+			<Menu.Item as={Link} header to="/admin/purchase-code" name="Purchase Codes"/>
+			<Menu.Item as={Link} header to="/admin/subscription" name="Subscriptions"/>
 		</Menu>
 	</div>
 	);

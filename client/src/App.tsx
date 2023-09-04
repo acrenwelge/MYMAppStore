@@ -110,7 +110,7 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/admin/purchase-code">
 									<AdminPurchaseCode />
 								</Route>
-								<Route exact path="/admin/email-subscription">
+								<Route exact path="/admin/subscription">
 									<EmailSubscription/>
 								</Route>
 								<Route exact path="/admin/transaction">

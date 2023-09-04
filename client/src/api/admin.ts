@@ -3,6 +3,8 @@ import PurchaseCode from "../entities/purchaseCode";
 import { PurchaseCodeFormValues } from "../pages/Admin/PurchaseCode";
 import { request } from "./baseRequest"
 import User from "../entities/user";
+import { Subscription } from "../entities";
+import FreeSubscription from "../entities/freeSubscription";
 
 export function getAllUserData(): Promise<AxiosResponse<User[]>> {
     return request<User[]>({
@@ -39,13 +41,6 @@ export function getAllPurchaseCodeData():Promise<any>{
     return request({
         method: 'GET',
         url: 'api/purchaseCode',
-    })
-}
-
-export function getAllEmailSubscriptionData():Promise<any>{
-    return request({
-        method: 'GET',
-        url: 'api/admin/emailSubscription',
     })
 }
 
@@ -86,32 +81,35 @@ export function updateCodeApi(data: PurchaseCodeFormValues): Promise<AxiosRespon
     })
 }
 
-export function addEmailSubApi(data:any):Promise<any> {
+export function getAllFreeSubs(): Promise<AxiosResponse<FreeSubscription[]>> {
+    return request({
+        method: 'GET',
+        url: 'api/admin/free-subscription',
+    })
+}
+
+export function addFreeSub(data: {suffix: string}): Promise<AxiosResponse<FreeSubscription>> {
     return request({
         method: 'POST',
-        url: `api/admin/add-emailsub`,
+        url: `api/admin/free-subscription`,
         data: data
     })
 }
 
-export function deleteEmailSubApi(data:any):Promise<any> {
-    console.log("client admin");
-    console.log(data);
+export function deleteFreeSub(id: number): Promise<AxiosResponse<FreeSubscription>> {
     return request({
-        method: 'POST',
-        url: `api/admin/delete-emailsub`,
-        data: data
+        method: 'DELETE',
+        url: `api/admin/free-subscription/${id}`
     })
 }
 
-export function updateEmailSubApi(data:any):Promise<any> {
+export function updateFreeSub(data: FreeSubscription): Promise<AxiosResponse<FreeSubscription>> {
     return request({
-        method: 'POST',
-        url: `api/admin/update-emailsub`,
-        data: data
+        method: 'PUT',
+        url: `api/admin/free-subscription/${data.email_sub_id}`,
+        data: {suffix: data.suffix}
     })
 }
-
 
 export function getItem(data:any):Promise<any> {
     return request ({

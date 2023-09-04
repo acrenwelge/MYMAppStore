@@ -110,6 +110,7 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 
 	return (
 		<Container>
+			<h1>Individual Sign Up</h1>
 			<Form
 				error={formState.requestError !== undefined}
 				loading={formState.loading}
