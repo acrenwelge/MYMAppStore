@@ -22,6 +22,10 @@ export class SubscriptionService {
     return this.subscriptionRepo.save(newEnt);
   }
 
+  async findAll() {
+    return await this.subscriptionRepo.find({relations: ["user", "item"]});
+  }
+
   async findAllForUser(user_id: number) {
     return await this.subscriptionRepo.find({ where: { user: { userId: user_id } }});
   }

@@ -8,7 +8,8 @@ import InstructorClassSignUpForm from "./InstructorClassSignUpForm";
 const SignUp: React.FC = (): JSX.Element => {
 	// use a state variable to determine if the user is an individual or instructor
 	const [isIndividual, setIsIndividual] = useState<boolean>(true);
-
+	const componentToRender = isIndividual ? <IndividualSignUpForm  /> : <InstructorClassSignUpForm />;
+		
 	return (
 		<Page>
 			<Button.Group style={{marginBottom: "20px"}}>
@@ -17,7 +18,7 @@ const SignUp: React.FC = (): JSX.Element => {
 				<Button color="green" onClick={()=>setIsIndividual(false)}>Instructor Sign-Up</Button>
 			</Button.Group>
 			<Container>
-				{ isIndividual ? <IndividualSignUpForm /> : <InstructorClassSignUpForm />}
+				{componentToRender}
 				{/* TODO: Third party authenticators? */}
 				{/*<ThirdPartyAuthenticators action="sign-up" />*/}
 			</Container>

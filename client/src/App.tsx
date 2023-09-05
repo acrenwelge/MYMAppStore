@@ -21,13 +21,15 @@ import SignUp from "./pages/SignUp/SignUpPage";
 import RequestPasswordReset from "./pages/RequestPasswordReset";
 import ResetPassword from "./pages/ResetPassword";
 import ReadBook from "./pages/Book/index"
-import AdminUserInfo from "./pages/Admin/UserInfo"
-import AdminPurchaseCode from "./pages/Admin/PurchaseCode"
+import AdminUserInfo from "./pages/Admin/AdminUserInfoPage"
+import AdminPurchaseCode from "./pages/Admin/AdminPurchaseCodePage"
 import Records from "./pages/Records";
-import AdminTransactionRecord from "./pages/Admin/TransactionRecord"
 import Prices from "./pages/Price";
-import EmailSubscription from "./pages/Admin/EmailSubscription";
+import AdminTransactionPage from "./pages/Admin/AdminTransactionPage"
+import AdminFreeSubscriptionPage from "./pages/Admin/AdminFreeSubscriptionPage";
 import ManageClassPage from "./pages/Instructor/ManageClassPage";
+import AdminPaidSubscriptionPage from "./pages/Admin/AdminPaidSubscriptionPage";
+import AdminEditProductInfo from "./pages/Admin/AdminProductInfoPage";
 
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line
@@ -107,14 +109,20 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/admin/user">
 									<AdminUserInfo />
 								</Route>
+								<Route exact path="/admin/products">
+									<AdminEditProductInfo />
+								</Route>
 								<Route exact path="/admin/purchase-code">
 									<AdminPurchaseCode />
 								</Route>
-								<Route exact path="/admin/subscription">
-									<EmailSubscription/>
+								<Route exact path="/admin/free-subscription">
+									<AdminFreeSubscriptionPage/>
+								</Route>
+								<Route exact path="/admin/paid-subscription">
+									<AdminPaidSubscriptionPage/>
 								</Route>
 								<Route exact path="/admin/transaction">
-									<AdminTransactionRecord />
+									<AdminTransactionPage />
 								</Route>
 								<Route exact path="/read">
 									<ReadBook />

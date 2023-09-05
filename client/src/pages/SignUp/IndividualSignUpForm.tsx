@@ -112,6 +112,7 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 		<Container>
 			<h1>Individual Sign Up</h1>
 			<Form
+				hidden={formState.success}
 				error={formState.requestError !== undefined}
 				loading={formState.loading}
 				onSubmit={(event, data) => onSubmit(data)}
@@ -194,11 +195,6 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 				/>
 				{/*<Form.Checkbox id="termsAndConditions" label="I agree to the terms and conditions" required />*/}
 
-				<Message
-					content="Your account has been successfully created. To login, first confirm your email using the link that was sent to the email address you provided."
-					header="SUCCESS"
-					success
-				/>
 				<Message content={formState.requestError} error header="Error" />
 				<Button
 					active={
@@ -211,6 +207,12 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 					{formState.loading ? <Loader active inline="centered" /> : "Sign up"}
 				</Button>
 			</Form>
+			<Message
+					hidden={!formState.success}
+					content="Your account has been successfully created. To login, first confirm your email using the link that was sent to the email address you provided."
+					header="SUCCESS"
+					success
+				/>
 		</Container>
 
 	);

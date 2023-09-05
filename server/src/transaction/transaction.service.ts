@@ -25,16 +25,9 @@ export class TransactionService {
   }
 
   async findAll() {
-    const transactions = await this.txRepo.find();
-    // is this needed?
-    //   {
-    //   relations: ["item", "purchasecode", "user"],
-    //   select:{
-    //     txId: true,
-    //     date: true,
-    //     total: true
-    //   }
-    // })
+    const transactions = await this.txRepo.find({
+      relations: ["transactionDetails", "user"]
+    });
     return transactions
   }
 

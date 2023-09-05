@@ -60,24 +60,28 @@ const LocalLoginForm: React.FC = (): JSX.Element => {
 				localStorage.setItem('token', token);
 				ctx.setUser!(user);
 				history.replace(location.state?.prevPath || '/');
-
-				})
-				.catch((err) => {
-						if(err.response.status == 403) {
-							formStateDispatch({
-								type: "ERROR",
-								payload:
-									"Account is not activated. Please check your email to confirm your account."
-							})
-						}
-						if (err.response.status == 401) {
-							formStateDispatch({
-								type: "ERROR",
-								payload:
-									"Incorrect email or password. Please ensure your email and password are correct and try again."
-							})
-						}
-
+			}).catch((err) => {
+					if(err.response.status == 403) {
+						formStateDispatch({
+							type: "ERROR",
+							payload:
+								"Account is not activated. Please check your email to confirm your account."
+						})
+					}
+					if (err.response.status == 401) {
+						formStateDispatch({
+							type: "ERROR",
+							payload:
+								"Incorrect email or password. Please ensure your email and password are correct and try again."
+						})
+					}
+					if (err.response.status >= 500) {
+						formStateDispatch({
+							type: "ERROR",
+							payload:
+								"Unable to login due to server error. Please try again later."
+						})
+					}
 				});
 		},
 		[formStateDispatch, ctx.setUser, formValues, history]
@@ -89,7 +93,6 @@ const LocalLoginForm: React.FC = (): JSX.Element => {
 			loading={formState.loading}
 			onSubmit={(event, data) => onSubmit(data)}
 		>
-
 			<Form.Input
 				id="email"
 				label="Email"

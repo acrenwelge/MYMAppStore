@@ -1,10 +1,11 @@
-import { Axios, AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import PurchaseCode from "../entities/purchaseCode";
-import { PurchaseCodeFormValues } from "../pages/Admin/PurchaseCode";
+import { PurchaseCodeFormValues } from "../pages/Admin/AdminPurchaseCodePage";
 import { request } from "./baseRequest"
 import User from "../entities/user";
 import { Subscription } from "../entities";
 import FreeSubscription from "../entities/freeSubscription";
+import Transaction from "../entities/transaction";
 
 export function getAllUserData(): Promise<AxiosResponse<User[]>> {
     return request<User[]>({
@@ -44,10 +45,10 @@ export function getAllPurchaseCodeData():Promise<any>{
     })
 }
 
-export function getTransactionRecordData():Promise<any>{
+export function getAllTransactions(): Promise<AxiosResponse<Transaction[]>> {
     return request({
         method: 'GET',
-        url: 'api/admin/transaction',
+        url: 'api/transaction',
     })
 }
 
@@ -79,6 +80,20 @@ export function updateCodeApi(data: PurchaseCodeFormValues): Promise<AxiosRespon
         url: `api/purchaseCode/${data.code_id}`,
         data: data
     })
+}
+
+export function getAllSubscriptions(): Promise<AxiosResponse<Subscription[]>> {
+    return request({
+        method: 'GET',
+        url: 'api/subscription/all',
+    })
+}
+
+export function getSubsForCurrentUser(): Promise<AxiosResponse<Subscription[]>> {
+    return request({
+        method: 'GET',
+        url: 'api/subscription',
+    });
 }
 
 export function getAllFreeSubs(): Promise<AxiosResponse<FreeSubscription[]>> {

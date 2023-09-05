@@ -27,8 +27,10 @@ export class UserService {
       throw new ConflictException("User email address already exists")
     }
     const newUserToCreate = this.userRepo.create(userFromClient)
-    const hashed = await hash(userFromClient.password, 10)
-    newUserToCreate.passwordHash = hashed
+    if (userFromClient.password) {
+      const hashed = await hash(userFromClient.password, 10)
+      newUserToCreate.passwordHash = hashed
+    }
     newUserToCreate.role = Roles.User // default to regular user. TODO: allow admin/instructor roles
     newUserToCreate.activatedAccount = false
     newUserToCreate.activationCode = this.generateActivationCode(userFromClient.firstName + userFromClient.lastName)
