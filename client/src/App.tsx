@@ -21,7 +21,7 @@ import SignUp from "./pages/SignUp/SignUpPage";
 import RequestPasswordReset from "./pages/RequestPasswordReset";
 import ResetPassword from "./pages/ResetPassword";
 import ReadBook from "./pages/Book/index"
-import AdminUserInfo from "./pages/Admin/AdminUserInfoPage"
+import AdminUserInfoPage from "./pages/Admin/AdminUserInfoPage"
 import AdminPurchaseCode from "./pages/Admin/AdminPurchaseCodePage"
 import Records from "./pages/Records";
 import Prices from "./pages/Price";
@@ -107,7 +107,7 @@ const App: React.FC = (): JSX.Element => {
 									<ManageClassPage />
 								</Route>
 								<Route exact path="/admin/user">
-									<AdminUserInfo />
+									<AdminUserInfoPage />
 								</Route>
 								<Route exact path="/admin/products">
 									<AdminEditProductInfo />

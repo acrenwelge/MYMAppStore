@@ -5,7 +5,7 @@ import {
     Input,
     Container,
     Confirm,
-    Loader, Dimmer, Button
+    Loader, Dimmer, Button, Dropdown
 } from "semantic-ui-react";
 import {getAllUserData, updateUser, deleteUser, sendAccountActivationEmail} from "../../api/admin";
 import {useHistory} from "react-router-dom";
@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.min.css';
 import User from "../../entities/user";
 import AdminBasePage from "./AdminBasePage";
 import { formatDate } from "../../utils";
+import { Roles } from "../../entities/roles";
 
 interface localUser {
     role: string;
@@ -26,7 +27,7 @@ interface localState {
     filterText: string;
 }
 
-const AdminUserInfo: React.FC = (props): JSX.Element | null => {    
+const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {    
     const [userData, setUserData] = useState<User[]>([]);
     const [loading, setLoading] = useState(false);
     const [confirmBoxOpen, setConfirmBoxOpen] = useState(false);
@@ -62,6 +63,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 sortedUsers = sortedUsers.sort((a, b) => a['firstName'].localeCompare(b['firstName']));
                 break;
             case 'createdAt':
+                // TODO: fix broken sort
                 // sortedUsers = sortedUsers.sort((a, b) => a['createdAt'].toISOString().localeCompare(b['createdAt'].toISOString()));
                 break;
         }
@@ -131,8 +133,8 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             throw new Error("invalid action type")
         }
       }
-    
-    useEffect(() => {
+
+    const refreshAllUserData = async () => {
         setLoading(true);
         getAllUserData()
         .then(res => {
@@ -141,8 +143,13 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
         })
         .catch(error => {
             console.error(error)
+            toast.error("Failed to load user data")
             setLoading(false)
         });
+    }
+
+    useEffect(() => {
+        refreshAllUserData()
     }, []);
     
     const sendVerificationEmail = (id: number) => {
@@ -161,6 +168,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             });
         }
     }
+
     const toggleUserActive = (id: number) => {
         console.log("ID:",id);
         console.log("USERDATA:",userData);
@@ -178,12 +186,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
                 } else {
                     toast.warn("User deactivated successfully");
                 }
-                setUserData(userData.map(u => {
-                    if (u.userId === id) {
-                        u = res.data;
-                    }
-                    return u;
-                }));
+                refreshAllUserData();
             })
             .catch(error => {
                 console.error(error);
@@ -192,10 +195,12 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             });
         }
     }
+
     const confirmUserDelete = (id: number) => {
         setSelectedUserId(id);
         setConfirmBoxOpen(true);
     }
+
     const attemptUserDelete = () => {
         if (selectedUserId === null) {
             console.error("Attempted to delete but no user selected");
@@ -205,7 +210,7 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             deleteUser(selectedUserId).then(res => {
                 toast.success("User deleted successfully");
                 setConfirmBoxOpen(false);
-                setUserData(userData.filter(user => user.userId !== selectedUserId));
+                refreshAllUserData();
             }).catch(error => {
                 console.error(error);
                 setConfirmBoxOpen(false);
@@ -213,96 +218,126 @@ const AdminUserInfo: React.FC = (props): JSX.Element | null => {
             });
         }
     }
+
     const resetSelectedUser = () => {
         setSelectedUserId(null);
         setConfirmBoxOpen(false);
     }
 
-    return (
-        <AdminBasePage>
-            <div style={{height:'80vh',overflowY:'auto'}}>
-                {loading==true?<Dimmer active inverted>
-                    <Loader inverted>Loading User</Loader>
-                </Dimmer>:<div></div>
-                }
-                <Container>
-                    {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
-                    {state.filterActivated === null ? null : 
-                        <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
-                        </div>
-                    }
-                    {state.filterRole === null ? null : 
-                        <div>Filtering by: {state.filterRole}
-                        </div>
-                    }
-                </Container>
+    const changeUserRole = (id: number, newRole: Roles) => {
+        const user = userData.find(user => user.userId === id);
+        if (!user) {
+            console.error("Attempted to change user role but no user found in local data");
+            toast.error("User role change failed");
+        } else {
+            user.role = newRole;
+            updateUser(user)
+            .then(res => {
+                toast.success("User role changed successfully");
+                refreshAllUserData();
+            }).catch(error => {
+                console.error(error);
+                toast.error("User role change failed");
+            });
+        }
+    }
 
-                <Input label="Search by Email or Name:" icon='search' placeholder='email@domain.com'
-                    onChange={(e) => handleFilterTextChange(e)}/>
-                <Table sortable>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell 
-                            sorted={state.sortBy === 'email' ? state.sortDirection : undefined}
-                            onClick={() => handleSortChange('email')}>Email</Table.HeaderCell>
-                            <Table.HeaderCell 
-                            sorted={state.sortBy === 'firstName' ? state.sortDirection : undefined}
-                            onClick={() => handleSortChange('firstName')}>First Name</Table.HeaderCell>
-                            <Table.HeaderCell 
-                            sorted={state.sortBy === 'name' ? state.sortDirection : undefined}
-                            onClick={() => handleSortChange('lastName')}>Last Name</Table.HeaderCell>
-                            <Table.HeaderCell 
-                            sorted={state.sortBy === 'createdAt' ? state.sortDirection : undefined}
-                            onClick={() => handleSortChange('createdAt')}>Register Time</Table.HeaderCell>
-                            <Table.HeaderCell onClick={() => handleFilterChange('role')}>Admin</Table.HeaderCell>
-                            <Table.HeaderCell onClick={() => handleFilterChange('activated')}>Activated</Table.HeaderCell>
-                            <Table.HeaderCell>Verify Email</Table.HeaderCell>
-                            <Table.HeaderCell>Activate</Table.HeaderCell>
-                            <Table.HeaderCell>Delete User</Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        {sortedUsers.map(user => (
-                            <Table.Row key={user.userId}>
-                                <Table.Cell>{user.email}</Table.Cell>
-                                <Table.Cell>{user.firstName}</Table.Cell>
-                                <Table.Cell>{user.lastName}</Table.Cell>
-                                <Table.Cell>{formatDate(user.createdAt)}</Table.Cell>
-                                <Table.Cell>
-                                    {user.role === "admin" ?
-                                        <Icon color='blue' name='checkmark' size='large' />:
-                                        <div></div>}
-                                </Table.Cell>
-                                <Table.Cell>
-                                    {user.activatedAccount ?
-                                        <Icon color='green' name='checkmark' size='large' />:
-                                        <div></div>}
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <Button compact size='medium' color="green" onClick={() => sendVerificationEmail(user.userId)}>Resend Verification Email</Button>
-                                </Table.Cell>
-                                <Table.Cell>
-                                    {user.activatedAccount ?
-                                    <Button compact size='medium' color="orange" onClick={() => toggleUserActive(user.userId)}>Deactivate User</Button>
-                                    : <Button compact size='medium' color="blue" onClick={() => toggleUserActive(user.userId)}>Activate User</Button>
-                                    }
-                                </Table.Cell>
-                                <Table.Cell><Button compact color="red" onClick={() => confirmUserDelete(user.userId)}>Delete User</Button></Table.Cell>
-                                </Table.Row>
-                        ))}
-                    </Table.Body>
-                </Table>
-            </div>
-            <ToastContainer position="bottom-right" />
-            <Confirm
-            open={confirmBoxOpen}
-            content="Are you sure you want to delete this user?"
-            confirmButton="Delete User"
-            onCancel={resetSelectedUser}
-            onConfirm={attemptUserDelete}
-            />
-        </AdminBasePage>
+    return (
+      <AdminBasePage>
+        <div style={{height:'80vh',overflowY:'auto'}}>
+          {loading==true?<Dimmer active inverted>
+            <Loader inverted>Loading User</Loader>
+          </Dimmer>:<div></div>
+          }
+          <Container>
+              {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
+              {state.filterActivated === null ? null : 
+                  <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
+                  </div>
+              }
+              {state.filterRole === null ? null : 
+                  <div>Filtering by: {state.filterRole}
+                  </div>
+              }
+          </Container>
+
+            <Input label="Search by Email or Name:" icon='search' placeholder='email@domain.com'
+              onChange={(e) => handleFilterTextChange(e)}/>
+            <Table sortable>
+              <Table.Header>
+                  <Table.Row>
+                      <Table.HeaderCell 
+                          sorted={state.sortBy === 'email' ? state.sortDirection : undefined}
+                          onClick={() => handleSortChange('email')}
+                      >Email</Table.HeaderCell>
+                      <Table.HeaderCell 
+                          sorted={state.sortBy === 'firstName' ? state.sortDirection : undefined}
+                          onClick={() => handleSortChange('firstName')}
+                      >First Name</Table.HeaderCell>
+                      <Table.HeaderCell 
+                          sorted={state.sortBy === 'name' ? state.sortDirection : undefined}
+                          onClick={() => handleSortChange('lastName')}
+                      >Last Name</Table.HeaderCell>
+                      <Table.HeaderCell 
+                          sorted={state.sortBy === 'createdAt' ? state.sortDirection : undefined}
+                          onClick={() => handleSortChange('createdAt')}
+                      >Register Time</Table.HeaderCell>
+                      <Table.HeaderCell onClick={() => handleFilterChange('role')}>Admin</Table.HeaderCell>
+                      <Table.HeaderCell onClick={() => handleFilterChange('activated')}>Activated</Table.HeaderCell>
+                      <Table.HeaderCell>Actions</Table.HeaderCell>
+                  </Table.Row>
+              </Table.Header>
+              <Table.Body>
+                {sortedUsers.map(user => (
+                  <Table.Row key={user.userId}>
+                    <Table.Cell>{user.email}</Table.Cell>
+                    <Table.Cell>{user.firstName}</Table.Cell>
+                    <Table.Cell>{user.lastName}</Table.Cell>
+                    <Table.Cell>{formatDate(user.createdAt).split(' ')[0]}</Table.Cell>
+                    <Table.Cell>
+                        {user.role === "admin" ?
+                            <Icon color='blue' name='checkmark' size='large' />:
+                            <div></div>}
+                    </Table.Cell>
+                    <Table.Cell>
+                        {user.activatedAccount ?
+                            <Icon color='green' name='checkmark' size='large' />:
+                            <div></div>}
+                    </Table.Cell>
+                    <Table.Cell>
+                      <Dropdown text='User Actions'>
+                        <Dropdown.Menu>
+                          <Dropdown.Item color="green" icon='paper plane' 
+                              onClick={() => sendVerificationEmail(user.userId)} text='Resend verification email' />
+                          {user.activatedAccount ? 
+                            <Dropdown.Item text='Deactivate user' onClick={() => toggleUserActive(user.userId)}/> : 
+                            <Dropdown.Item text='Activate user' onClick={() => toggleUserActive(user.userId)}/>}
+                          {user.role !== Roles.Admin ? 
+                            <Dropdown.Item text='Change role to Admin' onClick={() => changeUserRole(user.userId,Roles.Admin)}/> : null }
+                          {user.role !== Roles.User ? 
+                            <Dropdown.Item text='Change role to User' onClick={() => changeUserRole(user.userId,Roles.User)}/> : null }
+                          {user.role !== Roles.Instructor ?
+                            <Dropdown.Item text='Change role to Instructor' onClick={() => changeUserRole(user.userId,Roles.Instructor)}/> : null }
+                          <Dropdown.Divider />
+                          <Dropdown.Item text='Delete user' onClick={() => confirmUserDelete(user.userId)}/>
+                          </Dropdown.Menu>
+                      </Dropdown>
+                    </Table.Cell>
+                  </Table.Row>
+                ))}
+              </Table.Body>
+            </Table>
+        </div>
+        <ToastContainer position="bottom-right" />
+        <Confirm
+          open={confirmBoxOpen}
+          content="Are you sure you want to delete this user?"
+          confirmButton="Delete User"
+          onCancel={resetSelectedUser}
+          onConfirm={attemptUserDelete}
+        />
+      </AdminBasePage>
     );
 };
 
-export default AdminUserInfo;
+export default AdminUserInfoPage;

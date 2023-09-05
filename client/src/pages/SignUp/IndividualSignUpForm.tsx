@@ -194,6 +194,7 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 					type="password"
 				/>
 				{/*<Form.Checkbox id="termsAndConditions" label="I agree to the terms and conditions" required />*/}
+				<Form.Checkbox label="Request Admin access" />
 
 				<Message content={formState.requestError} error header="Error" />
 				<Button
@@ -214,7 +215,6 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 					success
 				/>
 		</Container>
-
 	);
 };
 
