@@ -1,3 +1,5 @@
+import { AxiosResponse } from "axios";
+import { User } from "../entities";
 import { request } from "./baseRequest"
 
 export function localLoginApi(data:any):Promise<any> {
@@ -9,7 +11,7 @@ export function localLoginApi(data:any):Promise<any> {
     })
 }
 
-export function localSignupApi(data:any):Promise<any> {
+export async function localSignupApi(data:any): Promise<AxiosResponse<User>> {
     return request ({
         method : 'post',
         url: `api/auth/local-signup`,

@@ -35,7 +35,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
     }
   }
 
-  useEffect(() => {
+  const loadClass = () => {
     const instructor = JSON.parse(localStorage.getItem('user') || 'null');
     const instructorId = instructor.userId;
     getClassByInstructor(instructorId)
@@ -47,6 +47,10 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
         toast.error("Failed to load class");
       }
     );
+  }
+
+  useEffect(() => {
+    loadClass();
   }, []);
 
   const removeStudent = (studentId: number) => {
@@ -61,32 +65,37 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       });
   }
 
-  const addNewUserAsStudent = () => {
-    // localSignupApi({
-    //   firstName: formValues.firstName,
-    //   lastName: formValues.lastName,
-    //   email: formValues.email,
-    //   password: formValues.password
-    // }).then((res) => {
-    //     setFormValues(emptyVals);
-    //     formStateDispatch({ type: "SUCCESS" });
-    //     toast.success("Account created");
-    //   }).catch((err) => {
-    //     console.log(err);
-    //     toast.error("Failed to create account");
-    //   });
+  const addExistingUserAsStudent = () => {
+    return addExistingUserPassEmail(addExistingStudentEmail);
   }
 
-  const addExistingUserAsStudent = () => {
-    addStudentToClassByEmail(classData.id, addExistingStudentEmail)
+  const addExistingUserPassEmail = (email: string) => {
+    return addStudentToClassByEmail(classData.id, email)
       .then(res => {
         const students: Student[] = res.data.students.map(u => transformUserToStudent(u));
         setClassData({id: classData.id, students: students});
         setExistingStudentEmail("");
-        toast.success("Student added");
+        toast.success("Student added to class successfully");
       }).catch(err => {
         console.log(err);
         toast.error("Failed to add student");
+      });
+  }
+
+  const addNewUserAsStudent = () => {
+    localSignupApi({
+      firstName: newStudent.firstName,
+      lastName: newStudent.lastName,
+      email: newStudent.email,
+    }).then((res) => {
+        toast.success("Student account created");
+        setNewStudent({firstName: "", lastName: "", email: ""});
+        // passing email directly as param instead of setting local state because of async
+        addExistingUserPassEmail(res.data.email);
+      }).catch((err) => {
+        console.log(err);
+        setExistingStudentEmail("");
+        toast.error("Failed to create an account for the student");
       });
   }
 
