@@ -21,6 +21,7 @@ import { PaymentModule } from './payment/payment.module';
 import {FreeSubscriptionEntity} from "./free-subscription/free-subscription.entity";
 import {join} from 'path';
 import { TransactionDetailEntity } from './transaction/entities/transaction-detail.entity';
+import { ClassEntity } from './class/class.entity';
 
 let envFilePath = [];
 if (process.env.RUNNING_ENV === 'dev') {
@@ -53,7 +54,7 @@ if (process.env.RUNNING_ENV === 'prod') {
             password: process.env.DB_Password,
             database: process.env.DB_Database,
             entities:[
-                UserEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
+                UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
                 TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
             ],
             synchronize: process.env.ENV_TYPE === 'DEV' ? true: false,

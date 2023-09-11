@@ -20,7 +20,7 @@ export class UserService {
   /**
    * Inserts a new user into the database after checking that the email address is not already in use
    **/
-  async localSignUp(userFromClient: UserDto) {
+  async localSignUp(userFromClient: UserDto): Promise<UserDto> {
     const exists = await this.userRepo.exist({where: {email: userFromClient.email}})
     if (exists) {
       console.log(`User email address ${userFromClient.email} already exists`)
@@ -36,15 +36,15 @@ export class UserService {
     newUserToCreate.activationCode = this.generateActivationCode(userFromClient.firstName + userFromClient.lastName)
     const retUserEntity = await this.userRepo.save(newUserToCreate)
     const retUserDTO = this.convertToUserDTO(retUserEntity)
-    return await this.emailService.sendActivateAccountEmail(retUserDTO)
+    await this.emailService.sendActivateAccountEmail(retUserDTO)
+    return retUserDTO
   }
 
   /**
-   * Creates an entire group of users at once
-   * Used by instructors to create a class of students
+   * Creates an entire group of users at once. Used by instructors to create a class of students
    **/
   async localSignUpForClass(createUsers: UserDto[]) {
-    const createResults: Promise<void>[] = []
+    const createResults: Promise<UserDto>[] = []
     console.log(createUsers)
     for (const newUser of createUsers) {
       let res = this.localSignUp(newUser)

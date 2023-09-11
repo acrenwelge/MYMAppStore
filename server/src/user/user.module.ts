@@ -5,9 +5,10 @@ import { UserService } from './user.service';
 import { EmailModule } from "../email/email.module";
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { SubscriptionModule } from 'src/subscription/subscription.module';
+import { ClassEntity } from 'src/class/class.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([UserEntity]), EmailModule, SubscriptionModule],
+  imports:[TypeOrmModule.forFeature([UserEntity, ClassEntity]), EmailModule, SubscriptionModule],
   providers: [UserService],
   exports:[UserService]
 })

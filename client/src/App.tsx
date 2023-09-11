@@ -27,9 +27,10 @@ import Records from "./pages/Records";
 import Prices from "./pages/Price";
 import AdminTransactionPage from "./pages/Admin/AdminTransactionPage"
 import AdminFreeSubscriptionPage from "./pages/Admin/AdminFreeSubscriptionPage";
-import ManageClassPage from "./pages/Instructor/ManageClassPage";
+import InstructorManageClassPage from "./pages/Instructor/InstructorManageClassPage";
 import AdminPaidSubscriptionPage from "./pages/Admin/AdminPaidSubscriptionPage";
 import AdminEditProductInfo from "./pages/Admin/AdminProductInfoPage";
+import AdminManageClassesPage from "./pages/Admin/AdminManageClassesPage";
 
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line
@@ -104,7 +105,10 @@ const App: React.FC = (): JSX.Element => {
 									<RequestPasswordReset />
 								</Route>
 								<Route exact path="/instructor/class">
-									<ManageClassPage />
+									<InstructorManageClassPage />
+								</Route>
+								<Route exact path="/admin/class">
+									<AdminManageClassesPage />
 								</Route>
 								<Route exact path="/admin/user">
 									<AdminUserInfoPage />
