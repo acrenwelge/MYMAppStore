@@ -15,7 +15,7 @@ export class TransactionService {
     private txDetailRepo: Repository<TransactionDetailEntity>,
 ) {}
 
-  create(newTx: TransactionDto) {
+  create(newTx: any) {
     // is this needed?
     // for (const detail of newTx.transactionDetails) {
     //   const detailEnt = this.txDetailRepo.create(detail);

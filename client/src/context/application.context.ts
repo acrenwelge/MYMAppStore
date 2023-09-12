@@ -1,13 +1,14 @@
 import React from "react";
-import { User, Subscription } from "../entities";
+import { User, Product } from "../entities";
 
 export type ApplicationContextData = {
 	user?: User;
 	setUser?: (user?: User) => void;
-	cart: Subscription[];
-	setCart?: (cart: Subscription[]) => void;
+	cart: Product[];
+	setCart: (cart: Product[]) => void;
 };
 
 export const ApplicationContext = React.createContext<ApplicationContextData>({
-	cart: []
+	cart: [],
+	setCart: () => {console.warn("No cart provider")},
 });

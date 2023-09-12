@@ -54,7 +54,7 @@ When("not login",  async () => {
 
 
 When("go to the record url",  async () => {
-    await driver.get("http://localhost:3000/records");
+    await driver.get("http://localhost:3000/subscriptions");
     await driver.sleep(3 * 1000);
         //When("the user enters their email and password", async () => {
         });
@@ -62,7 +62,7 @@ When("go to the record url",  async () => {
 // Scenario 1: Successful Login with Valid Entries
 Then("the user will see the record table.", async () => {
  let curURL =  await driver.getCurrentUrl();
-    expect(curURL).to.equal("http://localhost:3000/records");
+    expect(curURL).to.equal("http://localhost:3000/subscriptions");
 
  //console.log(curURL);
     //expect(curURL).to.equal("http://localhost:3000/");

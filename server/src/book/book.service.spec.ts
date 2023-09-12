@@ -9,7 +9,7 @@ import { ForbiddenException } from '@nestjs/common';
 
 describe('BookService', () => {
   let service: BookService;
-  let recordService: SubscriptionService;
+  let subService: SubscriptionService;
   let emailSubscriptionService: FreeSubscriptionService;
   let userService: UserService;
 
@@ -31,7 +31,7 @@ describe('BookService', () => {
       ],
     }).compile();
     service = module.get<BookService>(BookService);
-    recordService = module.get<SubscriptionService>(SubscriptionService);
+    subService = module.get<SubscriptionService>(SubscriptionService);
     emailSubscriptionService = module.get<FreeSubscriptionService>(FreeSubscriptionService);
     userService = module.get<UserService>(UserService);
   });
@@ -50,9 +50,9 @@ describe('BookService', () => {
       user.email = "abc@tamu.edu"
       return user;
     });
-    jest.spyOn(recordService, 'checkIfUserPurchaseItem').mockImplementation(async () => false);
+    jest.spyOn(subService, 'userHasValidSubscription').mockImplementation(async () => false);
     jest.spyOn(emailSubscriptionService, 'userEmailHasFreeSubscription').mockImplementation(async () => false);
-    expect(await service.getBookURL(1,"dummyValue")).toStrictEqual(
+    expect(await service.getBookURL(1,1)).toStrictEqual(
       {bookURL: process.env.BOOK_ROOT_PATH,
       ifPurchase: false,
       ifEmailSub: false});
@@ -64,9 +64,9 @@ describe('BookService', () => {
       user.email = "abc@otherschool.com"
       return user;
     });
-    jest.spyOn(recordService, 'checkIfUserPurchaseItem').mockImplementation(async () => false);
+    jest.spyOn(subService, 'userHasValidSubscription').mockImplementation(async () => false);
     jest.spyOn(emailSubscriptionService, 'userEmailHasFreeSubscription').mockImplementation(async () => false);
-    expect(service.getBookURL(1,"dummyValue")).toThrowError(ForbiddenException);
+    expect(service.getBookURL(1,1)).toThrowError(ForbiddenException);
   });
 
 });

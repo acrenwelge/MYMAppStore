@@ -2,14 +2,14 @@ import React, {useEffect, useState} from "react";
 import {
     Table,
 } from "semantic-ui-react";
-import { getAllItemData } from "../../api/admin";
+import { getAllProductData } from "../../api/admin";
 import AdminBasePage from "./AdminBasePage";
 
 const AdminEditProductInfo: React.FC = (props): JSX.Element => {
     const [allProducts, setAllProducts] = useState<any[]>([]);
 
     const getAllProducts = () => {
-        getAllItemData()
+      getAllProductData()
             .then(res => {
                 setAllProducts(res.data)
             })

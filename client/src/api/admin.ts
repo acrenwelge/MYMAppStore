@@ -52,10 +52,18 @@ export function getAllTransactions(): Promise<AxiosResponse<Transaction[]>> {
     })
 }
 
-export function getAllItemData():Promise<any>{
+export function getAllProductData():Promise<any>{
     return request({
         method: 'GET',
         url: 'api/item',
+    })
+}
+
+export function getProduct(data:any):Promise<any> {
+    return request ({
+        method : 'GET',
+        url: `api/item/id`,
+        data: data
     })
 }
 
@@ -123,14 +131,6 @@ export function updateFreeSub(data: FreeSubscription): Promise<AxiosResponse<Fre
         method: 'PUT',
         url: `api/admin/free-subscription/${data.email_sub_id}`,
         data: {suffix: data.suffix}
-    })
-}
-
-export function getItem(data:any):Promise<any> {
-    return request ({
-        method : 'GET',
-        url: `api/item/id`,
-        data: data
     })
 }
 

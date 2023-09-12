@@ -3,7 +3,6 @@ import { useCookies } from "react-cookie";
 import { SWRConfig } from "swr";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import "./App.css";
-import { ApplicationContext } from "./context/application.context";
 import Header from "./components/Header";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -11,9 +10,9 @@ import MYMACalc1 from "./pages/MYMACalc1";
 import MYMACalc3 from "./pages/MYMACalc3";
 import MYMACalc2 from "./pages/MYMACalc2";
 import FinancePreview from "./pages/FinancePreview";
-import Checkout from "./pages/Checkout";
+import Checkout from "./pages/CheckoutPage";
 import User from "./entities/user";
-import Subscription from "./entities/subscription";
+import Product from "./entities/product";
 import Home from "./pages/Home";
 import AccountActivation from "./pages/AccountActivation";
 import Login from "./pages/Login";
@@ -23,19 +22,20 @@ import ResetPassword from "./pages/ResetPassword";
 import ReadBook from "./pages/Book/index"
 import AdminUserInfoPage from "./pages/Admin/AdminUserInfoPage"
 import AdminPurchaseCode from "./pages/Admin/AdminPurchaseCodePage"
-import Records from "./pages/Records";
-import Prices from "./pages/Price";
+import UserSubscriptionPage from "./pages/UserSubscriptionPage";
+import ProductsPage from "./pages/Products/ProductsPage";
 import AdminTransactionPage from "./pages/Admin/AdminTransactionPage"
 import AdminFreeSubscriptionPage from "./pages/Admin/AdminFreeSubscriptionPage";
 import InstructorManageClassPage from "./pages/Instructor/InstructorManageClassPage";
 import AdminPaidSubscriptionPage from "./pages/Admin/AdminPaidSubscriptionPage";
 import AdminEditProductInfo from "./pages/Admin/AdminProductInfoPage";
 import AdminManageClassesPage from "./pages/Admin/AdminManageClassesPage";
+import { ApplicationContext } from "./context";
 
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line
-	const [user, setUser] = useState<User | undefined>();
-	const [cart, setCart] = useState<Subscription[]>([]);
+	const [user, setUser] = useState<User>();
+	const [cart, setCart] = useState<Product[]>([]);
 
 	useEffect(() => {
 		const storedUser = localStorage.getItem('user');
@@ -56,7 +56,7 @@ const App: React.FC = (): JSX.Element => {
 					revalidateOnReconnect: false
 				}}
 			>
-				<ApplicationContext.Provider value={{ user, setUser, cart, setCart }}>
+				<ApplicationContext.Provider value={{ user, setUser, cart, setCart}}>
 					<div className="App" style={{ display: "flex", flexDirection: "column" }}>
 						<Header />
 						<br></br>
@@ -74,8 +74,8 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/about">
 									<About />
 								</Route>
-								<Route exact path="/price">
-									<Prices />
+								<Route exact path="/products">
+									<ProductsPage />
 								</Route>
 								<Route exact path="/products/MYMACalc1">
 									<MYMACalc1 />
@@ -89,7 +89,7 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/products/finance-with-maple">
 									<FinancePreview />
 								</Route>
-								<Route  path="/checkout/:id">
+								<Route exact path="/checkout">
 									<Checkout />
 								</Route>
 								<Route exact path="/contact">
@@ -131,8 +131,8 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/read">
 									<ReadBook />
 								</Route>
-								<Route exact path="/records">
-									<Records />
+								<Route exact path="/subscriptions">
+									<UserSubscriptionPage />
 								</Route>
 							</Switch>
 						</main>

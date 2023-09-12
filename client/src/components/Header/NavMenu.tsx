@@ -17,8 +17,8 @@ const NavMenu: React.FC = (): JSX.Element => {
 				</Menu.Item>
 				<Dropdown item text="Products">
 					<Dropdown.Menu>
-						<Dropdown.Item as={Link} to="/price">
-							{"Price"}
+						<Dropdown.Item as={Link} to="/products">
+							{"Product Pricing"}
 						</Dropdown.Item>
 						<Dropdown.Divider />
 						<Dropdown className="link item" pointing="left" text="Calculus">
@@ -54,7 +54,7 @@ const NavMenu: React.FC = (): JSX.Element => {
 				)}
 
 				<Menu.Item fitted position="right">
-					{ctx.user ? <Menu.Item as={Link} to="/records">My Records</Menu.Item> : null}
+					{ctx.user ? <Menu.Item as={Link} to="/subscriptions">My Subscriptions</Menu.Item> : null}
 					{ctx.user?.role === "admin" ?
 						<Menu.Item as={Link} to="/admin/user">Admin</Menu.Item> : null}
 					{ctx.user?.role === "instructor" ?

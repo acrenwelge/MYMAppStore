@@ -22,8 +22,8 @@ const ProductHeader: React.FC<ProductHeaderProps> = (props): JSX.Element => {
 	return (
 		<Container style={{ marginTop: 10 }}>
 			<Image centered size="medium" src={props.image} />
-			<Header as="h2">{props.product.title}</Header>
-			<Header as="h4">{props.product.tagLine}</Header>
+			{/* <Header as="h2">{props.product.title}</Header>
+			<Header as="h4">{props.product.tagLine}</Header> */}
 			<Button color="blue" style={{ marginBottom: 10 }}>{`Sample Chapter`}</Button>
 			<Container>
 				<Dropdown

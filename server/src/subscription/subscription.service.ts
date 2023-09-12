@@ -1,20 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ItemEntity } from 'src/item/item.entity';
 import { Repository } from 'typeorm';
 import { SubscriptionDto } from './subscription.dto';
 import { SubscriptionEntity } from './subscription.entity';
-import { UserEntity } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class SubscriptionService {
   constructor(
     @InjectRepository(SubscriptionEntity)
     private subscriptionRepo: Repository<SubscriptionEntity>,
-    @InjectRepository(UserEntity)
-    private userRepo: Repository<UserEntity>,
-    @InjectRepository(ItemEntity)
-    private itemRepo: Repository<ItemEntity>,
 ) {}
 
   async create(newSubscription: SubscriptionDto) {
@@ -27,7 +21,10 @@ export class SubscriptionService {
   }
 
   async findAllForUser(user_id: number) {
-    return await this.subscriptionRepo.find({ where: { user: { userId: user_id } }});
+    return await this.subscriptionRepo.find({
+      relations: ["user", "item"],
+      where: { user: { userId: user_id } }
+    });
   }
 
   async findOne(id: number) {

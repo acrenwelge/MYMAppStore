@@ -7,7 +7,7 @@ import thumbnail from "../../resources/images/MYMACalc1/thumbnail.gif";
 
 
 const MYMACalc2: React.FC = (): JSX.Element => {
-	const priceURL = process.env.REACT_APP_FRONT_PATH + `/price`;
+	const priceURL = process.env.REACT_APP_FRONT_PATH + `/products`;
 	return (
 		<>
 		<Container style={{ marginTop: 10,marginBottom: 30 }}>

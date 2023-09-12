@@ -3,10 +3,10 @@ import { ItemDto } from "src/item/item.dto";
 import { PurchaseCodeDto } from "src/purchaseCode/purchaseCode.dto";
 import { UserDto } from "src/user/user.dto";
 
-class TransactionDetailDto {
-    txDetailId: number;
+export class TransactionDetailDto {
+    txDetailId?: number;
     item: ItemDto;
-    purchaseCode: PurchaseCodeDto;
+    purchaseCode?: PurchaseCodeDto;
     finalPrice: number;
 }
 

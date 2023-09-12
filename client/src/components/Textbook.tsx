@@ -5,7 +5,6 @@ import useSWR from "swr";
 import { Loader, Divider } from "semantic-ui-react";
 import { Product } from "../entities";
 import ProductHeader from "./ProductHeader";
-import TextbookHeader from "./TextbookHeader";
 
 type TextbookProps = {
 	child: React.ReactNode;

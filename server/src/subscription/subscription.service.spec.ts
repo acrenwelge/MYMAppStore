@@ -7,7 +7,7 @@ import { SubscriptionDto } from './subscription.dto';
 import { createMock } from '@golevelup/ts-jest';
 import {ItemEntity} from "../item/item.entity";
 
-describe('RecordService', () => {
+describe('SubscriptionService', () => {
   let service: SubscriptionService;
   let itemMock: MockType<Repository<ItemEntity>>;
   let repositoryMock: MockType<Repository<SubscriptionEntity>>;
@@ -40,22 +40,22 @@ describe('RecordService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should create a record', async () => {
+  it('should create a subscription', async () => {
     const rec = new SubscriptionDto();
-    const msg = `This action adds a new record`;
+    const msg = `This action adds a new subscription`;
     jest.spyOn(repositoryMock, 'create').mockImplementation(() => true);
     expect(await service.create(rec)).toBe(msg);
   });
 
-  it('should find all record', async () => {
+  it('should find all subscription', async () => {
     const testid = 1;
     jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
     expect(await service.findAllForUser(testid)).toBe(true);
   });
 
-  it('should fine one record', async () => {
+  it('should fine one subscription', async () => {
     const id = 1;
-    const msg = `This action returns a #${id} record`;
+    const msg = `This action returns a #${id} subscription`;
     jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
     expect(await service.findOne(id)).toBe(msg);
   });
@@ -69,7 +69,7 @@ describe('RecordService', () => {
   });
 
 
-  it('should update a record', async () => {
+  it('should update a subscription', async () => {
     const updateitem = new ItemEntity();
     const updateRec = new SubscriptionEntity();
     updateRec.expirationDate = new Date("2024-01-01");
@@ -91,9 +91,9 @@ describe('RecordService', () => {
   });
 
 
-  it('should remove a record', async () => {
+  it('should remove a subscription', async () => {
     const id = 123;
-    const msg = `This action removes a #${id} record`;
+    const msg = `This action removes a #${id} subscription`;
     jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
     expect(await service.remove(id)).toBe(msg);
   });

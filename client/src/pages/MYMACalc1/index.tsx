@@ -5,11 +5,10 @@ import {Container, Image, Button} from "semantic-ui-react";
 import Textbook from "../../components/Textbook";
 import thumbnail from "../../resources/images/MYMACalc1/thumbnail.gif";
 import {ApplicationContext} from "../../context";
-import TextbookHeader from "../../components/TextbookHeader";
 
 const MYMACalc1: React.FC = (): JSX.Element => {
 
-    const priceURL = process.env.REACT_APP_FRONT_PATH + `/price`;
+    const priceURL = process.env.REACT_APP_FRONT_PATH + `/products`;
     const ctx = useContext(ApplicationContext);
     return (
 

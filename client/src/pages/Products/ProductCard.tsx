@@ -32,16 +32,16 @@ function getImage(codeName: string): string {
 }
 
 const ProductCard: React.FC<ProductCardProps> = (props): JSX.Element => {
-	const date = new Date(props.product.updatedAt);
+	// const date = new Date(props.product.updatedAt);
 
 	return (
-		<Card as={Link} to={`/products/${props.product.codeName}`}>
-			<Image src={getImage(props.product.codeName)} ui={false} wrapped />
+		<Card as={Link} to={`/products/${props.product.name}`}>
+			<Image src={getImage(props.product.name)} ui={false} wrapped />
 			<Card.Content>
-				<Card.Header>{props.product.title}</Card.Header>
-				<Card.Meta>{`Published by ${props.product.company.name}`}</Card.Meta>
+				<Card.Header>Dummy Title</Card.Header>
+				{/* <Card.Meta>{`Published by ${props.product.company.name}`}</Card.Meta>
 				<Card.Meta>{`Last updated on ${date.toLocaleDateString()}`}</Card.Meta>
-				<Card.Description>{props.product.tagLine}</Card.Description>
+				<Card.Description>{props.product.tagLine}</Card.Description> */}
 			</Card.Content>
 		</Card>
 	);

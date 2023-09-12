@@ -1,6 +1,8 @@
+import { AxiosResponse } from "axios"
 import { request } from "./baseRequest"
+import { Subscription } from "../entities"
 
-export function getUserSubscriptions():Promise<any> {
+export function getUserSubscriptions(): Promise<AxiosResponse<Subscription[]>> {
     return request({
         method: 'get',
         url: `api/subscription`

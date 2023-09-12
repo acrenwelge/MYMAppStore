@@ -11,10 +11,6 @@ const Products: React.FC = (): JSX.Element => {
 		fetch(url, { method: "GET", headers: { Accept: "application/json" } }).then((res) => res.json())
 	);
 
-	// if (!data) {
-	// 	return <Loader active inline="centered" />;
-	// }
-
 	return (
 		<Container>
 			<p style={{ fontSize: 18 }}>
@@ -58,7 +54,7 @@ const Products: React.FC = (): JSX.Element => {
 				</Divider>
 				<Card.Group itemsPerRow={4} stackable>
 					{data?.products.map((product) => (
-						<ProductCard key={product.id} product={product} />
+						<ProductCard key={product.itemId} product={product} />
 					))}
 				</Card.Group>
 			</div>

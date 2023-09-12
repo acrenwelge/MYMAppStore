@@ -2,7 +2,7 @@ import Product from "./product";
 
 export default interface Subscription {
 	readonly id: number;
-	readonly product?: Product;
-	readonly expirationDate: Date;
+	readonly item: Product;
+	expirationDate: Date; // allow this to be edited for string -> Date conversion
 	readonly userId: number;
 }

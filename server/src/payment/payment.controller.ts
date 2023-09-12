@@ -1,8 +1,9 @@
-import {Body, Controller, Post, Req, Res, UseGuards, Request, HttpCode} from '@nestjs/common';
+import {Body, Controller, Post, Res, UseGuards, Request, HttpCode} from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import {TransactionEntity} from "../transaction/entities/transaction.entity";
+import Cart, { PayPalOrderDetails, PaypalCreateOrderResponse } from './payment.entity';
 
 @Controller('payment')
 export class PaymentController {
@@ -12,14 +13,15 @@ export class PaymentController {
     // @UseGuards(JwtAuthGuard)
     @HttpCode(200)
     @Post('create-paypal-order')
-    async create(@Req() req: Request, @Res() res: Response) {
-        await this.paymentService.create(req, res);
+    async create(@Body() cartData: Cart, @Res() res: Response<PaypalCreateOrderResponse>) {
+        console.log('create-paypal-order', cartData);
+        await this.paymentService.create(cartData, res);
     }
     
     @HttpCode(200)
     @Post('capture-paypal-order')
-    async capture(@Req() req: Request, @Res() res: Response) {
-        await this.paymentService.capture(req, res);
+    async capture(@Body() orderData: PayPalOrderDetails, @Res() res: Response) {
+        await this.paymentService.capture(orderData, res);
     }
 
     @HttpCode(200)

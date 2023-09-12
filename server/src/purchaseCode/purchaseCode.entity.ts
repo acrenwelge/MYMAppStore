@@ -16,7 +16,7 @@ export class PurchaseCodeEntity {
     @PrimaryGeneratedColumn({name: "purchaseCode_id"})
     public code_id: number;
 
-    @Column()
+    @Column({unique: true})
     @Unique("purchaseCode_name_unique", ["name"])
     public name: string;
 
