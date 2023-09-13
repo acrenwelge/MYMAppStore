@@ -1,47 +1,50 @@
-import {Controller, Get, Post, HttpCode, Request, UseGuards,Body, Patch, Param, Delete, Put} from '@nestjs/common';
+import {Controller, Get, Post, HttpCode, UseGuards, Body, Param, Delete, Put, HttpStatus} from '@nestjs/common';
 import {PurchaseCodeService} from "./purchaseCode.service";
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { NeedRole } from 'src/roles/roles.decorator';
 import { Roles } from 'src/roles/role.enum';
+import { PurchaseCodeDto } from './purchaseCode.dto';
 
 @UseGuards(AuthGuard('jwt'),RolesGuard)
 @NeedRole(Roles.Admin)
 @Controller('purchaseCode')
 export class PurchaseCodeController {
-    constructor(private readonly purchaseCodeService:PurchaseCodeService) {}
+    
+    constructor(private readonly purchaseCodeService: PurchaseCodeService) {}
 
     @Get()
     getAllPurchaseCodes() {
         return this.purchaseCodeService.findAll();
     }
 
-    @Get(':id')
-    getOnePurchaseCode(@Param('id') id: number) {
-        return this.purchaseCodeService.findOne(id);
+    @Get(':name')
+    getOnePurchaseCode(@Param('name') name: string) {
+        return this.purchaseCodeService.findOne(name);
     }
     
     @Post()
-    @HttpCode(200)
+    @HttpCode(HttpStatus.CREATED)
     addPurchaseCode(@Body() purchaseCodeDto) {
-        return this.purchaseCodeService.addOne(purchaseCodeDto);
+        return this.purchaseCodeService.createOne(purchaseCodeDto);
     }
 
-    @Put(':id')
-    updatePurchaseCode(@Param('id') id: number, @Body() updatePurchaseCodeDto) {
-        return this.purchaseCodeService.update(id, updatePurchaseCodeDto);
+    @Put(':name')
+    @HttpCode(HttpStatus.OK)
+    updatePurchaseCode(@Param('name') name: string, @Body() updatePurchaseCodeDto) {
+        return this.purchaseCodeService.update(name, updatePurchaseCodeDto);
     }
 
-    @Get("validate")
-    async checkValidPurchaseCode(@Param('name') name: string) {
-        return this.purchaseCodeService.validateCode(name);
+    @NeedRole(Roles.User)
+    @Post("validate")
+    async checkValidPurchaseCode(@Body() code: {name: string, itemId: number}) {
+        return this.purchaseCodeService.validateCode(code.name, code.itemId);
     }
 
-    @Delete(":id")
-    @HttpCode(200)
-    public async deleteCode(@Param('id') id: number) {
-        return this.purchaseCodeService.deleteCode(id);
+    @Delete(":name")
+    @HttpCode(HttpStatus.NO_CONTENT)
+    public async deleteCode(@Param('name') name: string) {
+        return this.purchaseCodeService.deleteCode(name);
     }
-
 
 }

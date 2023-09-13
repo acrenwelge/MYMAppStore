@@ -11,11 +11,12 @@ import { Product } from "../../entities";
 import { ApplicationContext } from "../../context";
 import { ToastContainer, toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { CartItem } from "../../entities/product";
 
 const TextbookHeader = (): JSX.Element => {
     const [productData, setproductData] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
-    const {cart, setCart} = useContext(ApplicationContext);
+    const ctx = useContext(ApplicationContext);
 
     useEffect(() => {
         setLoading(true);
@@ -31,9 +32,15 @@ const TextbookHeader = (): JSX.Element => {
     }, []);
 
     const addItemToCart = (product: Product) => {
-        setCart([
-            ...cart,
-            { ...product }
+        if (ctx.cart.find(item => item.itemId === product.itemId)) {
+            toast.error("Item already in cart");
+            return;
+        }
+        // default to the product's price, no purchase code
+        const cartItem: CartItem = { ...product, finalPrice: product.price, purchaseCode: undefined };
+        ctx.setCart([
+            ...ctx.cart,
+            { ...cartItem }
         ]);
         toast.success("Item added to cart");
     }

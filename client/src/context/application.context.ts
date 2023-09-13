@@ -1,11 +1,12 @@
 import React from "react";
-import { User, Product } from "../entities";
+import { User } from "../entities";
+import { CartItem } from "../entities/product";
 
 export type ApplicationContextData = {
 	user?: User;
 	setUser?: (user?: User) => void;
-	cart: Product[];
-	setCart: (cart: Product[]) => void;
+	cart: CartItem[];
+	setCart: (cart: CartItem[]) => void;
 };
 
 export const ApplicationContext = React.createContext<ApplicationContextData>({

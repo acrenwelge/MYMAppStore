@@ -3,11 +3,7 @@ import { PaymentService } from './payment.service';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import {TransactionService} from "../transaction/transaction.service";
 import * as paypal from "./paypal-api";
-import {EmailService} from "../email/email.service";
 import {createMock} from "@golevelup/ts-jest";
-import {CreateTransactionDto} from "../transaction/transaction.dto";
-import {SubscriptionEntity} from "../subscription/subscription.entity";
-import {TransactionEntity} from "../transaction/entities/transaction.entity";
 
 describe('PaymentService', () => {
   let service: PaymentService;
@@ -38,22 +34,8 @@ describe('PaymentService', () => {
     expect(service).toBeDefined();
   });
 
-/* create : request*/
-
-/* capture: request */
-
-  it('should finish purchasing and sync purchase information', async () => {
-    const userid = 1;
-    const codeid = 1;
-    const itemid = 1;
-    const price = 1;
-    const recordResult = new SubscriptionEntity();
-    const transactionResult = new TransactionEntity();
-    jest.spyOn(recservice, 'update').mockImplementation(async () => recordResult);
-    jest.spyOn(transervice, 'update').mockImplementation(async () => transactionResult);
-    expect(await service.recordPurchase(userid, codeid, itemid, price)).toEqual({recordResult, transactionResult});
+  it('should create a transaction from purchase data after payment', async () => {
+    // TODO: implement
   });
-
-
 
 });

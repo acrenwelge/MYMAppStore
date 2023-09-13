@@ -6,7 +6,6 @@ import {
 import {getAllTransactions} from "../../api/admin";
 import Transaction from "../../entities/transaction";
 import AdminBasePage from "./AdminBasePage";
-import { formatDate } from "../../utils";
 
 const AdminTransactionPage: React.FC = (props): JSX.Element | null => {
     const [transactionData, setTransactionData] = useState<Transaction[]>([]);
@@ -16,6 +15,7 @@ const AdminTransactionPage: React.FC = (props): JSX.Element | null => {
         setLoading(true);
         getAllTransactions()
             .then(res => {
+                console.log(res.data)
                 setTransactionData(res.data)
                 setLoading(false)
             })
@@ -51,7 +51,7 @@ const AdminTransactionPage: React.FC = (props): JSX.Element | null => {
                                 <Table.Cell>{tx.user.lastName}</Table.Cell>
                                 <Table.Cell>{tx.user.email}</Table.Cell>
                                 <Table.Cell>${tx.total.toFixed(2)}</Table.Cell>
-                                <Table.Cell>{formatDate(tx.date)}</Table.Cell>
+                                <Table.Cell>{new Date(tx.createdAt).toLocaleDateString()}</Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>

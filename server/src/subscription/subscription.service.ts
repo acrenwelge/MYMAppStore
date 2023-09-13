@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionDto } from './subscription.dto';
 import { SubscriptionEntity } from './subscription.entity';
+import Cart, { PayPalOrderDetails } from 'src/payment/payment.entity';
+import { Subscription } from 'rxjs';
+import { ItemService } from 'src/item/item.service';
 
 @Injectable()
 export class SubscriptionService {
   constructor(
     @InjectRepository(SubscriptionEntity)
     private subscriptionRepo: Repository<SubscriptionEntity>,
+    private itemService: ItemService,
 ) {}
 
   async create(newSubscription: SubscriptionDto) {
@@ -31,18 +35,42 @@ export class SubscriptionService {
     return await this.subscriptionRepo.findOne({ where: { subscriptionId: id } });
   }
 
-  async addMonthsToSubscription(subscriptionId: number, months: number) {
-    return this.subscriptionRepo.findOne({where: { subscriptionId}})
-      .then((subscription) => {
-        if (subscription == null) {
-          throw new Error("Cannot extend subscription because it was not found");
+  private addMonthsUtil = (date: Date, months: number) => {
+    var d = date.getDate();
+    date.setMonth(date.getMonth() + +months);
+    if (date.getDate() != d) {
+      date.setDate(0);
+    }
+    return date;
+}
+
+  /**
+   * Updates the expiration date of a subscription for a user, or creates a new subscription if one does not exist.
+   * @returns the updated or created subscription
+   */
+  async addOrExtendSubscriptions(order: Cart) {
+    const subs: SubscriptionEntity[] = await this.findAllForUser(order.purchaserUserId);
+    const now = new Date(Date.now());
+    for (const item of order.items) {
+      const {subscriptionLengthMonths} = await this.itemService.findOne(item.itemId);
+      const subsForItem = subs.filter(s => s.item.itemId === item.itemId);
+      if (subsForItem.length > 0) { // user already has a subscription for this item
+        const sub = subsForItem[0];
+        if (sub.expirationDate < now) { // subscription has expired - replace it
+          const newdate = this.addMonthsUtil(now, subscriptionLengthMonths);
+          sub.expirationDate = newdate;
+        } else { // subscription expires in the future - extend it
+          sub.expirationDate = this.addMonthsUtil(sub.expirationDate, subscriptionLengthMonths);
         }
-        subscription.expirationDate.setMonth(subscription.expirationDate.getMonth() + months);
-        return this.subscriptionRepo.save(subscription);
-      }).catch((err) => {
-        console.log(err);
-        throw new Error("Error adding months to subscription");
-      });
+        return this.subscriptionRepo.save(sub);
+      } else { // no existing subscriptions for this user for this item
+        const newSub = this.subscriptionRepo.create();
+        newSub.item = <any> item.itemId;
+        newSub.user = <any> order.purchaserUserId;
+        newSub.expirationDate = this.addMonthsUtil(now, subscriptionLengthMonths);
+        await this.subscriptionRepo.save(newSub);
+      }
+    }
   }
 
   /**

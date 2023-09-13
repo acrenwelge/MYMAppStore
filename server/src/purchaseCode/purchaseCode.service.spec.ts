@@ -63,7 +63,7 @@ describe('PurchaseCodeService', () => {
     
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldCode);
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => newCode);
-    await expect(service.addOne(newCode.name, newCode.priceOff)).rejects.toThrowError();
+    await expect(service.createOne(newCode.name, newCode.salePrice)).rejects.toThrowError();
   });
     
   it('should add a code if it does not exist', async () => {
@@ -73,7 +73,7 @@ describe('PurchaseCodeService', () => {
     
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldCode);
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => newCode);
-    expect(await service.addOne(newCode.name, newCode.priceOff)).toBe(newCode);
+    expect(await service.createOne(newCode.name, newCode.salePrice)).toBe(newCode);
   });
 
 

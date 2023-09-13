@@ -1,17 +1,28 @@
 import { ApiProperty } from "@nestjs/swagger";
 
+// sent to client
 export class PurchaseCodeDto {
-  @ApiProperty()
-  codeId: number;
-
   @ApiProperty()
   name: string;
 
   @ApiProperty()
-  item?: { // not required on updates
+  item: {
     itemId: number;
-    itemName?: string; // not required from client, but sent in response
+    itemName: string;
+    itemSubscriptionLength: number;
   }
+
+  @ApiProperty()
+  priceOff: number;
+}
+
+// received from client for new purchase code
+export class PurchaseCodeFormValues {
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty()
+  itemId: number;
 
   @ApiProperty()
   priceOff: number;

@@ -6,23 +6,15 @@ import {
     Button,
     Modal, Dimmer, Loader, Message, Dropdown
 } from "semantic-ui-react";
-import {addCodeApi, deleteCodeApi, getAllPurchaseCodeData, updateCodeApi} from "../../api/admin";
+import {addPurchaseCodeApi, deleteCodeApi, getAllProductData, getAllPurchaseCodeData, updateCodeApi} from "../../api/admin";
 import AdminBasePage from "./AdminBasePage";
-
-interface PurchaseCode {
-    readonly codeId: number;
-    name: string;
-    priceOff: number;
-    item: {
-        readonly itemId: number;
-        itemName: string;
-    }
-}
+import PurchaseCode from "../../entities/purchaseCode";
+import { Product } from "../../entities";
 
 export type PurchaseCodeFormValues = {
-    code_id: number | null,
-    name: string | null;
-    priceOff: number | null;
+    name: string;
+    priceOff: number;
+    itemId: number;
 };
 
 type MessageValues = {
@@ -38,39 +30,31 @@ interface ProductSelection {
 
 const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
 
-    const [formValues, setFormValues] = useState<PurchaseCodeFormValues>({
-        code_id: null,
-        name: null,
-        priceOff: null
-    });
+    const initFormState: PurchaseCodeFormValues = {
+        name: '',
+        priceOff: 0,
+        itemId: 0
+    }
 
+    const [loading, setLoading] = useState(false);
+    const [formValues, setFormValues] = useState<PurchaseCodeFormValues>(initFormState);
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
-    const [purchaseData, setPurchaseCodeData] = useState<PurchaseCode[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [buttonLoading, setButtonLoading] = useState(false);
-    const [products, setProducts] = useState<ProductSelection[]>([{
-            key: 1,
-            value: 1,
-            text: 'Calc 1',
-        }, {
-            key: 2,
-            value: 2,
-            text: 'Calc 2',
-        }
-    ]);
-    const [selectedProduct, setSelectedProduct] = useState<number>(1);
+    const [purchaseCodeList, setPurchaseCodeList] = useState<PurchaseCode[]>([]);
+    const [purchaseCodeEditName, setPurchaseCodeEditName] = useState<string>('');
+    const [products, setProducts] = useState<ProductSelection[]>([]);
 
     const [message, setMessage] = useState<MessageValues>({
         type:'none',
         message:''
     });
 
-    const getPurchaseCode = () => {
+    const loadPurchaseCodes = () => {
         setLoading(true)
         getAllPurchaseCodeData()
             .then(res => {
-                setPurchaseCodeData(res.data)
+                console.log(res.data)
+                setPurchaseCodeList(res.data)
                 setLoading(false)
             })
             .catch(error => {
@@ -78,29 +62,39 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                 setLoading(false)
             });
     }
+
+    const loadProducts = () => {
+        setLoading(true)
+        getAllProductData()
+            .then(axiosResponse => {
+                setProducts(axiosResponse.data.map((product: Product) => {
+                    return {
+                        key: product.itemId,
+                        value: product.itemId,
+                        text: `${product.name} - ${product.subscriptionLengthMonths} months`,
+                    }
+                }))
+                setLoading(false)
+            })
+            .catch(error => {
+                console.error(error)
+                setLoading(false)
+            });
+    }
+
     useEffect(() => {
-        getPurchaseCode()
+        loadPurchaseCodes()
+        loadProducts()
     }, []);
 
     const handleAdd = () => {
-        setButtonLoading(true)
-        const itemId = products.find((product) => product.value === selectedProduct)?.value
-        addCodeApi({
-            name: formValues.name,
-            item: {
-                itemId
-            },
-            priceOff: Number(formValues.priceOff)
-        }).then(async (res) => {
-            const purchaseCode = res.data.purchaseCode
-            localStorage.setItem('purchaseCode', JSON.stringify(purchaseCode));
-            setButtonLoading(false)
+        addPurchaseCodeApi(formValues)
+        .then((purchaseCode) => {
             setAddModalOpen(false)
-            setMessage({type:'success',message:`Purchase code ${formValues.name} has been added successfully.`})
-            getPurchaseCode()
+            setMessage({type:'success',message:`Purchase code ${purchaseCode.data.name} has been added successfully.`})
+            loadPurchaseCodes()
         }).catch((err) => {
             console.log(err)
-            setButtonLoading(false)
             setAddModalOpen(false)
             setMessage({type:'fail',message:`Error: Purchase code ${formValues.name} not added`})
         });
@@ -109,20 +103,18 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
     const handleCancel = () => {
         setAddModalOpen(false)
         setUpdateModalOpen(false)
-        setFormValues({code_id: null, name: null, priceOff: null})
+        setFormValues(initFormState)
+        setPurchaseCodeEditName('')
     }
 
     const handleDelete = (code: PurchaseCode) => {
         console.log(code)
-        setButtonLoading(true)
-        deleteCodeApi(code.codeId)
-            .then(res => {
-                setButtonLoading(false)
-                getPurchaseCode()
+        deleteCodeApi(code.name)
+            .then(() => {
+                loadPurchaseCodes()
                 setMessage({type:'success',message:`Purchase code ${code.name} has been deleted successfully.`})
             })
             .catch(error => {
-                setButtonLoading(false)
                 console.error(error)
                 setMessage({type:'fail',message:`Fail to delete purchase code ${code.name}. Please try again.`})
             });
@@ -130,31 +122,24 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
 
     const handleEditOpen = (code: PurchaseCode) => {
         console.log(code)
+        setPurchaseCodeEditName(code.name)
         setFormValues({
             ...formValues,
-            code_id: code.codeId,
             name: code.name,
-            priceOff: code.priceOff
+            priceOff: code.priceOff,
+            itemId: code.item.itemId
         })
         setUpdateModalOpen(true)
     };
 
     const handleEdit = () => {
-        setButtonLoading(true)
-        updateCodeApi({
-            code_id: formValues.code_id,
-            name: formValues.name,
-            priceOff: Number(formValues.priceOff)
-        }).then(async (res) => {
-            const purchaseCode = res.data.name
-            localStorage.setItem('purchaseCode', JSON.stringify(purchaseCode));
-            setButtonLoading(false)
+        updateCodeApi(purchaseCodeEditName,formValues)
+        .then((res) => {
             setUpdateModalOpen(false)
-            setMessage({type:'success',message:`Purchase code ${formValues.name} has been updated successfully.`})
-            getPurchaseCode()
+            setMessage({type:'success',message:`Purchase code ${res.data.name} has been updated successfully.`})
+            loadPurchaseCodes()
         }).catch((err) => {
             console.log(err)
-            setButtonLoading(false)
             setUpdateModalOpen(false)
             setMessage({type:'fail',message:`Failed to update purchase code ${formValues.name}. Please try again.`})
         });
@@ -201,17 +186,17 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {purchaseData.map(purchaseCode => (
-                            <Table.Row key={purchaseCode.codeId}>
+                        {purchaseCodeList.map(purchaseCode => (
+                            <Table.Row key={purchaseCode.name}>
                                 <Table.Cell>{purchaseCode.name}</Table.Cell>
-                                <Table.Cell>{purchaseCode.item.itemName}</Table.Cell>
+                                <Table.Cell>{`${purchaseCode.item.itemName} - ${purchaseCode.item.itemSubscriptionLength} months`}</Table.Cell>
                                 <Table.Cell>{purchaseCode.priceOff}</Table.Cell>
                                 <Table.Cell>
                                     <Button primary basic
                                         onClick={() => handleEditOpen(purchaseCode)}>
                                         EDIT
                                     </Button>
-                                    <Button negative basic loading={buttonLoading}
+                                    <Button negative basic
                                         onClick={() => handleDelete(purchaseCode)}>
                                         DELETE
                                     </Button>
@@ -234,7 +219,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                             placeholder='Select Item'
                             fluid
                             selection
-                            onChange={(event, data) => setSelectedProduct(Number(data.value))}
+                            onChange={(event, data) => setFormValues({...formValues, itemId: Number(data.value)})}
                             options={products}
                         />
                         <Form.Input
@@ -262,7 +247,6 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                         content="Add"
                         onClick={handleAdd}
                         positive
-                        loading={buttonLoading}
                     />
                 </Modal.Actions>
             </Modal>
@@ -302,7 +286,6 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                         content="Save"
                         onClick={handleEdit}
                         positive
-                        loading={buttonLoading}
                     />
                 </Modal.Actions>
             </Modal>

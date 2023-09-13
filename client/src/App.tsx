@@ -12,7 +12,7 @@ import MYMACalc2 from "./pages/MYMACalc2";
 import FinancePreview from "./pages/FinancePreview";
 import Checkout from "./pages/CheckoutPage";
 import User from "./entities/user";
-import Product from "./entities/product";
+import { CartItem } from "./entities/product";
 import Home from "./pages/Home";
 import AccountActivation from "./pages/AccountActivation";
 import Login from "./pages/Login";
@@ -35,7 +35,7 @@ import { ApplicationContext } from "./context";
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line
 	const [user, setUser] = useState<User>();
-	const [cart, setCart] = useState<Product[]>([]);
+	const [cart, setCart] = useState<CartItem[]>([]);
 
 	useEffect(() => {
 		const storedUser = localStorage.getItem('user');

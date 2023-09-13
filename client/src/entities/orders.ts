@@ -1,11 +1,14 @@
+import { CartItem } from "./product"
+
+export interface PayPalOrderDetails {
+  orderId: string,
+  cart: CartDataDto,
+}
+
 export interface CartDataDto {
   purchaserUserId: number,
   grandTotal: number,
-  items: {
-    itemId: number,
-    quantity: number,
-    purchaseCode: string | null,
-  }[]
+  items: CartItem[]
 }
 
 export interface PaypalCreateOrderResponse {
@@ -16,9 +19,4 @@ export interface PaypalCreateOrderResponse {
     rel: string,
     method: string,
   }[]
-}
-
-export interface PayPalOrderDetails {
-  orderId: string,
-  cart: CartDataDto,
 }

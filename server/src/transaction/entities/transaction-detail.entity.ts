@@ -21,12 +21,12 @@ export class TransactionDetailEntity {
     @JoinColumn({ name: 'item_id' })
     public item: ItemEntity;
 
-    @OneToOne(() => PurchaseCodeEntity, purchaseCode => purchaseCode.code_id)
-    @JoinColumn({ name: 'purchaseCode_id' })
-    public purchasecode?: PurchaseCodeEntity;
+    @ManyToOne(() => PurchaseCodeEntity, purchaseCode => purchaseCode.name)
+    @JoinColumn({ name: 'purchaseCode_name' })
+    public purchaseCode?: PurchaseCodeEntity;
 
     @Column()
-    public readonly finalPrice: number;
+    public finalPrice: number;
 
     @ManyToOne(() => TransactionEntity, transaction => transaction.transactionDetails)
     @JoinColumn({ name: 'transaction_id' })

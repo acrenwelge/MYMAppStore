@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import * as paypal from "./paypal-api";
-import { SubscriptionService } from 'src/subscription/subscription.service';
 import {TransactionService} from "../transaction/transaction.service";
-import { TransactionDetailDto, TransactionDto } from 'src/transaction/transaction.dto';
 import Cart, { PayPalOrderDetails } from './payment.entity';
 
 @Injectable()
 export class PaymentService {
 
-    constructor(private readonly subervice: SubscriptionService,
-                private readonly txService: TransactionService) {}
+    constructor(private readonly txService: TransactionService) {}
 
-    async create(cart: Cart, res) {
+    /**
+     * Creates a PayPal order for the cart and returns the order details.
+     * Client can use the order details to call PaymentController again and confirm the purchase and record the transaction.
+     * @param cart - contains the purchaser's user ID, the grand total, and the items in the cart
+     * @param res
+     */
+    async createPaypalOrder(cart: Cart, res) {
         // TODO: validate purchase codes and grand total
         try {
             const order = await paypal.createOrder(cart.grandTotal);
@@ -21,43 +24,25 @@ export class PaymentService {
         }
     }
 
-    async capture(orderData: PayPalOrderDetails, res) {
+    /**
+     * Calls PayPal API to capture the payment for the order and then records the transaction in the database.
+     * @param orderData - contains the order ID and the cart data
+     * @param res 
+     * @returns 
+     */
+    async captureAndRecordTx(orderData: PayPalOrderDetails, res): Promise<boolean> {
         console.log('Record a payment for order:', orderData.orderId);
         try {
             const captureData = await paypal.capturePayment(orderData.orderId);
             console.log('Capture data:', captureData);
             // now that the payment has been captured, record the transaction
-            // let txDetails: TransactionDetailDto[] = [];
-            // for (const prod of orderData.cart.items) {
-            //     let detail: any = { 
-            //         itemId: prod.itemId,
-            //         quantity: prod.quantity
-            //     }
-            //     if (prod.purchaseCode) {
-            //         detail.purchaseCode = prod.purchaseCode
-            //     }
-            //     txDetails.push(detail)
-            // }
-            // const transactionDto = {
-            //     userId: orderData.cart.purchaserUserId,
-            //     transactionDetails: txDetails,
-            //     total: orderData.cart.grandTotal,
-            // }
-            // const newTx = await this.txService.create(transactionDto);
-            // assign fields and save
+            this.txService.createAndSaveFromPurchaseCart(orderData.cart);
             res.json(captureData);
+            return Promise.resolve(true);
         } catch (err) {
             console.error(err);
             res.status(500).send(err.message);
+            return Promise.resolve(false);
         }
-    }
-
-    /**
-     * Creates the transaction and subscription database records.
-     * If a subscription already exists for the item, it updates the expiration date.
-     * @returns 
-     */
-    async recordPurchase() {
-        // TODO: implement
     }
 }

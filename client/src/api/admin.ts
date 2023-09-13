@@ -3,7 +3,7 @@ import PurchaseCode from "../entities/purchaseCode";
 import { PurchaseCodeFormValues } from "../pages/Admin/AdminPurchaseCodePage";
 import { request } from "./baseRequest"
 import User from "../entities/user";
-import { Subscription } from "../entities";
+import { Product, Subscription } from "../entities";
 import FreeSubscription from "../entities/freeSubscription";
 import Transaction from "../entities/transaction";
 
@@ -52,14 +52,14 @@ export function getAllTransactions(): Promise<AxiosResponse<Transaction[]>> {
     })
 }
 
-export function getAllProductData():Promise<any>{
+export function getAllProductData(): Promise<AxiosResponse<Product[]>> {
     return request({
         method: 'GET',
         url: 'api/item',
     })
 }
 
-export function getProduct(data:any):Promise<any> {
+export function getProduct(data:any): Promise<any> {
     return request ({
         method : 'GET',
         url: `api/item/id`,
@@ -67,26 +67,33 @@ export function getProduct(data:any):Promise<any> {
     })
 }
 
-export function addCodeApi(data:any):Promise<any> {
+export function getPurchaseCode(name: string): Promise<AxiosResponse<PurchaseCode>> {
+    return request ({
+        method : 'GET',
+        url: `api/purchaseCode/${name}`,
+    })
+}
+
+export function addPurchaseCodeApi(data: PurchaseCodeFormValues): Promise<AxiosResponse<PurchaseCode>> {
     return request({
         method: 'POST',
         url: `api/purchaseCode`,
-        data:data
+        data: data
     })
 }
 
-export function deleteCodeApi(id: number): Promise<any> {
+export function deleteCodeApi(name: string): Promise<AxiosResponse<null>> {
     return request({
         method: 'DELETE',
-        url: `api/purchaseCode/${id}`
+        url: `api/purchaseCode/${name}`
     })
 }
 
-export function updateCodeApi(data: PurchaseCodeFormValues): Promise<AxiosResponse<PurchaseCode>> {
+export function updateCodeApi(name: string, newCode: PurchaseCodeFormValues): Promise<AxiosResponse<PurchaseCode>> {
     return request({
         method: 'PUT',
-        url: `api/purchaseCode/${data.code_id}`,
-        data: data
+        url: `api/purchaseCode/${name}`,
+        data: newCode
     })
 }
 
@@ -131,13 +138,5 @@ export function updateFreeSub(data: FreeSubscription): Promise<AxiosResponse<Fre
         method: 'PUT',
         url: `api/admin/free-subscription/${data.email_sub_id}`,
         data: {suffix: data.suffix}
-    })
-}
-
-export function getPurchaseCode(data:any):Promise<any> {
-    return request ({
-        method : 'GET',
-        url: `api/purchaseCode/id`,
-        data: data
     })
 }

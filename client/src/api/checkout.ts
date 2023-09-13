@@ -1,32 +1,19 @@
+import { AxiosResponse } from "axios"
+import PurchaseCode from "../entities/purchaseCode"
 import { request } from "./baseRequest"
 
 export function getCurrentItem(data:any):Promise<any> {
     return request({
-        method: 'get',
+        method: 'GET',
         url: `api/item/${data}`,
         data: data
     })
 }
-export function checkPurchaseCode(data:any):Promise<any> {
+
+export function validatePurchaseCode(data: {name: string, itemId: number}): Promise<AxiosResponse<PurchaseCode>> {
     return request({
-        method: 'get',
-        url: `api/purchaseCode/${data}`,
+        method: 'POST',
+        url: `api/purchaseCode/validate`,
         data: data
-    })
-}
-
-export function addSubscription(data:any):Promise<any>{
-    return request({
-        method: 'post',
-        url: 'api/subscription',
-        data: data,
-    })
-}
-
-export function addTransaction(data:any):Promise<any>{
-    return request({
-        method: 'post',
-        url: 'api/transaction',
-        data: data,
     })
 }

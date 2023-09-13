@@ -17,7 +17,7 @@ export class TransactionEntity {
     @PrimaryGeneratedColumn({ name: "transaction_id" })
     public txId: number;
 
-    @OneToMany(() => TransactionDetailEntity, transactionDetail => transactionDetail.transaction)
+    @OneToMany(() => TransactionDetailEntity, transactionDetail => transactionDetail.transaction, { cascade: true })
     public transactionDetails: TransactionDetailEntity[];
 
     @ManyToOne(() => UserEntity, user => user.transactions)
@@ -28,5 +28,5 @@ export class TransactionEntity {
     public total: number;
 
     @CreateDateColumn({ name: "created_at", type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
-    public date: Date;
+    public createdAt: Date;
 }

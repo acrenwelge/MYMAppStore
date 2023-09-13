@@ -17,11 +17,3 @@ export function capturePaypalOrder(orderData: PayPalOrderDetails): Promise<Axios
         data: orderData
     })
 }
-
-export function finishPurchasing(data:any):Promise<any> {
-    return request({
-        method: 'post',
-        url: `api/payment/finish-purchasing`,
-        data:data,
-    })
-}

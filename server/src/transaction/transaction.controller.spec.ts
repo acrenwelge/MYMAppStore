@@ -42,7 +42,7 @@ describe('TransactionController', () => {
   it('calling create method', () => {
     const dto: CreateTransactionDto = new CreateTransactionDto();
     controller.create(dto);
-    expect(service.create).toHaveBeenCalledWith(dto);
+    expect(service.createAndSaveFromPurchaseCart).toHaveBeenCalledWith(dto);
   });
 
   it('calling findOne method', () => {

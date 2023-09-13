@@ -24,5 +24,5 @@ export class TransactionDto {
     public total: number;
 
     @ApiProperty()
-    public date: Date;
+    public createdAt: Date;
 }

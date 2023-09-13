@@ -3,9 +3,12 @@ import { TransactionEntity } from "./entities/transaction.entity";
 import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CreateTransactionDto } from './transaction.dto';
 import { createMock } from '@golevelup/ts-jest';
+import Cart from 'src/payment/payment.entity';
 
+type MockType<T> = {
+  [P in keyof T]: jest.Mock<{}>;
+};
 
 describe('TransactionService', () => {
   let service: TransactionService;
@@ -42,32 +45,30 @@ describe('TransactionService', () => {
     expect(await service.findOne(123)).toBe(result);
   });
 
-  it('should remove a transaction', async () => {
-    const id = 123;
-    const msg = `This action removes a #${id} transaction`;
-    jest.spyOn(repositoryMock, 'remove').mockImplementation(() => true);
-    expect(await service.remove(id)).toBe(msg);
-  });
-
   it('should find all transactions', async () => {
     jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
     expect(await service.findAll()).toBe(true);
   });
 
-  it('should create a transaction', async () => {
-    const trans = new CreateTransactionDto();
+  it('should create a transaction from purchase data', async () => {
+    const cart: Cart = {
+      purchaserUserId: 1,
+      grandTotal: 10,
+      items: [
+        {
+          itemId: 1,
+          quantity: 1,
+          purchaseCode: "ABC",
+        },
+        {
+          itemId: 1,
+          quantity: 1,
+          purchaseCode: "ABC",
+        }
+      ]
+    }
     jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
-    expect(await service.create(trans)).toBe(true);
-  });
-
-  it('should update a transaction', async () => {
-    const trans = new TransactionEntity();
-    jest.spyOn(repositoryMock, 'save').mockImplementation(() => true);
-    expect(await service.update(trans.user_id, trans.itemId, trans.codeId, trans.total)).toBe(true);
+    expect(await service.createAndSaveFromPurchaseCart(cart)).toBe(true);
   });
 
 });
-
-export type MockType<T> = {
-  [P in keyof T]: jest.Mock<{}>;
-};

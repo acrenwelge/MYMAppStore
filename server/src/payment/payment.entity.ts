@@ -3,8 +3,9 @@ export default interface Cart {
   grandTotal: number,
   items: {
     itemId: number,
-    quantity: number,
-    purchaseCode: string,
+    finalPrice: number,
+    quantity?: number,
+    purchaseCode?: string,
   }[]
 }
 

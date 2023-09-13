@@ -4,32 +4,32 @@ import { Response } from 'express';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import {TransactionEntity} from "../transaction/entities/transaction.entity";
 import Cart, { PayPalOrderDetails, PaypalCreateOrderResponse } from './payment.entity';
+import { SubscriptionService } from 'src/subscription/subscription.service';
 
 @Controller('payment')
 export class PaymentController {
 
-    constructor(private readonly paymentService: PaymentService) {}
+    constructor(
+        private readonly paymentService: PaymentService,
+        private readonly subService: SubscriptionService) {}
 
     // @UseGuards(JwtAuthGuard)
     @HttpCode(200)
     @Post('create-paypal-order')
     async create(@Body() cartData: Cart, @Res() res: Response<PaypalCreateOrderResponse>) {
         console.log('create-paypal-order', cartData);
-        await this.paymentService.create(cartData, res);
+        await this.paymentService.createPaypalOrder(cartData, res);
     }
     
     @HttpCode(200)
     @Post('capture-paypal-order')
     async capture(@Body() orderData: PayPalOrderDetails, @Res() res: Response) {
-        await this.paymentService.capture(orderData, res);
-    }
-
-    @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
-    @Post('finish-purchasing')
-    async finishPurchasing(@Request() req, @Body() body: TransactionEntity) {
-        // TODO: implement
-        return this.paymentService.recordPurchase()
+        const result = await this.paymentService.captureAndRecordTx(orderData, res);
+        if (result) {
+            await this.subService.addOrExtendSubscriptions(orderData.cart);
+        } else {
+            console.error('Failed to capture payment');
+        }
     }
 }
 

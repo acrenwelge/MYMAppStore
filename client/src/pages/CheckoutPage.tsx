@@ -1,46 +1,42 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useContext, useEffect, useState, useReducer, Reducer } from "react";
 import ReactDOM from "react-dom"
-import { Table, Container, Header, Input, Item, Message, Form, Button } from "semantic-ui-react";
+import { Table, Container, Header, Input, Message, Form, Button } from "semantic-ui-react";
 import { ApplicationContext } from "../context";
-import { getCurrentItem, checkPurchaseCode, addSubscription, addTransaction } from "../api/checkout"
+import { validatePurchaseCode } from "../api/checkout"
 
 // @ts-ignore
 const PayPalButton = paypal.Buttons.driver("react", { React, ReactDOM });
-import { capturePaypalOrder, createPaypalOrder, finishPurchasing } from "../api/payment";
-import { Product } from "../entities";
+import { capturePaypalOrder, createPaypalOrder } from "../api/payment";
 import { CartDataDto, PayPalOrderDetails } from "../entities/orders";
+import { CartItem } from "../entities/product";
 
 interface localUser {
 	role: number;
-	id: number;
+	userId: number;
 }
 
 const Checkout: React.FC = (props): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
-	//for purchase code
-	const [currentCode, setCurrentCode] = useState('');
+	const [currentCode, setCurrentCode] = useState({name: '', itemId: -1});
 	const [totalPrice, setTotalPrice] = useState(-1);
 	const [purchaseFinished, setPurchaseFinished] = useState(false)
 
 	const user: localUser = JSON.parse(localStorage.getItem('user') || 'null');
 
 	useEffect(() => {
-		const total = ctx.cart.reduce((total, item) => total + item.price, 0);
+		const sum = (total: number, item: CartItem) => {
+			return item.quantity ? total + (item.finalPrice * item.quantity) : total + item.finalPrice;
+		}
+		const total = ctx.cart.reduce(sum, 0);
 		setTotalPrice(total);
 	}, [ctx.cart]);
 
-	const cartToData = (cart: Product[]) => {
+	const cartToData = (cart: CartItem[]): CartDataDto => {
 		return {
-			purchaserUserId: user.id,
+			purchaserUserId: user.userId,
 			grandTotal: totalPrice,
-			items: cart.map((product) => {
-				return {
-					itemId: product.itemId,
-					quantity: 1,
-					purchaseCode: null,
-				}
-			})
+			items: cart,
 		}
 	}
 
@@ -61,7 +57,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 	};
 
 	// Finalize the transaction after payer approval
-	const onApprove = async (data: {orderID: string, payerId: string, paymentId: string}) => {
+	const onApprove = async (data: {orderID: string, payerId: string, paymentId: string}, actions: any) => {
 		console.log("onApprove - payment being authorized", data);
 		const orderObj: PayPalOrderDetails = {
 			orderId: data.orderID,
@@ -74,29 +70,46 @@ const Checkout: React.FC = (props): JSX.Element => {
 				console.log("Capture result:", res.data);
 			}).catch((err) => {
 				console.error(err);
-				formStateDispatch({
-					type: "REQUEST_ERROR",
-					payload: "There was a problem processing your payment"
-				})
+				// Two cases to handle:
+				// (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+				// (2) Other non-recoverable errors -> Show a failure message
+				const errorDetail = err?.details?.[0];
+				if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+					// recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
+					return actions.restart();
+				} else if (errorDetail) {
+					throw new Error(`${errorDetail.description} (${err?.debug_id})`);
+				} else if (!err?.purchase_units) {
+					formStateDispatch({
+						type: "REQUEST_ERROR",
+						payload: "There was a problem processing your payment"
+					})
+				}
 			});
 	};
 
-	const updatePurchaseCode = (event: React.FormEvent<HTMLInputElement>) => {
-		setCurrentCode((event.target as HTMLInputElement).value)
+	const updatePurchaseCode = (name: string, itemId: number) => {
+		setCurrentCode({name, itemId});
 	}
 
 	const applyPurchaseCode = () => {
 		formStateDispatch({ type: "LOADING" });
-		checkPurchaseCode(currentCode).then(
-			async (res) => {
-				const discounted = (1 - res.data.priceOff.priceOff * 0.01) * ctx.cart[0].price;
-				setTotalPrice(discounted);
+		validatePurchaseCode(currentCode)
+			.then((res) => {
+				// set the purchase code and final price of the item in the cart
+				ctx.setCart(ctx.cart.map((item) => {
+					if (item.itemId === res.data.item.itemId) {
+						item.finalPrice = res.data.priceOff;
+						item.purchaseCode = currentCode.name;
+					}
+					return item;
+				}));
 				formStateDispatch({ type: "SUCCESS" });
 			})
 			.catch((err) => {
 				formStateDispatch({
 					type: "REQUEST_ERROR",
-					payload: "Unable to apply. The account has already been created."
+					payload: "Unable to apply. Please check the code and try again."
 				})
 			})
 	};
@@ -166,6 +179,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 							<Table.HeaderCell width={4}>Product</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}>Subscription Length</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}>Original Price (USD)</Table.HeaderCell>
+							<Table.HeaderCell collapsing width={2}>Final Price (USD)</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}>Purchase Code</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}></Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}></Table.HeaderCell>
@@ -176,12 +190,18 @@ const Checkout: React.FC = (props): JSX.Element => {
 							<Table.Row key={item.itemId}>
 								<Table.Cell>{item.name}</Table.Cell>
 								<Table.Cell>{item.subscriptionLengthMonths} months</Table.Cell>
-								<Table.Cell>${item.price.toFixed(2)}</Table.Cell>
+								<Table.Cell style={item.finalPrice !== item.price ? {"text-decoration": "line-through"} : null}>
+									${item.price.toFixed(2)}
+								</Table.Cell>
+								<Table.Cell>${item.finalPrice.toFixed(2)}</Table.Cell>
 								<Table.Cell>
-									<Input type="text" name="purchasecode" id="purchasecode" onChange={updatePurchaseCode} value={currentCode}></Input>
+									<Input type="text" name="purchasecode" id="purchasecode"
+									disabled={item.purchaseCode !== undefined}
+									onChange={e => updatePurchaseCode(e.target.value, item.itemId)} value={currentCode.name}></Input>
 								</Table.Cell>
 								<Table.Cell>
 									<Button positive size="small"
+										disabled={item.purchaseCode !== undefined}
 										onClick={applyPurchaseCode}>Apply</Button>
 								</Table.Cell>
 								<Table.Cell>
@@ -196,6 +216,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 							<Table.HeaderCell colSpan={2}>
 								<b>Total</b>
 							</Table.HeaderCell>
+							<Table.HeaderCell></Table.HeaderCell>
 							<Table.HeaderCell colSpan={2} collapsing>
 								<b>${totalPrice.toFixed(2)}</b>
 							</Table.HeaderCell>
@@ -225,7 +246,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 						<script defer src="https://www.paypal.com/sdk/js?client-id=AWuJ4TbTs8TF4PCyNsC3nZo-gJNpUTvebNbns0AvJWuAirsC3BRoTs4lW4_okNlpb0OQNtSZmada8Qtm&currency=USD"></script>
 						<PayPalButton
 							createOrder={(data: any, actions: any) => createOrder(data, actions)}
-							onApprove={(data: any, actions: any) => onApprove(data)}
+							onApprove={(data: any, actions: any) => onApprove(data, actions)}
 						/>
 					</div>
 				) : null}
