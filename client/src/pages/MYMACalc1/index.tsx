@@ -4,7 +4,7 @@ import React, {useContext} from "react";
 import {Container, Image, Button} from "semantic-ui-react";
 import Textbook from "../../components/Textbook";
 import thumbnail from "../../resources/images/MYMACalc1/thumbnail.gif";
-import {ApplicationContext} from "../../context";
+import ApplicationContext from "../../context/application.context";
 
 const MYMACalc1: React.FC = (): JSX.Element => {
 

@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseGuards} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseGuards, HttpStatus} from '@nestjs/common';
 import { ItemService } from './item.service';
 import { ItemDto } from './item.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -10,10 +10,10 @@ import { Roles } from 'src/roles/role.enum';
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @NeedRole(Roles.Admin)
-  @HttpCode(200)
-  @Post()
   create(@Body() createItemDto: ItemDto) {
     return this.itemService.create(createItemDto);
   }
@@ -28,18 +28,19 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @NeedRole(Roles.Admin)
-  @HttpCode(200)
-  @Patch(':id')
   update(@Param('id') id: string, @Body() updateItemDto: ItemDto) {
     return this.itemService.update(+id, updateItemDto);
   }
 
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AuthGuard('jwt'),RolesGuard)
   @NeedRole(Roles.Admin)
-  @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.itemService.remove(+id);
+    this.itemService.remove(+id);
   }
 }

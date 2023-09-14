@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useContext, useReducer, Reducer } from "react";
 import { Form, Button, FormProps, Message, Loader, Segment, Icon, Header } from "semantic-ui-react";
 import {useHistory, useLocation} from "react-router-dom";
-import { ApplicationContext } from "../../context";
+import ApplicationContext from "../../context/application.context";
 import { User } from "../../entities";
 import {localLoginApi} from "../../api/auth";
 

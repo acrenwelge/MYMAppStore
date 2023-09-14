@@ -7,7 +7,6 @@ import {AuthGuard} from "@nestjs/passport";
 import {PurchaseCodeService} from '../purchaseCode/purchaseCode.service';
 import {TransactionService} from '../transaction/transaction.service';
 import {FreeSubscriptionService} from "../free-subscription/free-subscription.service";
-import { PurchaseCodeDto } from 'src/purchaseCode/purchaseCode.dto';
 import { EmailService } from 'src/email/email.service';
 import { UserDto } from 'src/user/user.dto';
 
@@ -27,7 +26,7 @@ export class AdminController {
     }
 
     @Delete("user/:id")
-    @HttpCode(HttpStatus.OK)
+    @HttpCode(HttpStatus.NO_CONTENT)
     public async deleteUser(@Param('id') userId: number) {
         return this.userService.deleteOne(userId);
     }
@@ -57,19 +56,19 @@ export class AdminController {
     }
 
     @Post("free-subscription")
-    @HttpCode(200)
+    @HttpCode(HttpStatus.CREATED)
     public async addEmailSub(@Body() obj: {suffix: string}) {
         return this.freeSubService.addOne(obj.suffix)
     }
 
     @Put("free-subscription/:id")
-    @HttpCode(200)
+    @HttpCode(HttpStatus.OK)
     public async updateFreeSub(@Param('id') id: number, @Body() obj: {suffix: string}) {
         return this.freeSubService.updateEmailSub(id, obj.suffix)
     }
 
     @Delete("free-subscription/:id")
-    @HttpCode(200)
+    @HttpCode(HttpStatus.NO_CONTENT)
     public async deleteEmailSub(@Param("id") id: number) {
         return this.freeSubService.deleteEmailSub(id)
     }

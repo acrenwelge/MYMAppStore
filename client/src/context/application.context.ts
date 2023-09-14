@@ -9,7 +9,9 @@ export type ApplicationContextData = {
 	setCart: (cart: CartItem[]) => void;
 };
 
-export const ApplicationContext = React.createContext<ApplicationContextData>({
+const ApplicationContext = React.createContext<ApplicationContextData>({
 	cart: [],
 	setCart: () => {console.warn("No cart provider")},
 });
+
+export default ApplicationContext;

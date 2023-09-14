@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Container, Header, Button, Dropdown, DropdownItemProps, Image } from "semantic-ui-react";
-import { ApplicationContext } from "../context";
+import ApplicationContext from "../context/application.context";
 import { Product } from "../entities";
 
 type ProductHeaderProps = {

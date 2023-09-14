@@ -1,7 +1,7 @@
 import React, { useContext, useState, useCallback } from "react";
 import { Header, Divider, Form } from "semantic-ui-react";
 import * as libphonenumber from "libphonenumber-js";
-import { ApplicationContext } from "../../context";
+import ApplicationContext from "../../context/application.context";
 import Page from "../../components/Page";
 
 const ContactPage: React.FC = (props): JSX.Element => {

@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Param, Delete, UseGuards, Request, HttpCode} from '@nestjs/common';
+import {Controller, Get, Post, Body, Param, Delete, UseGuards, Request, HttpCode, HttpStatus} from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import { SubscriptionDto } from './subscription.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -7,8 +7,8 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 export class SubscriptionController {
   constructor(private readonly subscriptionService: SubscriptionService) {}
 
-  @HttpCode(200)
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   create(@Body() newSubscription: SubscriptionDto) {
     return this.subscriptionService.create(newSubscription);
   }
@@ -31,7 +31,8 @@ export class SubscriptionController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: number) {
-    return this.subscriptionService.remove(id);
+    this.subscriptionService.remove(id);
   }
 }

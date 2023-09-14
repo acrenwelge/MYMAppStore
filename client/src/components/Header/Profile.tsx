@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Menu, Dropdown } from "semantic-ui-react";
 import { useHistory } from "react-router-dom";
 import { useCookies } from "react-cookie";
-import { ApplicationContext } from "../../context";
+import ApplicationContext from "../../context/application.context";
 
 const Profile: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Menu, Dropdown } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import { ApplicationContext } from "../../context";
+import ApplicationContext from "../../context/application.context";
 import Cart from "./Cart";
 import Profile from "./Profile";
 import LoginSignUp from "./LoginSignUp";
@@ -10,7 +10,7 @@ const NavMenu: React.FC = (): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
 
 	return (
-		<div>
+		<nav>
 			<Menu>
 				<Menu.Item as={Link} header to="/">
 					{"MYMathApps"}
@@ -59,11 +59,11 @@ const NavMenu: React.FC = (): JSX.Element => {
 						<Menu.Item as={Link} to="/admin/user">Admin</Menu.Item> : null}
 					{ctx.user?.role === "instructor" ?
 						<Menu.Item as={Link} to="/instructor/class">Manage Class</Menu.Item>: null}
-					{/*<Cart />*/}
+					<Cart />
 					{ctx.user ? <Profile /> : <LoginSignUp />}
 				</Menu.Item>
 			</Menu>
-		</div>
+		</nav>
 	);
 };
 

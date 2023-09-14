@@ -3,7 +3,6 @@ import { useCookies } from "react-cookie";
 import { SWRConfig } from "swr";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import "./App.css";
-import Header from "./components/Header";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import MYMACalc1 from "./pages/MYMACalc1";
@@ -19,9 +18,9 @@ import Login from "./pages/Login";
 import SignUp from "./pages/SignUp/SignUpPage";
 import RequestPasswordReset from "./pages/RequestPasswordReset";
 import ResetPassword from "./pages/ResetPassword";
-import ReadBook from "./pages/Book/index"
-import AdminUserInfoPage from "./pages/Admin/AdminUserInfoPage"
-import AdminPurchaseCode from "./pages/Admin/AdminPurchaseCodePage"
+import ReadBook from "./pages/Book/index";
+import AdminUserInfoPage from "./pages/Admin/AdminUserInfoPage";
+import AdminPurchaseCode from "./pages/Admin/AdminPurchaseCodePage";
 import UserSubscriptionPage from "./pages/UserSubscriptionPage";
 import ProductsPage from "./pages/Products/ProductsPage";
 import AdminTransactionPage from "./pages/Admin/AdminTransactionPage"
@@ -30,7 +29,8 @@ import InstructorManageClassPage from "./pages/Instructor/InstructorManageClassP
 import AdminPaidSubscriptionPage from "./pages/Admin/AdminPaidSubscriptionPage";
 import AdminEditProductInfo from "./pages/Admin/AdminProductInfoPage";
 import AdminManageClassesPage from "./pages/Admin/AdminManageClassesPage";
-import { ApplicationContext } from "./context";
+import ApplicationContext from "./context/application.context";
+import NavMenu from "./components/Header/NavMenu";
 
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line
@@ -58,7 +58,7 @@ const App: React.FC = (): JSX.Element => {
 			>
 				<ApplicationContext.Provider value={{ user, setUser, cart, setCart}}>
 					<div className="App" style={{ display: "flex", flexDirection: "column" }}>
-						<Header />
+						<NavMenu />
 						<br></br>
 						<main style={{ flexGrow: 1 }}>
 							<Switch>

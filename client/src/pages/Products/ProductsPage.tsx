@@ -8,7 +8,7 @@ import {
 } from "semantic-ui-react";
 import { getAllProductData } from "../../api/admin";
 import { Product } from "../../entities";
-import { ApplicationContext } from "../../context";
+import ApplicationContext from "../../context/application.context";
 import { ToastContainer, toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { CartItem } from "../../entities/product";
@@ -91,7 +91,7 @@ const TextbookHeader = (): JSX.Element => {
                 </Button>
             </Link>
         </div>
-        <ToastContainer />
+        <ToastContainer position="bottom-right" />
 		</Container>
 	);
 };

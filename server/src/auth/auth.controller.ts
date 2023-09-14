@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Post, Request, UnauthorizedException, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UnauthorizedException, UseGuards} from '@nestjs/common';
 import {UserService} from "../user/user.service";
 import {ClassService} from "../class/class.service";
 import {AuthGuard} from "@nestjs/passport";
@@ -13,14 +13,14 @@ export class AuthController {
                 private authService:AuthService,
                 private readonly classService: ClassService) {}
 
-    @HttpCode(200)
     @Post("local-signup")
+    @HttpCode(HttpStatus.CREATED)
     public create(@Body() user: UserDto) {
         return this.userService.localSignUp(user);
     }
 
-    @HttpCode(200)
     @Post("class-signup")
+    @HttpCode(HttpStatus.CREATED)
     public async signUpStudents(@Body() instructorAndClass: {instructor: UserDto, students: UserDto[]}) {
         console.log(instructorAndClass);
         // first create the instructor
@@ -37,21 +37,20 @@ export class AuthController {
      * Authenticates a user with email and password and returns a JWT token
      */
     @Post("local-login")
-    @HttpCode(200)
+    @HttpCode(HttpStatus.OK)
     public async localLogin(@Body() user: UserDto) {
         await this.userService.authenticate(user)
         return this.authService.login(user)
     }
 
-    @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
     @Get('profile')
+    @UseGuards(JwtAuthGuard)
     public getProfile(@Request() req) {
         return req.user;
     }
 
-    @HttpCode(200)
     @Post("activate")
+    @HttpCode(HttpStatus.OK)
     public activateAccount(@Body() body: {activationCode: string}) {
         return this.userService.activateAccount(body.activationCode);
     }

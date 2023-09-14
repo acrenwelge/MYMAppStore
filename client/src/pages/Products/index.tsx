@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import useSWR from "swr";
 import { Loader, Container, Divider, Header, Icon, Card } from "semantic-ui-react";
-import { ApplicationContext } from "../../context";
+import ApplicationContext from "../../context/application.context";
 import { ProductsResponse } from "../../responses";
 import ProductCard from "./ProductCard";
 

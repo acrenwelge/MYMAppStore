@@ -2,7 +2,7 @@
 import React, { useContext, useEffect, useState, useReducer, Reducer } from "react";
 import ReactDOM from "react-dom"
 import { Table, Container, Header, Input, Message, Form, Button } from "semantic-ui-react";
-import { ApplicationContext } from "../context";
+import ApplicationContext from "../context/application.context";
 import { validatePurchaseCode } from "../api/checkout"
 
 // @ts-ignore
