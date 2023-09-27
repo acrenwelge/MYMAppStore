@@ -6,7 +6,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import Cart from 'src/payment/payment.entity';
 
-type MockType<T> = {
+export type MockType<T> = {
   [P in keyof T]: jest.Mock<{}>;
 };
 
