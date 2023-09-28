@@ -8,6 +8,7 @@ import { createMock } from '@golevelup/ts-jest';
 import {EmailService} from "../email/email.service";
 import { hash } from 'bcrypt';
 import { SubscriptionService } from 'src/subscription/subscription.service';
+import { UserDto } from './user.dto';
 
 describe('UserService', () => {
   let service: UserService;
@@ -52,11 +53,11 @@ describe('UserService', () => {
     jest.clearAllMocks();
   });
 
-  xit('should be defined', () => {
+  it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
-  xit('should signup locally', async () => {
+  it('should signup locally', async () => {
       const olduser = null;
       const testuser = new UserEntity();
       jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => olduser);
@@ -75,7 +76,7 @@ describe('UserService', () => {
   //if too slow it won't work
 */
 
-  xit('should activate an account', async () => {
+  it('should activate an account', async () => {
     const activcode = "a";
     const olduser = new UserEntity();
     olduser.activationCode = activcode;
@@ -88,12 +89,12 @@ describe('UserService', () => {
     expect(await service.activateAccount(newuser.activationCode)).toStrictEqual(newuser);
   });
 
-  xit('should find all user', async () => {
+  it('should find all user', async () => {
     jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
     expect(await service.findAll()).toBe(true);
   });
 
-  xit('should find one user', async () => {
+  it('should find one user', async () => {
     const result = new UserEntity();
     result.email = "ncc@me.com";
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
@@ -107,7 +108,7 @@ describe('UserService', () => {
     expect(res).toHaveLength(60);
   })
 
-  xit('should authenticate a user', async () => {
+  it('should authenticate a user', async () => {
     const result = new UserEntity();
     result.email = "test@mail.com";
     result.passwordHash = "abcdefg";
@@ -115,7 +116,7 @@ describe('UserService', () => {
     expect(await service.authenticate(result)).toBe(result);
   });
 
-  xit('should NOT authenticate a user', async () => {
+  it('should NOT authenticate a user', async () => {
     const result = new UserEntity();
     result.email = "test@mail.com";
     result.passwordHash = "abcdefg";
@@ -123,10 +124,34 @@ describe('UserService', () => {
     expect(await service.authenticate(result)).toBeNull();
   });
 
-  xit('should delete a user', async () => {
+  it('should delete a user', async () => {
     jest.spyOn(repositoryMock, 'delete').mockImplementation(() => null);
     await service.deleteOne(1);
     expect(repositoryMock.delete).toBeCalledWith(1);
   });
+
+  xit('should change first and last name', async () => {
+    const user = new UserEntity()
+    user.email = "test@mail.com"
+    user.firstName = "Testing"
+    user.lastName = "Bad name"
+    const update = new UserDto()
+    update.email = "test@mail.com"
+    update.firstName = "John"
+    update.lastName = "Doe"
+    jest.spyOn(repositoryMock, 'update').mockImplementation(() => user);
+    expect((await service.updateOne(update)).firstName).toBe(update.firstName)
+  });
+
+  xit('should change password', async () => {
+    const user = new UserEntity()
+    user.email = "test@mail.com"
+    const update = new UserDto()
+    update.email = "test@mail.com"
+    update.password = "applesButter32Game"
+    jest.spyOn(repositoryMock, 'update').mockImplementation(() => user)
+    expect((await service.updateOne(update)).passwordHash).toHaveLength(60)
+  });
+
 });
 
