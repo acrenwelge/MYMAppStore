@@ -144,12 +144,12 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                       </Table.Header>
                       <Table.Body>
                         {classData.students.map(student => (
-                            <Table.Row className="instructor-class-table-row" key={student.id}>
+                            <Table.Row id="instructor-class-table-row" key={student.id}>
                               <Table.Cell>{student.firstName}</Table.Cell>
                               <Table.Cell>{student.lastName}</Table.Cell>
-                              <Table.Cell>{student.email}</Table.Cell>
+                              <Table.Cell id="instructor-class-table-cell-email">{student.email}</Table.Cell>
                               <Table.Cell>
-                                <Button compact color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
+                                <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
                                 <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button>
                               </Table.Cell>
                             </Table.Row>
@@ -164,10 +164,10 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                 <p>If your student already has an account, enter their email below and we will add them to your class.</p>
                 <Form>
                   <Form.Field width={6}>
-                  <Input placeholder="jsmith123@email.com" type="email" label="Email"
+                  <Input placeholder="jsmith123@email.com" id="existing-email" type="email" label="Email"
                   value={addExistingStudentEmail} onChange={(e) => setExistingStudentEmail(e.target.value)}/>
                   </Form.Field>
-                  <Button compact color="green" onClick={() => addExistingUserAsStudent()}>Add Student</Button>
+                  <Button compact id="existing-add" color="green" onClick={() => addExistingUserAsStudent()}>Add Student</Button>
                 </Form>
               </GridColumn>
             </Grid.Row>
@@ -177,18 +177,18 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                 <p>If your student does not have an account, enter their information below and we will create an account for them and add them to your class automatically.</p>
                 <Form>
                   <Form.Field width={5}>
-                  <Input placeholder="John" type="text" label="First Name"
+                  <Input placeholder="John" type="text" label="First Name" id="new-first-name"
                   value={newStudent.firstName} onChange={(e) => handleInputChange('firstName',e.target.value)}/>
                   </Form.Field>
                   <Form.Field width={5}>
-                  <Input placeholder="Smith" type="text" label="Last Name"
+                  <Input placeholder="Smith" type="text" label="Last Name" id="new-last-name"
                   value={newStudent.lastName} onChange={(e) => handleInputChange('lastName',e.target.value)}/>
                   </Form.Field>
                   <Form.Field width={6}>
-                  <Input placeholder="jsmith123@email.com" type="email" label="Email"
+                  <Input placeholder="jsmith123@email.com" type="email" label="Email" id="new-email"
                   value={newStudent.email} onChange={(e) => handleInputChange('email',e.target.value)}/>
                   </Form.Field>
-                  <Button compact color="green" onClick={() => addNewUserAsStudent()}>Add Student</Button>
+                  <Button compact id="new-add" color="green" onClick={() => addNewUserAsStudent()}>Add Student</Button>
                 </Form>
               </GridColumn>
             </Grid.Row>

@@ -27,12 +27,12 @@ Given('user is logged in as instructor', async function () {
     // log in using a premade instructor account
     // this instructor account has a class with at least one student
     await driver.get('http://localhost:3000/login')
- 	await driver.sleep(2 * 1000)
+ 	await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.id("email")).sendKeys('test@test.com')
     await driver.findElement(webdriver.By.id("password")).sendKeys('password')
-    await driver.sleep(2 * 1000)
+    await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
-    await driver.sleep(2 * 1000)
+    await driver.sleep(1 * 1000)
 })
 
 When('not accessing an item', async function () {
@@ -43,7 +43,7 @@ When('not accessing an item', async function () {
 
 When('go to the class management url', async function () {
     await driver.get("http://localhost:3000/instructor/class")
-	await driver.sleep(3 * 1000)
+	await driver.sleep(1 * 1000)
 })
 
 Then('the user should be at class management page with their class information displayed.', async function () {
@@ -61,12 +61,12 @@ Then('the user should be at class management page with their class information d
 Given('user is not logged in as instructor', async function () {
     // log in using a premade user account
     await driver.get('http://localhost:3000/login')
- 	await driver.sleep(3 * 1000)
+ 	await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.id("email")).sendKeys('test1@test.com')
     await driver.findElement(webdriver.By.id("password")).sendKeys('password')
-    await driver.sleep(6 * 1000)
+    await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
-    await driver.sleep(6 * 1000)
+    await driver.sleep(1 * 1000)
 })
 
 Then('the user will not see any class data.', async function () {
@@ -78,10 +78,12 @@ Then('the user will not see any class data.', async function () {
 // Background:
 //         Given user is logged in as instructor
 //         When user is at the class management page
-
+let initialNumberOfRows = 0
 When('user is at the class management page', async function () {
     await driver.get("http://localhost:3000/instructor/class")
-	await driver.sleep(3 * 1000)
+	await driver.sleep(1 * 1000)
+    let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
+    initialNumberOfRows = array.length
 })
 
 // Scenario: Successfully adding a student with an existing account
@@ -89,28 +91,83 @@ When('user is at the class management page', async function () {
 //         And clicks 'Add Student'
 //         Then student is added to the class and shows in the student list.
 
-// Scenario: Failed adding a student from an existing email
-//         And inputs student's email under 'Add Existing User as Student'
+When('inputs student\'s email under \'Add Existing User as Student\'', async function() {
+    await driver.findElement(webdriver.By.id("existing-email")).sendKeys('test1@test.com')
+    await driver.sleep(1 * 1000)
+})
+
+When('clicks \'Add Student\'', async function() {
+    await driver.findElement(webdriver.By.id('existing-add')).click()
+    await driver.sleep(1 * 1000)
+})
+
+Then('student is added to the class and shows in the student list.', async function() {
+    let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
+    expect(array.length).to.equal(initialNumberOfRows+1)
+})
+
+// Scenario: Failed adding a student from an existing email since they don't have an account
+//         And inputs student's email under 'Add Existing User as Student' with nonexisting
 //         And clicks 'Add Student'
-//         And email does not exist in the database
-//         Then student is not added to the class and doesn't show in the student list.
-
-// Scenario: Successfully adding a student without an existing account
-//         And under 'Add New User as Student' section
-//         And inputs student's firstname, lastname, and email
-//         And email given is not in the database already
-//         Then student is added to the class and shows in the student list.
-
-// Scenario: Failed adding a student without an existing account
-//         And under 'Add New User as Student' section
-//         And inputs student's firstname, lastname, and email
-//         And email given is in the database already
 //         Then student is not added to the class.
+When('inputs student\'s email under \'Add Existing User as Student\' with nonexisting', async function() {
+    await driver.findElement(webdriver.By.id("existing-email")).sendKeys('doesnt@exist.com')
+    await driver.sleep(1 * 1000)
+})
+
+Then('student is not added to the class.', async function() {
+    let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
+    expect(array.length).to.equal(initialNumberOfRows)
+})
+
+// *THIS SCENARIO REQUIRES YOU TO DELETE THE ACCOUNT FROM THE DATABASE*
+// Scenario: Successfully adding a student without an existing account
+//         And inputs student's firstname, lastname, and email under 'Add New User as Student' section
+//         Then student is added to the class and shows in the student list.
+When('inputs student\'s firstname, lastname, and email without existing', async function() {
+    await driver.findElement(webdriver.By.id("new-first-name")).sendKeys('new')
+    await driver.findElement(webdriver.By.id("new-last-name")).sendKeys('student')
+    await driver.findElement(webdriver.By.id("new-email")).sendKeys('new@test.com')
+    await driver.sleep(1 * 1000)
+    // click button to submit
+    await driver.findElement(webdriver.By.id('new-add')).click()
+    await driver.sleep(1 * 1000)
+})
+
+// Scenario: Failed adding a student without an existing account since account exists
+//         And inputs student's firstname, lastname, and email under 'Add New User as Student' section
+//         Then student is not added to the class.
+
+When('inputs student\'s firstname, lastname, and email with existing', async function() {
+    await driver.findElement(webdriver.By.id("new-first-name")).sendKeys('stu')
+    await driver.findElement(webdriver.By.id("new-last-name")).sendKeys('test1')
+    await driver.findElement(webdriver.By.id("new-email")).sendKeys('test1@test.com')
+    await driver.sleep(1 * 1000)
+    // click button to submit
+    await driver.findElement(webdriver.By.id('new-add')).click()
+    await driver.sleep(1 * 1000)
+})
 
 // Scenario: Successfully removing a student from the class
 //         And clicks 'Remove Student' for a student listed
-//         Then the student is removed from the class and doesn't show on the page.
+//         Then the student is removed from the class.
+When('clicks \'Remove Student\' for a student listed', async function() {
+    let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
+    let test1_idx = 0
+    for (let i = 0; i < array.length; i++) {
+        if ( array[i].findElement(webdriver.By.id("instructor-class-table-cell-email")).getText() === "test1@test.com" ) {
+            test1_idx = i
+        }
+    }
+    array[test1_idx].findElement(webdriver.By.id("remove-student")).click()
+    await driver.sleep(1 * 1000)
+})
+
+Then('the student is removed from the class.', async function() {
+    let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
+    expect(array.length).to.equal(initialNumberOfRows-1)
+})
 
 // Scenario: Successfully purchase a textbook for a student from the class
 //         And clicks 'Purchase Items' for a student listed
-//         Then the student is removed from the class and doesn't show on the page.
+//         Then the instructor is redirected to the product page.
