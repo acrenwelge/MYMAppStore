@@ -29,8 +29,6 @@ describe('TransactionController', () => {
     jest.clearAllMocks();
   });
 
-  //
-
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
@@ -44,6 +42,11 @@ describe('TransactionController', () => {
   it('calling findAll method', () => {
     controller.findAll();
     expect(service.findAll).toHaveBeenCalled();
+  });
+
+  it('calling findAllForUser method', () => {
+    controller.findAllForUser(1);
+    expect(service.findAllForUser).toHaveBeenCalled();
   });
 
 });
