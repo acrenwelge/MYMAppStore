@@ -1,5 +1,7 @@
 import { TransactionService } from './transaction.service';
 import { TransactionEntity } from "./entities/transaction.entity";
+import { TransactionDetailEntity } from './entities/transaction-detail.entity';
+
 import { Repository } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -21,7 +23,11 @@ describe('TransactionService', () => {
         {
           provide: getRepositoryToken(TransactionEntity),
           useValue: createMock<TransactionEntity>(),
-        }
+        },
+        {
+          provide: getRepositoryToken(TransactionDetailEntity),
+          useValue: createMock<TransactionDetailEntity>(),
+        },
       ],
     }).compile();
 
@@ -38,7 +44,7 @@ describe('TransactionService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should fine one transaction', async () => {
+  it('should find one transaction', async () => {
     const result = new TransactionEntity();
     result.txId = 123;
     jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
@@ -57,11 +63,13 @@ describe('TransactionService', () => {
       items: [
         {
           itemId: 1,
+          finalPrice: 19.00,
           quantity: 1,
           purchaseCode: "ABC",
         },
         {
           itemId: 1,
+          finalPrice: 21.00,
           quantity: 1,
           purchaseCode: "ABC",
         }
