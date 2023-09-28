@@ -58,23 +58,15 @@ describe('UserService', () => {
   });
 
   it('should signup locally', async () => {
-      const olduser = null;
-      const testuser = new UserEntity();
-      jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => olduser);
-      jest.spyOn(repositoryMock, 'save').mockImplementation(() => testuser);
+      const testUser = new UserEntity();
+      testUser.email = "testing@mail.com"
+      const userClient = new UserDto();
+      userClient.email = "testing@mail.com"
+      jest.spyOn(repositoryMock, 'exist').mockImplementation(() => false);
+      jest.spyOn(repositoryMock, 'save').mockImplementation(() => testUser);
       jest.spyOn(emailservice, 'sendActivateAccountEmail').mockReturnValue(Promise.resolve());
-      expect(await service.localSignUp(testuser)).toBe(undefined);
+      expect((await service.localSignUp(userClient)).email).toBe(testUser.email);
   });
-
-  /*
-  xit('should generate a new activation code', () => {
-      //const oldstr = "abc";
-      //const newstr = 'Naomi2049'+ Date.now().toString()+'ncclovekk';
-      // jest.spyOn(repositoryMock, 'generateActivationCode').mockImplementation(() => newstr);
-      expect(service.generateActivationCode("abc")).toStrictEqual('Naomi2049'+ Date.now().toString()+'ncclovekk');
-  });
-  //if too slow it won't work
-*/
 
   it('should activate an account', async () => {
     const activcode = "a";
@@ -90,8 +82,14 @@ describe('UserService', () => {
   });
 
   it('should find all user', async () => {
-    jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
-    expect(await service.findAll()).toBe(true);
+    const userList = []
+    const user = new UserEntity();
+    user.email = "banana@gmail.com"
+    userList.push(user)
+    user.email = "temporary@mail.com"
+    userList.push(user)
+    jest.spyOn(repositoryMock, 'find').mockImplementation(() => userList);
+    expect((await service.findAll()).pop().email).toBe(userList[1].email);
   });
 
   it('should find one user', async () => {
@@ -108,6 +106,7 @@ describe('UserService', () => {
     expect(res).toHaveLength(60);
   })
 
+  // TODO: Does not work
   it('should authenticate a user', async () => {
     const result = new UserEntity();
     result.email = "test@mail.com";
@@ -116,6 +115,7 @@ describe('UserService', () => {
     expect(await service.authenticate(result)).toBe(result);
   });
 
+  // TODO: Does not work
   it('should NOT authenticate a user', async () => {
     const result = new UserEntity();
     result.email = "test@mail.com";
@@ -130,26 +130,27 @@ describe('UserService', () => {
     expect(repositoryMock.delete).toBeCalledWith(1);
   });
 
-  xit('should change first and last name', async () => {
-    const user = new UserEntity()
+  it('should change first and last name', async () => {
+    const oldUser = new UserEntity()
+    oldUser.email = "test@mail.com"
+    oldUser.firstName = "Testing"
+    oldUser.lastName = "Bad name"
+    const user = new UserDto()
     user.email = "test@mail.com"
-    user.firstName = "Testing"
-    user.lastName = "Bad name"
-    const update = new UserDto()
-    update.email = "test@mail.com"
-    update.firstName = "John"
-    update.lastName = "Doe"
-    jest.spyOn(repositoryMock, 'update').mockImplementation(() => user);
-    expect((await service.updateOne(update)).firstName).toBe(update.firstName)
+    user.firstName = "John"
+    user.lastName = "Doe"
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldUser);
+    expect((await service.updateOne(user)).firstName).toBe(user.firstName)
   });
 
-  xit('should change password', async () => {
+  it('should change password', async () => {
     const user = new UserEntity()
     user.email = "test@mail.com"
     const update = new UserDto()
     update.email = "test@mail.com"
     update.password = "applesButter32Game"
     jest.spyOn(repositoryMock, 'update').mockImplementation(() => user)
+    // We have the same expectation that the password hash test does
     expect((await service.updateOne(update)).passwordHash).toHaveLength(60)
   });
 
