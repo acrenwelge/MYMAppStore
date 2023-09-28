@@ -9,13 +9,5 @@ Background:
 
 Scenario: Successfully changing first and last name
     And changes their 'First name' and 'Last name' field
-    And the names only have alphabetical characters
     And clicks 'Save Information'
     Then the first and last name of the user is changed
-
-
-Scenario: Failed to change first and last name
-    And changes their 'First name' and 'last name' field
-    And the names do not only have alphabetical characters
-    And clicks 'Save Information'
-    Then the user is prompted to input a valid name

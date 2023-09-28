@@ -14,7 +14,6 @@ Scenario: Successfully changing password
     And the password is at least 12 characters long with no more than 3 characters repeating
     Then the password is changed
 
-
 Scenario: Failed to change password
     And clicks the 'Change password' button
     And fills in the 'Enter password' and 'Confirm password' fields
