@@ -1,0 +1,19 @@
+Upated Steps:
+Install nodejs
+Install yarn
+Install nestjs:
+    npm install -g @nestjs/cli
+Download docker
+Change the env.example to env.dev
+Set ENV_TYPE = dev
+Set SERVER_PORT = 6324 (the port exposed by the docker file)
+Set DB_Host = localhost
+Set DB_Port = 3306
+Set DB_Password = your password
+Set DB_Database = mymathapps
+Set EMAIL_ENABLE = false
+Once done, save
+Run the docker mysql instructions
+for the last line, do:
+    source /tmp/init.sql
+Then follow the instructions to run the server.

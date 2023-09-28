@@ -1,0 +1,12 @@
+it - function that defines a test
+xit - quick way to skip a test
+jest.spyOn(data_type, 'function') - Given a data type and a function name, returns a mock function that can be used for testing purposes. Sotres info like how many times the function is called, what parameters were used, and what was returned.
+mockImplementation(function) - used to define a default implementation of a mock function that is created from another module. Stating this again, it sets the implementation of a mock function that is used for calls.
+The combination of jest.spyOn with .mockImplementation appears to create a spied on function that returns any value that we want it to.
+For example,
+    jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result)
+takes our findOne function from the Repository datatype and has it always return a variable called result.
+When our next function,
+    expect(await service.findOneByEmail("ncc@me.com")).toBe(result);
+Is called, it contains findOne. This means that findOne will return the email and we can test the function without needing to to test if the repo is set up.
+Asynchronous mock functions will also return a promise.
