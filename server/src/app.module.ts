@@ -25,52 +25,65 @@ import { ClassEntity } from './class/class.entity'
 
 let envFilePath = [];
 if (process.env.RUNNING_ENV === 'dev') {
-    envFilePath.unshift('.env.dev');
+	envFilePath.unshift('.env.dev');
 }
 if (process.env.RUNNING_ENV === 'heroku') {
-    envFilePath.unshift('.env.heroku');
+	envFilePath.unshift('.env.heroku');
 }
 if (process.env.RUNNING_ENV === 'prod') {
-    envFilePath.unshift('.env.prod');
+	envFilePath.unshift('.env.prod');
 }
 
 @Module({
-    imports: [
-        // ServeStaticModule.forRoot({
-        //     rootPath: join(__dirname, '../', 'public','textbook')
-        // }),
-        ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '../', 'public')
-        }),
-        ConfigModule.forRoot({
-            isGlobal: true,
-            envFilePath: envFilePath
-        }),
-        TypeOrmModule.forRoot({
-            type: process.env.RUNNING_ENV.toLowerCase() === 'dev' ? 'mysql' : 'postgres',
-            host: process.env.DB_Host,
-            port: Number(process.env.DB_Port),
-            username: process.env.DB_Username,
-            password: process.env.DB_Password,
-            database: process.env.DB_Database,
-            entities:[
-                UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
-                TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
-            ],
-            synchronize: process.env.ENV_TYPE.toUpperCase() === 'DEV' || process.env.ENV_TYPE.toUpperCase() === 'HEROKU',
-        }),
-        UserModule,
-        AuthModule,
-        AdminModule,
-        TransactionModule,
-        SubscriptionModule,
-        ItemModule,
-        PurchaseCodeModule,
-        EmailModule,
-        PaymentModule,
-        BookModule,
-    ],
-    providers: [],
-    controllers: [],
+	imports: [
+		// ServeStaticModule.forRoot({
+		//     rootPath: join(__dirname, '../', 'public','textbook')
+		// }),
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '../', 'public')
+		}),
+		ConfigModule.forRoot({
+			isGlobal: true,
+			envFilePath: envFilePath
+		}),
+		process.env.RUNNING_ENV.toLowerCase() === 'dev' ? TypeOrmModule.forRoot({
+			type: 'mysql',
+			host: process.env.DB_Host,
+			port: Number(process.env.DB_Port),
+			username: process.env.DB_Username,
+			password: process.env.DB_Password,
+			database: process.env.DB_Database,
+			entities:[
+				UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
+				TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
+			],
+			synchronize: process.env.ENV_TYPE.toUpperCase() === 'DEV',
+		}) : TypeOrmModule.forRoot({
+			type: 'postgres',
+			url: process.env.DATABASE_URL,
+			entities:[
+				UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
+				TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
+			],
+			ssl: {
+				rejectUnauthorized: false,
+			  },
+			autoLoadEntities: true,
+			synchronize: process.env.ENV_TYPE.toUpperCase() === 'HEROKU',
+			
+		}),
+		UserModule,
+		AuthModule,
+		AdminModule,
+		TransactionModule,
+		SubscriptionModule,
+		ItemModule,
+		PurchaseCodeModule,
+		EmailModule,
+		PaymentModule,
+		BookModule,
+	],
+	providers: [],
+	controllers: [],
 })
 export class AppModule {}
