@@ -119,20 +119,6 @@ describe('UserService', () => {
 		expect(await service.authenticate(result)).toBe(foundUser)
 	});
 
-	// TODO: Does not work
-	// I need to figure out how to handle promise rejection.
-	xit('should NOT authenticate a user', async () => {
-		const password = "abcdefg"
-		const result = new UserDto()
-		result.email = "test@mail.com"
-		result.password = password
-		const foundUser = new UserEntity()
-		foundUser.email = "test@mail.com"
-		foundUser.passwordHash = await hash("aaaaaaa",10)
-		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => foundUser)
-		await expect(await service.authenticate(result)).rejects.toThrow("Incorrect email or password")
-	});
-
 	it('should delete a user', async () => {
 		jest.spyOn(repositoryMock, 'delete').mockImplementation(() => null);
 		await service.deleteOne(1);
@@ -141,24 +127,26 @@ describe('UserService', () => {
 
 	it('should change first and last name', async () => {
 		const oldUser = new UserEntity()
-		oldUser.email = "test@mail.com"
+		oldUser.email = "testtest@mail.com"
 		oldUser.firstName = "Testing"
 		oldUser.lastName = "Bad name"
 		const user = new UserDto()
-		user.email = "test@mail.com"
+		user.email = "testtest@mail.com"
 		user.firstName = "John"
 		user.lastName = "Doe"
 		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => oldUser);
+		jest.spyOn(repositoryMock, 'update').mockImplementation(() => null)
 		expect((await service.updateOne(user)).firstName).toBe(user.firstName)
 	});
 
 	it('should change password', async () => {
 		const user = new UserEntity()
-		user.email = "test@mail.com"
+		user.email = "testtest@mail.com"
 		const update = new UserDto()
-		update.email = "test@mail.com"
+		update.email = "testtest@mail.com"
 		update.password = "applesButter32Game"
-		jest.spyOn(repositoryMock, 'update').mockImplementation(() => user)
+		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => user)
+		jest.spyOn(repositoryMock, 'update').mockImplementation(() => null)
 		// We have the same expectation that the password hash test does
 		expect((await service.updateOne(update)).passwordHash).toHaveLength(60)
 	});

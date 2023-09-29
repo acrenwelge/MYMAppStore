@@ -57,7 +57,7 @@ if (process.env.RUNNING_ENV === 'prod') {
                 UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
                 TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
             ],
-            synchronize: process.env.ENV_TYPE.toUpperCase() === 'DEV',
+            synchronize: process.env.ENV_TYPE.toUpperCase() === 'DEV' || process.env.ENV_TYPE.toUpperCase() === 'HEROKU',
         }),
         UserModule,
         AuthModule,

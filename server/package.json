@@ -15,7 +15,7 @@
     "start:prod": "cross-env RUNNING_ENV=prod node dist/main",
     "start:heroku": "cross-env RUNNING_ENV=heroku node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest ./src/class",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
