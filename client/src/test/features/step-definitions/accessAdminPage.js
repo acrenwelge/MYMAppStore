@@ -22,7 +22,7 @@ After(function () {
  driver.quit();
 });
 
-//场景
+
 Given("user is in home page", async () => {
 	await driver.get("http://localhost:3000/");
 	await driver.sleep(3 * 1000);

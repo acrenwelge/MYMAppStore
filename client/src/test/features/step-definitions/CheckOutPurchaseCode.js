@@ -1,4 +1,4 @@
-const { Given, When, Then, And, After, Before } = require("@cucumber/cucumber");
+const { Given, When, Then, And, AfterAll, Before } = require("@cucumber/cucumber");
 const { expect } = require("chai");
 const { time, assert } = require("console");
 const webdriver = require("selenium-webdriver");
@@ -11,7 +11,7 @@ Before(function (env) {
 	driver = new webdriver.Builder().forBrowser("chrome").build();
 });
 
-After(function () {
+AfterAll(function () {
 	driver.quit();
 });
 

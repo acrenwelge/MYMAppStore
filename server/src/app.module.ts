@@ -8,20 +8,20 @@ import {AuthModule } from './auth/auth.module';
 import {AdminModule } from './admin/admin.module';
 import {TransactionModule } from './transaction/transaction.module';
 import {SubscriptionModule } from './subscription/subscription.module';
-import {ItemModule } from './item/item.module';
-import {PurchaseCodeModule } from './purchaseCode/purchaseCode.module';
-import {ItemEntity} from "./item/item.entity";
-import {PurchaseCodeEntity} from "./purchaseCode/purchaseCode.entity";
-import {TransactionEntity} from "./transaction/entities/transaction.entity";
-import {SubscriptionEntity} from "./subscription/subscription.entity";
-import { EmailModule } from './email/email.module';
-import { BookModule } from './book/book.module';
+import {ItemModule } from './item/item.module'
+import {PurchaseCodeModule } from './purchaseCode/purchaseCode.module'
+import {ItemEntity} from "./item/item.entity"
+import {PurchaseCodeEntity} from "./purchaseCode/purchaseCode.entity"
+import {TransactionEntity} from "./transaction/entities/transaction.entity"
+import {SubscriptionEntity} from "./subscription/subscription.entity"
+import { EmailModule } from './email/email.module'
+import { BookModule } from './book/book.module'
 
-import { PaymentModule } from './payment/payment.module';
-import {FreeSubscriptionEntity} from "./free-subscription/free-subscription.entity";
-import {join} from 'path';
-import { TransactionDetailEntity } from './transaction/entities/transaction-detail.entity';
-import { ClassEntity } from './class/class.entity';
+import { PaymentModule } from './payment/payment.module'
+import {FreeSubscriptionEntity} from "./free-subscription/free-subscription.entity"
+import {join} from 'path'
+import { TransactionDetailEntity } from './transaction/entities/transaction-detail.entity'
+import { ClassEntity } from './class/class.entity'
 
 let envFilePath = [];
 if (process.env.RUNNING_ENV === 'dev') {
@@ -47,7 +47,7 @@ if (process.env.RUNNING_ENV === 'prod') {
             envFilePath: envFilePath
         }),
         TypeOrmModule.forRoot({
-            type: 'mysql',
+            type: process.env.RUNNING_ENV.toLowerCase() === 'dev' ? 'mysql' : 'postgres',
             host: process.env.DB_Host,
             port: Number(process.env.DB_Port),
             username: process.env.DB_Username,
@@ -57,7 +57,7 @@ if (process.env.RUNNING_ENV === 'prod') {
                 UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
                 TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
             ],
-            synchronize: process.env.ENV_TYPE === 'DEV' ? true: false,
+            synchronize: process.env.ENV_TYPE.toUpperCase() === 'DEV',
         }),
         UserModule,
         AuthModule,
