@@ -1,12 +1,24 @@
 # MyMathApp
 
-CSCE606 Textbook Project in Spring 2023.
+CSCE606 Textbook Project in Fall 2023.
+
+Deployed project at [Heroku](https://my-math-apps-online-textbook-63eb858df6f6.herokuapp.com/)
 
 ## Project Description
 This project is a full-stack web application ecommerce site that allows users to register, login, find MYMathApps products (Calc 1/2/3 textbooks) and buy a subscription to them. They can then access the textbook from the webapp. Admins can view, activate/deactivate, and delete users. User access to a textbook is disabled after the end of their subscription date. Admins can also add or edit purchase codes that give discounts for particular products. Instructors can sign up an entire class along with themselves and then pay for their subscriptions. Instructors can also manage their classes and add or remove users from it.
 
 ## Technical Description
 The application is built using React, Node.js, Express, and MySQL. Both front and back-end are written in TypeScript. The web client communicates with the backend REST API using Axios. The backend uses TypeORM to communicate with the MySQL database.
+
+## To test with this iteration
+
+### Spec Tests
+1. cd ./server
+2. yarn test
+
+### Cucumber tests
+1. cd ./client
+2. yarn cucumber-test
 
 ## Getting Started
 1. Install nodejs (it will automatically install npm)
@@ -54,4 +66,4 @@ mysql> source init.sql
 4. `git push heroku main`
 
 ## Contributors
-Cheng Niu, Shuang Yu, Zhiting Zhao, Yongqing Liang, Shuyu Wang, Yun Du, Andrew Crenwelge
+Cheng Niu, Shuang Yu, Zhiting Zhao, Yongqing Liang, Shuyu Wang, Yun Du, Andrew Crenwelge, Spencer Banasik, Nikhil Nehra, Nick Robert, Arunim Samudra
