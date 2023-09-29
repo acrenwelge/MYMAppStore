@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios"
 import Class from "../entities/class"
+//import User from "../entities/user"
 import { request } from "./baseRequest"
 
 export function getClasses(): Promise<AxiosResponse<Class[]>> {
@@ -22,6 +23,13 @@ export function getClassByInstructor(instructorId: number): Promise<AxiosRespons
         url: `api/classes/instructor/${instructorId}`,
     })
 }
+
+// export function givenUserIsInstructor(userId: number): Promise<AxiosResponse<User>> {
+//     return request({
+//         method: 'GET',
+//         url: 'api/classes/instructor/query/${userId}',
+//     })
+// }
 
 export function removeStudentFromClass(classId: number, studentUserId: number): Promise<AxiosResponse<Class>> {
     return request({
