@@ -26,7 +26,10 @@ export class ClassService {
   }
 
   async getClassById(id: number) {
-    return await this.classRepo.findOne({relations: ['instructor', 'students'], where: {classId: id}})
+    return await this.classRepo.findOne({
+      relations: ['instructor', 'students'], 
+      where: {classId: id}
+    })
   }
 
   async getClassByUserIdOfInstructor(userIdOfInstructor: number) {
@@ -37,8 +40,13 @@ export class ClassService {
   }
 
   async addStudentToClass(classId: number, studentEmail: string) {
-    let classEntity = await this.classRepo.findOne({relations: ['instructor', 'students'],where: {classId}})
-    const userEntity = await this.userRepo.findOne({where: {email: studentEmail}})
+    let classEntity = await this.classRepo.findOne({
+      relations: ['instructor', 'students'],
+      where: {classId}
+    })
+    const userEntity = await this.userRepo.findOne({
+      where: {email: studentEmail}
+    })
     if (!userEntity) {
       throw new Error(`No user with email ${studentEmail} found.`)
     }
@@ -62,6 +70,9 @@ export class ClassService {
     })
     studentEntity.class = null // unassign student from class
     await this.userRepo.save(studentEntity)
-    return await this.classRepo.findOne({relations: ['instructor','students'],where: {classId}})
+    return await this.classRepo.findOne({
+      relations: ['instructor','students'],
+      where: {classId}
+    })
   }
 }
