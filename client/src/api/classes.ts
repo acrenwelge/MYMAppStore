@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios"
 import Class from "../entities/class"
+import { ExpandedClass } from "../entities"
 //import User from "../entities/user"
 import { request } from "./baseRequest"
 
@@ -10,14 +11,14 @@ export function getClasses(): Promise<AxiosResponse<Class[]>> {
     })
 }
 
-export function getClassById(classId: number): Promise<AxiosResponse<Class>> {
+export function getClassById(classId: number): Promise<AxiosResponse<ExpandedClass>> {
     return request({
         method: 'GET',
         url: `api/classes/${classId}`,
     })
 }
 
-export function getClassByInstructor(instructorId: number): Promise<AxiosResponse<Class>> {
+export function getClassByInstructor(instructorId: number): Promise<AxiosResponse<ExpandedClass>> {
     return request({
         method: 'GET',
         url: `api/classes/instructor/${instructorId}`,
@@ -31,14 +32,14 @@ export function getClassByInstructor(instructorId: number): Promise<AxiosRespons
 //     })
 // }
 
-export function removeStudentFromClass(classId: number, studentUserId: number): Promise<AxiosResponse<Class>> {
+export function removeStudentFromClass(classId: number, studentUserId: number): Promise<AxiosResponse<ExpandedClass>> {
     return request({
         method: 'DELETE',
         url: `api/classes/${classId}/student/${studentUserId}`,
     })
 }
 
-export function addStudentToClassByEmail(classId: number, studentEmail: string): Promise<AxiosResponse<Class>> {
+export function addStudentToClassByEmail(classId: number, studentEmail: string): Promise<AxiosResponse<ExpandedClass>> {
     return request({
         method: 'POST',
         url: `api/classes/${classId}/student`,

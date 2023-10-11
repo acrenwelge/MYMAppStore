@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { ClassEntity } from "./class.entity";
 import { Repository } from "typeorm";
 import { UserEntity } from "src/user/entities/user.entity";
+import { SubscriptionEntity } from "src/subscription/subscription.entity";
 
 @Injectable()
 export class ClassService {
@@ -10,6 +11,7 @@ export class ClassService {
   constructor(
     @InjectRepository(ClassEntity) private readonly classRepo: Repository<ClassEntity>,
     @InjectRepository(UserEntity) private readonly userRepo: Repository<UserEntity>,
+    @InjectRepository(SubscriptionEntity) private readonly subscRepo: Repository<SubscriptionEntity>
   ) {}
 
   async createNewClass(instructorId?: number) {
@@ -33,7 +35,7 @@ export class ClassService {
   }
 
   async getClassByUserIdOfInstructor(userIdOfInstructor: number) {
-    return await this.classRepo.findOne({
+    let classEntity = await this.classRepo.findOne({
       relations: ['instructor', 'students'],
       where: {instructor: {userId: userIdOfInstructor}}
     })

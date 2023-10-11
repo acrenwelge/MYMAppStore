@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Button, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
 import { getClassByInstructor, addStudentToClassByEmail, removeStudentFromClass } from "../../api/classes";
 import { ToastContainer, toast } from "react-toastify";
-import { User } from "../../entities";
+import { ExpandedUser, ExpandedClass } from "../../entities";
 import { localSignupApi } from "../../api/auth";
 
 interface Student {
@@ -10,6 +10,7 @@ interface Student {
   firstName: string,
   lastName: string,
   email: string;
+  hasSubscription: boolean;
 }
 
 interface ClassData {
@@ -29,12 +30,13 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const [addExistingStudentEmail, setExistingStudentEmail] = React.useState("")
   const [isInstructor, setIsInstructor] = React.useState<boolean>(true)
 
-  const transformUserToStudent = (user: User): Student => {
+  const transformUserToStudent = (user: ExpandedUser): Student => {
     return {
       id: user.userId,
       firstName: user.firstName,
       lastName: user.lastName,
-      email: user.email
+      email: user.email,
+      hasSubscription: false
     }
   }
 
