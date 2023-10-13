@@ -1,27 +1,17 @@
-import React from "react";
-import {
-    Grid,
-    GridColumn,
-    Container,
-} from "semantic-ui-react";
-import AdminMenu from "../../components/AdminMenu";
+import React, { useState } from "react";
+import ThirdPartyAuthenticators from "../../components/ThirdPartyAuthenticators";
+import Page from "../../components/Page";
+//import UserInfoForm from "./UserInfoForm";
+import { Button, Container } from "semantic-ui-react";
 
 // TODO: Figure out how to add a submitable form
+// We can use the login page to get an idea of it
 
 const UserBasePage: React.FC = (props) => {
   return (
-    <Container fluid style={{padding: "2"}}>
-      <Grid columns={2}>
-        <Grid.Row>
-          <GridColumn width={3}>
-              <AdminMenu/>
-          </GridColumn>
-          <GridColumn width={12}>
-              {props.children}
-          </GridColumn>
-        </Grid.Row>
-      </Grid>
-    </Container>
+    <Page>
+      <h1>User form would go here.</h1>
+		</Page>
   );
 }
 
