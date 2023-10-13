@@ -33,6 +33,7 @@ import AdminManageClassesPage from "./pages/Admin/AdminManageClassesPage";
 import ApplicationContext from "./context/application.context";
 import NavMenu from "./components/Header/NavMenu";
 import { Roles } from "./entities/roles";
+import UserBasePage from "./pages/User/UserBasePage";
 
 const App: React.FC = (): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
@@ -143,6 +144,9 @@ const App: React.FC = (): JSX.Element => {
 								</Route>
 								<Route exact path="/subscriptions">
 									<UserSubscriptionPage />
+								</Route>
+								<Route exact path="/profile">
+									<UserBasePage />
 								</Route>
 							</Switch>
 						</main>

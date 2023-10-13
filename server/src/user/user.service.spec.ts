@@ -9,7 +9,7 @@ import {EmailService} from "../email/email.service";
 import { hash } from 'bcrypt';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import { UserDto } from './user.dto';
-import { UnauthorizedException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 
 describe('UserService', () => {
 	let service: UserService;
@@ -59,14 +59,53 @@ describe('UserService', () => {
 	});
 
 	it('should signup locally', async () => {
-			const testUser = new UserEntity();
-			testUser.email = "testing@mail.com"
-			const userClient = new UserDto();
-			userClient.email = "testing@mail.com"
-			jest.spyOn(repositoryMock, 'exist').mockImplementation(() => false);
-			jest.spyOn(repositoryMock, 'save').mockImplementation(() => testUser);
-			jest.spyOn(emailservice, 'sendActivateAccountEmail').mockReturnValue(Promise.resolve());
-			expect((await service.localSignUp(userClient)).email).toBe(testUser.email);
+		const testUser = new UserEntity()
+		testUser.email = "testing@mail.com"
+		const userClient = new UserDto()
+		userClient.email = "testing@mail.com"
+		jest.spyOn(repositoryMock, 'exist').mockImplementation(() => false)
+		jest.spyOn(repositoryMock, 'save').mockImplementation(() => testUser)
+		jest.spyOn(emailservice, 'sendActivateAccountEmail').mockReturnValue(Promise.resolve())
+		expect((await service.localSignUp(userClient)).email).toBe(testUser.email)
+	})
+
+	// TODO: Need to figure out how to handle exceptions with async
+	xit('should not signup existing locally', async () => {
+		const userClient = new UserDto()
+		jest.spyOn(repositoryMock, 'exist').mockImplementation(() => true)
+		try {
+			await service.localSignUp(userClient)
+		} catch (e) {
+			expect(e).toMatch("User email address already exists")
+		}
+	})
+
+	// TODO: Need to figure out how to test for promises
+	xit('should sign up for a class', async () => {
+		const UserA = new UserDto()
+		const UserB = new UserDto()
+		jest.spyOn(service, 'localSignUp').mockReturnValueOnce(Promise.resolve(UserA))
+										.mockReturnValueOnce(Promise.resolve(UserB))
+		const users = [UserA, UserB]
+		expect(await service.localSignUpForClass(users)).toBe(Promise.all([Promise.resolve(UserA), Promise.resolve(UserB)]))
+	})
+
+	it('should generate activation code', async () => {
+		const username = "banana"
+		jest.spyOn(Date, 'now').mockImplementation(() => 1697156101082)
+		expect((await service.generateActivationCode(username))).toBe("MYCode1697156101082ncclovekk")
+	})
+
+	it('should authenticate a user', async () => {
+		const password = "abcdefg"
+		const result = new UserDto()
+		result.email = "test@mail.com"
+		result.password = password
+		const foundUser = new UserEntity()
+		foundUser.email = "test@mail.com"
+		foundUser.passwordHash = await hash(password,10)
+		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => foundUser)
+		expect(await service.authenticate(result)).toBe(foundUser)
 	});
 
 	it('should activate an account', async () => {
@@ -82,6 +121,14 @@ describe('UserService', () => {
 		expect(await service.activateAccount(newuser.activationCode)).toStrictEqual(newuser);
 	});
 
+	it('should deactivate an account', async () => {
+		const newuser = new UserEntity();
+		newuser.activatedAccount = true;
+		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => newuser);
+		jest.spyOn(repositoryMock, 'save').mockImplementation(() => newuser);
+		expect((await service.deactivateAccount(10)).activatedAccount).toStrictEqual(false);
+	});
+
 	it('should find all user', async () => {
 		const userList = []
 		const user = new UserEntity();
@@ -93,11 +140,18 @@ describe('UserService', () => {
 		expect((await service.findAll()).pop().email).toBe(userList[1].email);
 	});
 
-	it('should find one user', async () => {
+	it('should find one user by email', async () => {
 		const result = new UserEntity();
 		result.email = "ncc@me.com";
 		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
 		expect(await service.findOneByEmail("ncc@me.com")).toBe(result);
+	});
+
+	it('should find one user by id', async () => {
+		const result = new UserEntity();
+		result.email = "ncc@me.com"
+		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => result);
+		expect(await service.findOneById(35)).toBe(result);
 	});
 
 	it('should hash a password', async () => {
@@ -106,18 +160,6 @@ describe('UserService', () => {
 		console.log(res)
 		expect(res).toHaveLength(60);
 	})
-
-	it('should authenticate a user', async () => {
-		const password = "abcdefg"
-		const result = new UserDto()
-		result.email = "test@mail.com"
-		result.password = password
-		const foundUser = new UserEntity()
-		foundUser.email = "test@mail.com"
-		foundUser.passwordHash = await hash(password,10)
-		jest.spyOn(repositoryMock, 'findOne').mockImplementation(() => foundUser)
-		expect(await service.authenticate(result)).toBe(foundUser)
-	});
 
 	it('should delete a user', async () => {
 		jest.spyOn(repositoryMock, 'delete').mockImplementation(() => null);

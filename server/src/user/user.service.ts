@@ -54,11 +54,7 @@ export class UserService {
   }
 
   generateActivationCode(username: string): string {
-    if (process.env.EMAIL_ENABLE === 'test') {
-      return 'naomi2049'+ username + '114514'
-    }  else {
-      return 'Naomi2049'+ Date.now().toString()+'ncclovekk'
-    }
+      return 'MYCode'+ Date.now().toString()+'ncclovekk'
   }
 
   async authenticate(loginUser: UserDto): Promise<UserEntity> {
