@@ -31,6 +31,7 @@ import AdminEditProductInfo from "./pages/Admin/AdminProductInfoPage";
 import AdminManageClassesPage from "./pages/Admin/AdminManageClassesPage";
 import ApplicationContext from "./context/application.context";
 import NavMenu from "./components/Header/NavMenu";
+import UserBasePage from "./pages/User/UserBasePage";
 
 const App: React.FC = (): JSX.Element => {
 	// eslint-disable-next-line
@@ -133,6 +134,9 @@ const App: React.FC = (): JSX.Element => {
 								</Route>
 								<Route exact path="/subscriptions">
 									<UserSubscriptionPage />
+								</Route>
+								<Route exact path="/profile">
+									<UserBasePage />
 								</Route>
 							</Switch>
 						</main>

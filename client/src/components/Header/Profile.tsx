@@ -13,7 +13,13 @@ const Profile: React.FC = (): JSX.Element => {
 	return (
 		<Dropdown as={Menu.Item} item text={ctx.user!.firstName}>
 			<Dropdown.Menu>
-
+				<Dropdown.Item
+					onClick={(event, data) => history.push({
+						pathname:"/profile",
+						state: { prevPath: window.location.pathname }
+					})}>
+					Manage Profile
+				</Dropdown.Item>
 				<Dropdown.Item
 					onClick={(event, data) => {
 						localStorage.removeItem('user');
