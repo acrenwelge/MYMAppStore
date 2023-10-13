@@ -59,4 +59,7 @@ export class UserEntity {
     @JoinColumn({name: 'class_id'})
     public class: ClassEntity;
 
+    constructor(userId?: number) {
+        this.userId = userId;
+    }
 }

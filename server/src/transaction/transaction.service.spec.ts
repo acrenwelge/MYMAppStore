@@ -7,6 +7,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { createMock } from '@golevelup/ts-jest';
 import Cart from 'src/payment/payment.entity';
+import { UserEntity } from 'src/user/entities/user.entity';
 
 export type MockType<T> = {
   [P in keyof T]: jest.Mock<{}>;
@@ -54,6 +55,15 @@ describe('TransactionService', () => {
   it('should find all transactions', async () => {
     jest.spyOn(repositoryMock, 'find').mockImplementation(() => true);
     expect(await service.findAll()).toBe(true);
+  });
+
+  it('should find all transactions for one user', async () => {
+    const result = new TransactionEntity();
+    result.txId = 123
+    const user = new UserEntity(1);
+    result.user = user;
+    jest.spyOn(repositoryMock, 'find').mockImplementation(() => result);
+    expect(await service.findAllForUser(1)).toBe(result);
   });
 
   it('should create a transaction from purchase data', async () => {

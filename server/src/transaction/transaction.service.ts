@@ -66,10 +66,11 @@ export class TransactionService {
   }
 
   async findAllForUser(userId: number) {
-    return await this.txRepo.findOne({
+    const transactions = await this.txRepo.find({
       relations: ["transactionDetails", "user"],
       where: {user: {userId}}
     });
+    return transactions
   }
 
 }
