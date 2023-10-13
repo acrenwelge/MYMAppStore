@@ -62,4 +62,8 @@ export class UserEntity {
 
     @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
     subscriptions: SubscriptionEntity[]
+    
+    constructor(userId?: number) {
+        this.userId = userId;
+    }
 }

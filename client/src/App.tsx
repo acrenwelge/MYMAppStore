@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import ProtectedRoute, { ProtectedRouteProps } from "./components/ProtectedRoute";
 import { useCookies } from "react-cookie";
 import { SWRConfig } from "swr";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
@@ -31,8 +32,11 @@ import AdminEditProductInfo from "./pages/Admin/AdminProductInfoPage";
 import AdminManageClassesPage from "./pages/Admin/AdminManageClassesPage";
 import ApplicationContext from "./context/application.context";
 import NavMenu from "./components/Header/NavMenu";
+import { Roles } from "./entities/roles";
 
 const App: React.FC = (): JSX.Element => {
+	const ctx = useContext(ApplicationContext);
+
 	// eslint-disable-next-line
 	const [user, setUser] = useState<User>();
 	const [cart, setCart] = useState<CartItem[]>([]);
@@ -45,6 +49,11 @@ const App: React.FC = (): JSX.Element => {
 			setUser(JSON.parse(storedUser));
 		}
 	}, []);
+
+	const defaultProtectedRouteProps: ProtectedRouteProps = {
+		isAuthenticated: (user?.role == Roles.Admin),
+		authenticationPath: '/'
+	};
 
 	return (
 		<BrowserRouter>
@@ -63,6 +72,7 @@ const App: React.FC = (): JSX.Element => {
 						<main style={{ flexGrow: 1 }}>
 							<Switch>
 								<Route exact path="/">
+									{console.log(user?.role)}
 									<Home />
 								</Route>
 								<Route exact path="/login">
@@ -125,9 +135,9 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/admin/paid-subscription">
 									<AdminPaidSubscriptionPage/>
 								</Route>
-								<Route exact path="/admin/transaction">
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/transaction">
 									<AdminTransactionPage />
-								</Route>
+								</ProtectedRoute>
 								<Route exact path="/read">
 									<ReadBook />
 								</Route>
