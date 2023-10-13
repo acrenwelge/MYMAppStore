@@ -3,6 +3,7 @@ import {Exclude} from '@nestjs/class-transformer'
 import {TransactionEntity} from "src/transaction/entities/transaction.entity";
 import { Roles } from "src/roles/role.enum";
 import { ClassEntity } from "src/class/class.entity";
+import { SubscriptionEntity } from "src/subscription/subscription.entity";
 
 /**
  * @description Represents the User table in the database
@@ -59,4 +60,6 @@ export class UserEntity {
     @JoinColumn({name: 'class_id'})
     public class: ClassEntity;
 
+    @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
+    subscriptions: SubscriptionEntity[]
 }

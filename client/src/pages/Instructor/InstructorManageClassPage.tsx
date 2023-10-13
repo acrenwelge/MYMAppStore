@@ -1,9 +1,17 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect } from "react";
 import { Button, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
 import { getClassByInstructor, addStudentToClassByEmail, removeStudentFromClass } from "../../api/classes";
 import { ToastContainer, toast } from "react-toastify";
 import { ExpandedUser, ExpandedClass } from "../../entities";
 import { localSignupApi } from "../../api/auth";
+import { validatePurchaseCode } from "../../api/checkout"
+
+// @ts-ignore
+//const PayPalButton = paypal.Buttons.driver("react", { React, ReactDOM });
+import { capturePaypalOrder, createPaypalOrder } from "../../api/payment";
+import { CartDataDto, PayPalOrderDetails } from "../../entities/orders";
+import { CartItem } from "../../entities/product";
 
 interface Student {
   id: number;
@@ -11,6 +19,7 @@ interface Student {
   lastName: string,
   email: string;
   hasSubscription: boolean;
+  instructorOwnsSub: boolean;
 }
 
 interface ClassData {
@@ -30,13 +39,21 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const [addExistingStudentEmail, setExistingStudentEmail] = React.useState("")
   const [isInstructor, setIsInstructor] = React.useState<boolean>(true)
 
-  const transformUserToStudent = (user: ExpandedUser): Student => {
+  const transformUserToStudent = (user: ExpandedUser, instructorId: number): Student => {
+    let ownerOfItem1 = -1
+    user.subscriptions.forEach( subs => {
+      console.log(subs)
+      if (subs.subscriptionId == 1) {
+        ownerOfItem1 = subs.owner.userId
+      }
+    })
     return {
       id: user.userId,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      hasSubscription: false
+      hasSubscription: user.subscriptions.length != 0,
+      instructorOwnsSub: ownerOfItem1 == instructorId
     }
   }
 
@@ -52,7 +69,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       const instructorId = instructor.userId
       getClassByInstructor(instructorId)
         .then(res => {
-          const students: Student[] = res.data.students.map(u => transformUserToStudent(u));
+          console.log(res);
+          const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructorId));
           setClassData({id: res.data.classId, students: students});
           if (students.length === 0) {
             toast.warning("No students found in class");
@@ -73,7 +91,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const removeStudent = (studentId: number) => {
     removeStudentFromClass(classData.id, studentId)
       .then(res => {
-        const students: Student[] = res.data.students.map(u => transformUserToStudent(u))
+        console.log(res)
+        const students: Student[] = res.data.students.map(u => transformUserToStudent(u, -1))
         setClassData({id: classData.id, students: students})
         toast.success("Student removed")
       }).catch(err => {
@@ -93,7 +112,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const addExistingUserPassEmail = (email: string) => {
     return addStudentToClassByEmail(classData.id, email)
       .then(res => {
-        const students: Student[] = res.data.students.map(u => transformUserToStudent(u));
+        const students: Student[] = res.data.students.map(u => transformUserToStudent(u, -1));
         setClassData({id: classData.id, students: students})
         setExistingStudentEmail("")
         toast.success("Student added to class successfully")
@@ -141,6 +160,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                               <Table.HeaderCell>First Name</Table.HeaderCell>
                               <Table.HeaderCell>Last Name</Table.HeaderCell>
                               <Table.HeaderCell>Email</Table.HeaderCell>
+                              <Table.HeaderCell>Has Active Subscription</Table.HeaderCell>
+                              <Table.HeaderCell>You Own Their Subscription</Table.HeaderCell>
                               <Table.HeaderCell>Action</Table.HeaderCell>
                           </Table.Row>
                       </Table.Header>
@@ -150,6 +171,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                               <Table.Cell>{student.firstName}</Table.Cell>
                               <Table.Cell>{student.lastName}</Table.Cell>
                               <Table.Cell id="instructor-class-table-cell-email">{student.email}</Table.Cell>
+                              <Table.Cell id="instructor-class-table-cell-has_subscription">{(student.hasSubscription).toString().toUpperCase()}</Table.Cell>
+                              <Table.Cell>{(student.instructorOwnsSub).toString().toUpperCase()} </Table.Cell>
                               <Table.Cell>
                                 <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
                                 <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button>

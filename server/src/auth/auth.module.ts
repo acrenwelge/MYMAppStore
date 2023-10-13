@@ -12,12 +12,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ClassEntity } from 'src/class/class.entity';
 import { ClassController } from 'src/class/class.controller';
 import { UserEntity } from 'src/user/entities/user.entity';
+import { SubscriptionEntity } from "src/subscription/subscription.entity";
 
 @Module({
   imports:[
     UserModule,
     PassportModule,
-    TypeOrmModule.forFeature([ClassEntity, UserEntity]),
+    TypeOrmModule.forFeature([ClassEntity, UserEntity, SubscriptionEntity]),
     JwtModule.register({
       //todo put secret in env file
       secret:jwtConstants.secret,

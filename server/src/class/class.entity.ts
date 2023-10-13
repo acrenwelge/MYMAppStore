@@ -18,5 +18,4 @@ export class ClassEntity {
 
     @OneToMany(() => UserEntity, user => user.class)
     public students: UserEntity[];
-
 }

@@ -5,4 +5,5 @@ export default interface Subscription {
 	readonly item: Product;
 	expirationDate: Date; // allow this to be edited for string -> Date conversion
 	readonly userId: number;
+	readonly ownerId: number;
 }

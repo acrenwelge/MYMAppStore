@@ -23,6 +23,10 @@ export class SubscriptionEntity {
     @JoinColumn({ name: 'user_id' })
     public user: UserEntity;
 
+    @ManyToOne(() => UserEntity)
+    @JoinColumn({ name: 'owner_id' })
+    public owner: UserEntity;
+
     @Column()
     public expirationDate: Date;
 

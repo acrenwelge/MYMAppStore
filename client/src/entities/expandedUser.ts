@@ -1,3 +1,9 @@
+interface SubscriptionInterface {
+  	owner: any;
+	subscriptionId: number,
+	expirationDate: Date;
+}
+
 export default interface ExpandedUser {
 	readonly userId: number;
 	firstName: string;
@@ -7,5 +13,5 @@ export default interface ExpandedUser {
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 	activatedAccount: boolean;
-  readonly subscription_id: number;
+  	readonly subscriptions: SubscriptionInterface[];
 }
