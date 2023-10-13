@@ -36,8 +36,8 @@ When("logged in as admin",  async () => {
     await driver.get("http://localhost:3000/login");
     await driver.sleep(3 * 1000);
 
-    driver.findElement(webdriver.By.id("email")).sendKeys("ncc@me.com");
-    driver.findElement(webdriver.By.id("password")).sendKeys("ncc");
+    driver.findElement(webdriver.By.id("email")).sendKeys("nikhil2inc@gmail.com");
+    driver.findElement(webdriver.By.id("password")).sendKeys("123abc");
 	await driver.sleep(6 * 1000);
 
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click();
@@ -52,16 +52,38 @@ When("not logged in as admin",  async () => {
     });
 
 
+When("go to the transaction page",  async () => {
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/nav/div/div[2]/a[2]`)).click();
+    await driver.sleep(6 * 1000);
+
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[1]/div/div/a[3]`)).click();
+    await driver.sleep(6 * 1000);
+    });
+
 When("go to the transaction url",  async () => {
     await driver.get("http://localhost:3000/admin/transaction");
     await driver.sleep(6 * 1000);
-        //When("the user enters their email and password", async () => {
-        });
+    });
     
 // Scenario 1: Successful accessing transaction page as admin user
-Then("the user should be at transaction page and see info.", async () => {
+Then("the user should be at transaction page", async () => {
     let curURL =  await driver.getCurrentUrl();
     expect(curURL).to.equal("http://localhost:3000/admin/transaction");
+    //let tablebody = await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/table/tbody`));
+    let tablebody = await driver.findElements(webdriver.By.tagName("td"));
+    //expect(tablebody.length).to.not.equal(+0);
+    //expect((tablebody).size['Transaction ID']).to.not.equal(0);
+    //expect(tablebody).toBeDisplayed();
+});
+
+Then("the user should be at home page", async () => {
+    let curURL =  await driver.getCurrentUrl();
+    expect(curURL).to.equal("http://localhost:3000/");
+});
+
+Then("the user should see info", async () => {
+    //let curURL =  await driver.getCurrentUrl();
+    //expect(curURL).to.equal("http://localhost:3000/admin/transaction");
     //let tablebody = await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/table/tbody`));
     let tablebody = await driver.findElements(webdriver.By.tagName("td"));
     expect(tablebody.length).to.not.equal(+0);
@@ -70,7 +92,7 @@ Then("the user should be at transaction page and see info.", async () => {
 });
 
 //Scenario 2: Unsuccessful Login with Invalid Password
-Then("the user will not see any data.", async () => {
+Then("the user will not see any data", async () => {
     let tablebody = await driver.findElements(webdriver.By.tagName("td"));
     expect(tablebody.length).to.equal(+0);
     //let tablebody = await driver.findElements(webdriver.By.tagName("tr"));
