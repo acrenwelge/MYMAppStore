@@ -3,9 +3,10 @@ import { PaymentService } from '../payment.service';
 import { SubscriptionService } from 'src/subscription/subscription.service';
 import {TransactionService} from "../../transaction/transaction.service";
 import { createResponse} from 'node-mocks-http';
-import Cart, { PayPalOrderDetails } from '../payment.entity';
+import Cart, { PayPalOrderDetails, PaypalCreateOrderResponse } from '../payment.entity';
 import * as paypal from "../paypal-api";
 import {createMock} from "@golevelup/ts-jest";
+import { TransactionEntity } from 'src/transaction/entities/transaction.entity';
 
 describe('PaymentService', () => {
   let service: PaymentService;
@@ -46,14 +47,42 @@ describe('PaymentService', () => {
     transervice = module.get<TransactionService>(TransactionService);
   });
 
+  afterAll(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
   it('should create a paypal order', async () => {
     const res = createResponse({});
-    service.createPaypalOrder(cartData, res);
+    const mock = jest.spyOn(paypal, 'createOrder');
+    mock.mockImplementation(async (grandTotal) => {
+      // Return a mock response
+          return {
+             id: "1",
+            status: "SUCCESS",
+            links: [{
+              href: "sample link",
+              rel: "text",
+              method: "POST",
+          }],
+          };
+      });
+    await service.createPaypalOrder(cartData, res);
     expect(res.statusCode).toBe(200);
+  });
+
+  it('should not create a paypal order', async () => {
+    const res = createResponse({});
+    const mock = jest.spyOn(paypal, 'createOrder');
+    mock.mockImplementation(async (grandTotal) => {
+      // Return a mock response
+          throw new Error("Could not make payment");
+      });
+    await service.createPaypalOrder(cartData, res);
+    expect(res.statusCode).toBe(500);
   });
 
   it('should create a transaction from purchase data after payment', async () => {
@@ -62,8 +91,26 @@ describe('PaymentService', () => {
       cart: cartData
     };
     const res = createResponse({});
-    service.captureAndRecordTx(orderDetails, res);
+    const result = new TransactionEntity();
+    jest.spyOn(paypal, 'capturePayment').mockImplementation(async(orderId) => {});
+    jest.spyOn(transervice, 'createAndSaveFromPurchaseCart').mockImplementation(async(cartData) => {return result});
+    await service.captureAndRecordTx(orderDetails, res);
     expect(res.statusCode).toBe(200);
+  });
+
+  it('should not create a transaction from purchase data after payment', async () => {
+    const orderDetails:PayPalOrderDetails = {
+      orderId: "1",
+      cart: cartData
+    };
+    const res = createResponse({});
+    const result = new TransactionEntity();
+    jest.spyOn(paypal, 'capturePayment').mockImplementation(async(orderId) => {
+            // Return a mock response
+            throw new Error("Could not capture payment");
+    });
+    await service.captureAndRecordTx(orderDetails, res);
+    expect(res.statusCode).toBe(500);
   });
 
 });

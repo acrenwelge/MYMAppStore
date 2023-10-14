@@ -1,7 +1,6 @@
 import fetch from "node-fetch";
 import { PaypalCreateOrderResponse } from "./payment.entity";
 
-const { PAYPAL_CLIENT_ID, PAYPAL_APP_SECRET } = process.env;
 const BASE_URL = "https://api-m.sandbox.paypal.com";
 
 export async function createOrder(amount: number): Promise<PaypalCreateOrderResponse> {
@@ -42,7 +41,7 @@ export async function capturePayment(orderId: string) {
 }
 
 export async function generateAccessToken() {
-  const auth = Buffer.from(PAYPAL_CLIENT_ID + ":" + PAYPAL_APP_SECRET).toString("base64");
+  const auth = Buffer.from(process.env.CLIENT_ID + ":" + process.env.APP_SECRET).toString("base64");
   const response = await fetch(`${BASE_URL}/v1/oauth2/token`, {
     method: "post",
     body: "grant_type=client_credentials",
