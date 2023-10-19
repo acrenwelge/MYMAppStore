@@ -15,10 +15,10 @@ export class EnrollmentEntity {
     public readonly enrollmentId: number;
 
     @ManyToOne(() => ClassEntity)
-    @JoinColumn({ name: 'class_id' })
+    //@JoinColumn({ name: 'class_id' })
     public classId: ClassEntity;
 
     @ManyToOne(() => UserEntity)
-    @JoinColumn({ name: 'user_id' })
-    public studentId: UserEntity[];
+    //@JoinColumn({ name: 'user_id' })
+    public studentId: UserEntity;
 }
