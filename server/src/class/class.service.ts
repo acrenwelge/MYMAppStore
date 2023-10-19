@@ -99,7 +99,7 @@ export class ClassService {
     if (!userEntity) {
       throw new Error(`No user with email ${studentEmail} found.`)
     }
-    classEntity.students.push(userEntity)
+    // classEntity.students.push(userEntity)
     return await this.classRepo.save(classEntity)
   }
 
@@ -107,7 +107,7 @@ export class ClassService {
     let classEntity = await this.classRepo.findOne({where: {classId}})
     for (const sid of studentIds) {
       const userEntity = await this.userRepo.findOne({where: {userId: sid}})
-      classEntity.students.push(userEntity)
+      // classEntity.students.push(userEntity)
     }
     return this.classRepo.save(classEntity)
   }
@@ -133,7 +133,7 @@ export class ClassService {
       ])
       .where("user.userId = :studentUserId", { studentUserId })
       .getOne();
-    studentEntity.class = null // unassign student from class
+    // studentEntity.class = null // unassign student from class
     await this.userRepo.save(studentEntity)
     // return await this.classRepo.findOne({
     //   relations: ['instructor','students'],

@@ -22,7 +22,7 @@ export class SubscriptionController {
   @UseGuards(JwtAuthGuard)
   @Get()
   findAllForUser(@Request() req) {
-    return this.subscriptionService.findAllForUser(req.user.user_id);
+    return this.subscriptionService.findAllForOwner(req.user.user_id);
   }
 
   @Get(':id')

@@ -2,7 +2,7 @@ import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColu
 import {Exclude} from '@nestjs/class-transformer'
 import {TransactionEntity} from "src/transaction/entities/transaction.entity";
 import { Roles } from "src/roles/role.enum";
-import { ClassEntity } from "src/class/class.entity";
+import { EnrollmentEntity } from "src/connection-entities/enrollment.entity";
 import { SubscriptionEntity } from "src/subscription/subscription.entity";
 
 /**
@@ -55,13 +55,8 @@ export class UserEntity {
 
     @OneToMany(() => TransactionEntity, transaction => transaction.user)
     transactions: TransactionEntity[]
-
-    @ManyToOne(() => ClassEntity, classEntity => classEntity.students)
-    @JoinColumn({name: 'class_id'})
-    public class: ClassEntity;
-
-    @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
-    subscriptions: SubscriptionEntity[]
+    // @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
+    // subscriptions: SubscriptionEntity[]
     
     constructor(userId?: number) {
         this.userId = userId;

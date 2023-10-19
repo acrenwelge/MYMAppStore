@@ -24,10 +24,10 @@ export class SubscriptionService {
     return await this.subscriptionRepo.find({relations: ["user", "item"]});
   }
 
-  async findAllForUser(user_id: number) {
+  async findAllForOwner(user_id: number) {
     return await this.subscriptionRepo.find({
       relations: ["user", "item"],
-      where: { user: { userId: user_id } }
+      where: { owner: { userId: user_id } }
     });
   }
 
@@ -49,7 +49,7 @@ export class SubscriptionService {
    * @returns the updated or created subscription
    */
   async addOrExtendSubscriptions(order: Cart) {
-    const subs: SubscriptionEntity[] = await this.findAllForUser(order.purchaserUserId);
+    const subs: SubscriptionEntity[] = await this.findAllForOwner(order.purchaserUserId);
     const now = new Date(Date.now());
     for (const item of order.items) {
       const {subscriptionLengthMonths} = await this.itemService.findOne(item.itemId);
@@ -66,7 +66,7 @@ export class SubscriptionService {
       } else { // no existing subscriptions for this user for this item
         const newSub = this.subscriptionRepo.create();
         newSub.item = <any> item.itemId;
-        newSub.user = <any> order.purchaserUserId;
+        // newSub.user = <any> order.purchaserUserId;
         newSub.expirationDate = this.addMonthsUtil(now, subscriptionLengthMonths);
         await this.subscriptionRepo.save(newSub);
       }
@@ -79,7 +79,7 @@ export class SubscriptionService {
    */
   async userHasValidSubscription(user_id: number, item_id: number) {
     const allUserSubscriptions = await this.subscriptionRepo.find({
-      where: {user: {userId: user_id}, item: {itemId: item_id}}
+      where: {owner: {userId: user_id}, item: {itemId: item_id}}
     })
     const now = new Date(Date.now())
     return allUserSubscriptions.some(sub => sub.expirationDate > now)

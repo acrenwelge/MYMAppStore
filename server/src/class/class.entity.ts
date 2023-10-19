@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { UserEntity } from "src/user/entities/user.entity";
+import { EnrollmentEntity } from "src/connection-entities/enrollment.entity";
 import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 
 /**
@@ -16,6 +17,6 @@ export class ClassEntity {
     @JoinColumn({ name: 'instructor_id' })
     public instructor: UserEntity;
 
-    @OneToMany(() => UserEntity, user => user.class)
-    public students: UserEntity[];
+    // @OneToMany(() => UserEntity, user => .class)
+    // public students: UserEntity[];
 }

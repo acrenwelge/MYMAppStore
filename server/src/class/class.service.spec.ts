@@ -24,16 +24,15 @@ describe('ClassService', () => {
     let subsRepoMock: MockType<Repository<SubscriptionService>>
     let controller: ClassController
     let mockedInstructorEntity = createMock<UserEntity>()
-    mockedInstructorEntity.class = null
-    mockedInstructorEntity.subscriptions = []
+    //mockedInstructorEntity.subscriptions = []
 
     let mockedClassEntity = createMock<ClassEntity>()
     mockedClassEntity.instructor = mockedInstructorEntity
-    mockedClassEntity.students = []
+    //mockedClassEntity.students = []
 
     let mockedStudentEntity = createMock<UserEntity>()
-    mockedStudentEntity.class = mockedClassEntity
-    mockedStudentEntity.subscriptions = []
+    //mockedStudentEntity.class = mockedClassEntity
+    //mockedStudentEntity.subscriptions = []
 
     // let mockedSubscriptionEntity_UserOwner: SubscriptionEntity
     // let mockedSubscriptionEntity_InstrOwner: SubscriptionEntity
