@@ -11,7 +11,7 @@ import { useHistory } from "react-router-dom";
 import { getUserSubscriptions } from "../api/user";
 import { Subscription } from "../entities";
 import axios from "axios";
-import { useDownloadFile } from "./useDownloadFile";
+import { useDownloadFile } from "./Book/useDownloadFile";
 
 interface localUser {
     role: number;
