@@ -33,6 +33,12 @@ export class AuthController {
         return this.classService.addMultipleStudentsToClass(instructorAndClass.students.map(s => s.userId), newClass.classId);
     }
 
+    @Post("update-information")
+    @HttpCode(HttpStatus.CREATED)
+    public updateInformation(@Body() user: UserDto) {
+        return this.userService.updateOne(user);
+    }
+
     /**
      * Authenticates a user with email and password and returns a JWT token
      */

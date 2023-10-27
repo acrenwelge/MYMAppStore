@@ -69,25 +69,20 @@ describe('UserService', () => {
 		expect((await service.localSignUp(userClient)).email).toBe(testUser.email)
 	})
 
-	// TODO: Need to figure out how to handle exceptions with async
-	xit('should not signup existing locally', async () => {
+	it('should not signup existing locally', async () => {
 		const userClient = new UserDto()
+		const err = new ConflictException("User email address already exists")
 		jest.spyOn(repositoryMock, 'exist').mockImplementation(() => true)
-		try {
-			await service.localSignUp(userClient)
-		} catch (e) {
-			expect(e).toMatch("User email address already exists")
-		}
+		await expect(service.localSignUp(userClient)).rejects.toEqual(err)
 	})
 
-	// TODO: Need to figure out how to test for promises
-	xit('should sign up for a class', async () => {
+	it('should sign up for a class', async () => {
 		const UserA = new UserDto()
 		const UserB = new UserDto()
 		jest.spyOn(service, 'localSignUp').mockReturnValueOnce(Promise.resolve(UserA))
 										.mockReturnValueOnce(Promise.resolve(UserB))
 		const users = [UserA, UserB]
-		expect(await service.localSignUpForClass(users)).toBe(Promise.all([Promise.resolve(UserA), Promise.resolve(UserB)]))
+		await expect(service.localSignUpForClass(users)).resolves.not.toThrow();
 	})
 
 	it('should generate activation code', async () => {

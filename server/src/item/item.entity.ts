@@ -24,4 +24,7 @@ export class ItemEntity {
     @Column()
     public subscriptionLengthMonths: number;
 
+    constructor(itemId?: number) {
+        this.itemId = itemId;
+    }
 }
