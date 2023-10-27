@@ -25,9 +25,12 @@ export class SubscriptionEntity {
 
     @ManyToOne(() => UserEntity)
     @JoinColumn({ name: 'user_id' })
-    public userId: UserEntity;
+    public user: UserEntity;
 
     @Column()
     public expirationDate: Date;
 
+    constructor(subscriptionId?: number) {
+        this.subscriptionId = subscriptionId;
+    }
 }

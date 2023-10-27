@@ -1,7 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { UserEntity } from "src/user/entities/user.entity";
-import { EnrollmentEntity } from "src/connection-entities/enrollment.entity";
-import {Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import {Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn} from "typeorm";
 
 /**
  * @description A class with an instructor that leads it
@@ -13,11 +12,14 @@ export class ClassEntity {
     @PrimaryGeneratedColumn({name: "class_id"})
     public readonly classId: number;
 
-    @ManyToOne(() => UserEntity)
+    @OneToOne(() => UserEntity)
     @JoinColumn({ name: 'instructor_id' })
     public instructor: UserEntity;
 
-    @OneToMany(() => EnrollmentEntity, enrollment => enrollment.classId)
-    //@JoinColumn({ name: 'class_id' })
-    public enrollments: EnrollmentEntity[];
+    @OneToMany(() => UserEntity, user => user.class)
+    public students: UserEntity[];
+
+    constructor(classId?: number) {
+        this.classId = classId;
+    }
 }

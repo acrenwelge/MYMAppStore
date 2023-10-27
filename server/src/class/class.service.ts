@@ -35,71 +35,33 @@ export class ClassService {
   }
 
   async getClassByUserIdOfInstructor(userIdOfInstructor: number) {
-    const classWithStudentsAndSubscriptions = await this.classRepo
-      .createQueryBuilder("class")
-      .leftJoinAndSelect("class.instructor", "instructor")
-      .leftJoinAndSelect("class.students", "students")
-      .leftJoinAndSelect("students.subscriptions", "subscriptions")
-      .leftJoinAndSelect("subscriptions.owner", "owner")
-      .select([
-        "class",
-        "instructor",
-        "students.userId",
-        "students.firstName",
-        "students.lastName",
-        "students.email",
-        "subscriptions.subscriptionId",
-        "owner.userId",
-        "owner.role",
-        "subscriptions.expirationDate"
-      ])
-      .where("instructor.userId = :userIdOfInstructor", { userIdOfInstructor })
-      .getOne();
-    return classWithStudentsAndSubscriptions;
+    const classEntity = await this.classRepo.findOne({
+      relations: ['instructor', 'students', 'students.usingSubscriptions', 
+      'students.usingSubscriptions.owner'],
+      where: {instructor: {userId: userIdOfInstructor} }
+    })
+    return classEntity;
   }
 
   async addStudentToClass(classId: number, studentEmail: string) {
-    let classEntity = await this.classRepo
-      .createQueryBuilder("class")
-      .leftJoinAndSelect("class.instructor", "instructor")
-      .leftJoinAndSelect("class.students", "students")
-      .leftJoinAndSelect("students.subscriptions", "subscriptions")
-      .leftJoinAndSelect("subscriptions.owner", "owner")
-      .select([
-        "class",
-        "instructor",
-        "students.userId",
-        "students.firstName",
-        "students.lastName",
-        "students.email",
-        "subscriptions.subscriptionId",
-        "owner.userId",
-        "owner.role",
-        "subscriptions.expirationDate"
-      ])
-      .where("class.classId = :classId", { classId })
-      .getOne();
-
-    let userEntity = await this.userRepo
-      .createQueryBuilder("user")
-      .leftJoinAndSelect("user.subscriptions", "subscriptions")
-      .leftJoinAndSelect("subscriptions.owner", "owner")
-      .select([
-        "user.userId",
-        "user.firstName",
-        "user.lastName",
-        "user.email",
-        "subscriptions.subscriptionId",
-        "owner.userId",
-        "owner.role",
-        "subscriptions.expirationDate"
-      ])
-      .where("user.email = :studentEmail", { studentEmail })
-      .getOne();
+    let classEntity = await this.classRepo.findOne({
+      relations: ['instructor', 'students', 'students.usingSubscriptions', 
+      'students.usingSubscriptions.owner'],
+      where: {classId}
+    })
+    
+    console.log(classId)
+    console.log("classEntity = ", classEntity)
+    let userEntity = await this.userRepo.findOne({
+      relations: ['usingSubscriptions', 'usingSubscriptions.owner'],
+      where: { email: studentEmail }
+    })
+    
     if (!userEntity) {
       throw new Error(`No user with email ${studentEmail} found.`)
     }
-    // classEntity.students.push(userEntity)
+    console.log("userEntity.userId = ", userEntity.userId)
+    classEntity.students.push(userEntity)
     return await this.classRepo.save(classEntity)
   }
 
@@ -113,51 +75,16 @@ export class ClassService {
   }
 
   async removeStudentFromClass(classId: number, studentUserId: number) {
-    // let studentEntity = await this.userRepo.findOne({
-    //   relations: ['class'],
-    //   where: {userId: studentUserId}
-    // })
-    let studentEntity = await this.userRepo
-      .createQueryBuilder("user")
-      .leftJoinAndSelect("user.subscriptions", "subscriptions")
-      .leftJoinAndSelect("subscriptions.owner", "owner")
-      .select([
-        "user.userId",
-        "user.firstName",
-        "user.lastName",
-        "user.email",
-        "subscriptions.subscriptionId",
-        "owner.userId",
-        "owner.role",
-        "subscriptions.expirationDate"
-      ])
-      .where("user.userId = :studentUserId", { studentUserId })
-      .getOne();
-    // studentEntity.class = null // unassign student from class
+    let studentEntity = await this.userRepo.findOne({
+      relations: ['class', 'usingSubscriptions', 'usingSubscriptions.owner'],
+      where: {userId: studentUserId}
+    })
+    studentEntity.class = null // unassign student from class
     await this.userRepo.save(studentEntity)
-    // return await this.classRepo.findOne({
-    //   relations: ['instructor','students'],
-    //   where: {classId}
-    // })
-    return await this.classRepo
-      .createQueryBuilder("class")
-      .leftJoinAndSelect("class.instructor", "instructor")
-      .leftJoinAndSelect("class.students", "students")
-      .leftJoinAndSelect("students.subscriptions", "subscriptions")
-      .leftJoinAndSelect("subscriptions.owner", "owner")
-      .select([
-        "class",
-        "instructor",
-        "students.userId",
-        "students.firstName",
-        "students.lastName",
-        "students.email",
-        "subscriptions.subscriptionId",
-        "owner.userId",
-        "owner.role",
-        "subscriptions.expirationDate"
-      ])
-      .where("class.classId = :classId", { classId })
-      .getOne();
+    return await this.classRepo.findOne({
+      relations: ['instructor','students', 'students.usingSubscriptions', 
+      'students.usingSubscriptions.owner'],
+      where: {classId}
+    })
   }
 }

@@ -1,10 +1,9 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany, OneToOne, ManyToOne, JoinColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn} from "typeorm";
 import {Exclude} from '@nestjs/class-transformer'
 import {TransactionEntity} from "src/transaction/entities/transaction.entity";
 import { Roles } from "src/roles/role.enum";
-import { EnrollmentEntity } from "src/connection-entities/enrollment.entity";
-import { SubscriptionEntity } from "src/subscription/subscription.entity";
 import { ClassEntity } from "src/class/class.entity";
+import { SubscriptionEntity } from "src/subscription/subscription.entity";
 
 /**
  * @description Represents the User table in the database
@@ -57,18 +56,16 @@ export class UserEntity {
     @OneToMany(() => TransactionEntity, transaction => transaction.user)
     transactions: TransactionEntity[]
 
-    @OneToMany(() => SubscriptionEntity, subscription => subscription.owner)
-    ownedSubscriptions: SubscriptionEntity[]
+    @ManyToOne(() => ClassEntity, classEntity => classEntity.students)
+    @JoinColumn({name: 'class_id'})
+    public class: ClassEntity;
 
-    @OneToMany(() => SubscriptionEntity, subscription => subscription.userId)
+    @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
     usingSubscriptions: SubscriptionEntity[]
 
-    @OneToMany(() => EnrollmentEntity, enrollment => enrollment.studentId)
-    enrollments: EnrollmentEntity[]
+    @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
+    ownedSubscriptions: SubscriptionEntity[]
 
-    @OneToMany(() => ClassEntity, instructorClass => instructorClass.instructor)
-    instructorClasses: ClassEntity[]
-    
     constructor(userId?: number) {
         this.userId = userId;
     }
