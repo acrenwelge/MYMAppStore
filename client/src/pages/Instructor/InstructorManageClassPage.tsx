@@ -104,6 +104,11 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
 
   const purchaseItems = (studentId: number) => {
     toast.info("Not implemented yet, this requires more thought in design + client input")
+    localStorage.setItem('buy_for_user_id', JSON.stringify(studentId));
+    // do the API calls and such
+    const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
+    localStorage.setItem('buy_for_user_id', JSON.stringify(instructor.userId));
+
   }
 
   const addExistingUserAsStudent = () => {
@@ -149,6 +154,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       setNewStudent({...newStudent, email: value})
     }
   }
+
+
   if (isInstructor) {
     return (
       <Container name="valid-instructor" className="container-fluid" style={{padding: "2"}}>
