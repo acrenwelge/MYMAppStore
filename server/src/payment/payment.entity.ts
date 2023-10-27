@@ -1,6 +1,7 @@
 export default interface Cart {
   purchaserUserId: number,
   grandTotal: number,
+  hasAccessUserId: number,
   items: {
     itemId: number,
     finalPrice: number,

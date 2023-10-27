@@ -103,9 +103,13 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   }
 
   const purchaseItems = (studentId: number) => {
-    toast.info("Not implemented yet, this requires more thought in design + client input")
+    // just change the localStorage to the student's id so they get access to it
+    // after the student buys it
     localStorage.setItem('buy_for_user_id', JSON.stringify(studentId));
+
     // do the API calls and such
+    // includes API call to do PayPal purchase
+    // then API call to make the new subscription
     const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
     localStorage.setItem('buy_for_user_id', JSON.stringify(instructor.userId));
 

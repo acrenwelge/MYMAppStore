@@ -14,7 +14,6 @@ import {ItemEntity} from "./item/item.entity"
 import {PurchaseCodeEntity} from "./purchaseCode/purchaseCode.entity"
 import {TransactionEntity} from "./transaction/entities/transaction.entity"
 import {SubscriptionEntity} from "./subscription/subscription.entity"
-import { EnrollmentEntity } from './connection-entities/enrollment.entity';
 import { EmailModule } from './email/email.module'
 import { BookModule } from './book/book.module'
 
@@ -56,7 +55,7 @@ if (process.env.RUNNING_ENV === 'prod') {
 			database: process.env.DB_Database,
 			entities:[
 				UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
-				TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity, EnrollmentEntity
+				TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
 			],
 			synchronize: process.env.ENV_TYPE.toUpperCase() === 'DEV',
 		}) : TypeOrmModule.forRoot({
@@ -64,7 +63,7 @@ if (process.env.RUNNING_ENV === 'prod') {
 			url: process.env.DATABASE_URL,
 			entities:[
 				UserEntity, ClassEntity, ItemEntity, PurchaseCodeEntity, SubscriptionEntity,
-				TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity, EnrollmentEntity
+				TransactionEntity, TransactionDetailEntity, FreeSubscriptionEntity
 			],
 			ssl: {
 				rejectUnauthorized: false,
