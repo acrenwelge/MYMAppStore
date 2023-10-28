@@ -70,6 +70,7 @@ describe('TransactionService', () => {
     const cart: Cart = {
       purchaserUserId: 1,
       grandTotal: 10,
+      hasAccessUserId: 1,
       items: [
         {
           itemId: 1,

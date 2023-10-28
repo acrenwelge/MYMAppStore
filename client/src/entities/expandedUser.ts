@@ -13,5 +13,6 @@ export default interface ExpandedUser {
 	readonly createdAt: Date;
 	readonly updatedAt: Date;
 	activatedAccount: boolean;
-  	readonly subscriptions: SubscriptionInterface[];
+  	readonly usingSubscriptions: SubscriptionInterface[];
+  	readonly ownedSubscriptions: SubscriptionInterface[];
 }
