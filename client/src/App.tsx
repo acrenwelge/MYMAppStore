@@ -56,6 +56,8 @@ const App: React.FC = (): JSX.Element => {
 		authenticationPath: '/'
 	};
 
+	console.log(user?.role);
+
 	return (
 		<BrowserRouter>
 			<SWRConfig
@@ -73,7 +75,6 @@ const App: React.FC = (): JSX.Element => {
 						<main style={{ flexGrow: 1 }}>
 							<Switch>
 								<Route exact path="/">
-									{console.log(user?.role)}
 									<Home />
 								</Route>
 								<Route exact path="/login">
@@ -118,24 +119,24 @@ const App: React.FC = (): JSX.Element => {
 								<Route exact path="/instructor/class">
 									<InstructorManageClassPage />
 								</Route>
-								<Route exact path="/admin/class">
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/class">
 									<AdminManageClassesPage />
-								</Route>
-								<Route exact path="/admin/user">
+								</ProtectedRoute>
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/user">
 									<AdminUserInfoPage />
-								</Route>
-								<Route exact path="/admin/products">
+								</ProtectedRoute>
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/products">
 									<AdminEditProductInfo />
-								</Route>
-								<Route exact path="/admin/purchase-code">
+								</ProtectedRoute>
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/purchase-code">
 									<AdminPurchaseCode />
-								</Route>
-								<Route exact path="/admin/free-subscription">
+								</ProtectedRoute>
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/free-subscription">
 									<AdminFreeSubscriptionPage/>
-								</Route>
-								<Route exact path="/admin/paid-subscription">
+								</ProtectedRoute>
+								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/paid-subscription">
 									<AdminPaidSubscriptionPage/>
-								</Route>
+								</ProtectedRoute>
 								<ProtectedRoute {...defaultProtectedRouteProps} exact path="/admin/transaction">
 									<AdminTransactionPage />
 								</ProtectedRoute>
