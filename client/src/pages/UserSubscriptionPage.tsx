@@ -10,6 +10,8 @@ import {
 import { useHistory } from "react-router-dom";
 import { getUserSubscriptions } from "../api/user";
 import { Subscription } from "../entities";
+import axios from "axios";
+import { useDownloadFile } from "./Book/useDownloadFile";
 
 interface localUser {
     role: number;
@@ -47,6 +49,34 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
     const readBook = () => {
         history.push('/read')
     }
+    
+    const [showAlert, setShowAlert] = useState<boolean>(false);
+    
+    const onErrorDownloadFile = () => {
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+    };
+    
+    const getFileName = () => {
+        return (Math.random() + 1).toString(36).substring(7) + "_sample-file.csv";
+    };
+    
+    const downloadSampleCsvFile = () => {
+        return axios.get(
+          "https://raw.githubusercontent.com/anubhav-goel/react-download-file-axios/main/sampleFiles/csv-sample.csv",
+          {
+            responseType: "blob",
+          }
+        );
+      };
+    
+      const { ref, url, download, name } = useDownloadFile({
+        apiDefinition: downloadSampleCsvFile,
+        onError: onErrorDownloadFile,
+        getFileName,
+      });
 
     return (
         <Container style={{ marginTop: 10, marginBottom: 30 }}>
@@ -63,7 +93,7 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                                     <Table.Row>
                                         <Table.HeaderCell>Item Name</Table.HeaderCell>
                                         <Table.HeaderCell>Expiration Date</Table.HeaderCell>
-                                        <Table.HeaderCell>Operation</Table.HeaderCell>
+                                        <Table.HeaderCell colSpan = "2" textAlign="center">Operation</Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
@@ -71,11 +101,20 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                                         <Table.Row key={sub.id}>
                                             <Table.Cell>{sub.item.name}</Table.Cell>
                                             <Table.Cell>{sub.expirationDate.toLocaleDateString()}</Table.Cell>
-                                            <Table.Cell>
+                                            <Table.Cell textAlign="center">
                                                 <Button onClick={readBook} animated='fade'>
                                                     <Button.Content visible>Read</Button.Content>
                                                     <Button.Content hidden>
                                                         <Icon name='book' />
+                                                    </Button.Content>
+                                                </Button>
+                                            </Table.Cell>
+                                            <Table.Cell textAlign="center">
+                                            <a href={url} download={name} className="hidden" ref={ref} />
+                                                <Button onClick={download} animated='fade'>
+                                                    <Button.Content visible>Download</Button.Content>
+                                                    <Button.Content hidden>
+                                                        <Icon name='download' />
                                                     </Button.Content>
                                                 </Button>
                                             </Table.Cell>
