@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import ThirdPartyAuthenticators from "../../components/ThirdPartyAuthenticators";
 import Page from "../../components/Page";
-//import UserInfoForm from "./UserInfoForm";
+import UserInfoForm from "./UserInfoForm";
 import { Button, Container } from "semantic-ui-react";
 
 // TODO: Figure out how to add a submitable form
@@ -10,7 +10,7 @@ import { Button, Container } from "semantic-ui-react";
 const UserBasePage: React.FC = (props) => {
   return (
     <Page>
-      <h1>User form would go here.</h1>
+      <UserInfoForm />
 		</Page>
   );
 }

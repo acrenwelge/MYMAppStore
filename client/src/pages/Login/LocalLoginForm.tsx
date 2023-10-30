@@ -57,6 +57,7 @@ const LocalLoginForm: React.FC = (): JSX.Element => {
 				const user = res.data.user
 				const token = res.data.access_token
 				localStorage.setItem('user', JSON.stringify(user));
+				localStorage.setItem('buy_for_user_id', JSON.stringify(user.userId));
 				localStorage.setItem('token', token);
 				ctx.setUser!(user);
 				history.replace(location.state?.prevPath || '/');

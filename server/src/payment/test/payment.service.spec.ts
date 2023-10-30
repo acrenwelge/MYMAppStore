@@ -14,6 +14,7 @@ describe('PaymentService', () => {
   const cartData:Cart = {
     purchaserUserId: 12345,
     grandTotal: 500.0,
+    hasAccessUserId: 12345,
     items: [
       {
         itemId: 1,

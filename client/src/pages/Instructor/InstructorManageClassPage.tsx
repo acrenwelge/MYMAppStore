@@ -41,8 +41,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
 
   const transformUserToStudent = (user: ExpandedUser, instructorId: number): Student => {
     let ownerOfItem1 = -1
-    user.subscriptions.forEach( subs => {
-      console.log(subs)
+    user.usingSubscriptions.forEach( subs => {
+      //console.log(subs)
       if (subs.subscriptionId == 1) {
         ownerOfItem1 = subs.owner.userId
       }
@@ -52,19 +52,19 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      hasSubscription: user.subscriptions.length != 0,
-      instructorOwnsSub: ownerOfItem1 == instructorId
+      hasSubscription: user.usingSubscriptions.length != 0,
+      instructorOwnsSub: ownerOfItem1 === instructorId
     }
   }
 
   const checkIsInstructor = () => {
-    const user = JSON.parse(localStorage.getItem('user') || 'null')
+    const user = JSON.parse(localStorage.getItem('user') ?? 'null')
     setIsInstructor(user.role.toLowerCase() === 'instructor')
   }
 
   const loadClass = () => {
     if (isInstructor) {
-      const instructor = JSON.parse(localStorage.getItem('user') || 'null')
+      const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
       console.log(instructor)
       const instructorId = instructor.userId
       getClassByInstructor(instructorId)
@@ -89,10 +89,11 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   }, []);
 
   const removeStudent = (studentId: number) => {
+    const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
     removeStudentFromClass(classData.id, studentId)
       .then(res => {
         console.log(res)
-        const students: Student[] = res.data.students.map(u => transformUserToStudent(u, -1))
+        const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructor.userId))
         setClassData({id: classData.id, students: students})
         toast.success("Student removed")
       }).catch(err => {
@@ -102,7 +103,16 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   }
 
   const purchaseItems = (studentId: number) => {
-    toast.info("Not implemented yet, this requires more thought in design + client input")
+    // just change the localStorage to the student's id so they get access to it
+    // after the student buys it
+    localStorage.setItem('buy_for_user_id', JSON.stringify(studentId));
+
+    // do the API calls and such
+    // includes API call to do PayPal purchase
+    // then API call to make the new subscription
+    const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
+    localStorage.setItem('buy_for_user_id', JSON.stringify(instructor.userId));
+
   }
 
   const addExistingUserAsStudent = () => {
@@ -110,9 +120,10 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   }
 
   const addExistingUserPassEmail = (email: string) => {
+    const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
     return addStudentToClassByEmail(classData.id, email)
       .then(res => {
-        const students: Student[] = res.data.students.map(u => transformUserToStudent(u, -1));
+        const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructor.userId));
         setClassData({id: classData.id, students: students})
         setExistingStudentEmail("")
         toast.success("Student added to class successfully")
@@ -147,6 +158,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       setNewStudent({...newStudent, email: value})
     }
   }
+
+
   if (isInstructor) {
     return (
       <Container name="valid-instructor" className="container-fluid" style={{padding: "2"}}>

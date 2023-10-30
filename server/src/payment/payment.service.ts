@@ -16,10 +16,14 @@ export class PaymentService {
      */
     async createPaypalOrder(cart: Cart, res) {
         // TODO: validate purchase codes and grand total
+        console.log("__FUNCTION__createPaypalOrder")
         try {
+            console.log("__FUNCTION__createPaypalOrder in try")
             const order = await paypal.createOrder(cart.grandTotal);
             res.json(order);
+            console.log("__FUNCTION__createPaypalOrder, res = ", res)
         } catch (err) {
+            console.log("__FUNCTION__createPaypalOrder err.message = ", err.message)
             res.status(500).send(err.message);
         }
     }

@@ -18,4 +18,8 @@ export class ClassEntity {
 
     @OneToMany(() => UserEntity, user => user.class)
     public students: UserEntity[];
+
+    constructor(classId?: number) {
+        this.classId = classId;
+    }
 }

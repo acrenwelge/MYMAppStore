@@ -1,6 +1,8 @@
-import React, { useState, useCallback, useReducer, Reducer } from "react";
+import React, { useEffect, useState, useCallback, useContext, useReducer, Reducer } from "react";
 import {Form, FormProps, Button, Message, Loader, Container} from "semantic-ui-react";
-import {localSignupApi} from "../../api/auth";
+import {getProfileApi, updateInformation} from "../../api/user";
+import { User } from "../../entities";
+import ApplicationContext from "../../context/application.context";
 
 type FormValues = {
 	firstName: string;
@@ -66,7 +68,7 @@ const formStateReducer = (state: FormActionState, action: FormAction): FormActio
 	}
 };
 
-const IndividualSignUpForm: React.FC = (props): JSX.Element => {
+const UserInfoForm: React.FC = (props): JSX.Element => {
 	const emptyVals: FormValues = {
 		firstName: "",
 		lastName: "",
@@ -81,15 +83,24 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 		{ loading: false, success: false, confirmEmailError: false, passwordError: false, confirmPasswordError: false }
 	);
 
+	useEffect(() => {
+        getProfileApi().then( return_data => {
+		
+			setFormValues({...formValues, email: return_data.data.email})
+			// TODO: I want to get more user info and set the old values so we can display some information.
+		})
+    }, []);
+	
 	const onSubmit = useCallback(
 		(data: FormProps) => {
 			formStateDispatch({ type: "LOADING" });
-			localSignupApi({
+			updateInformation({
 				firstName: formValues.firstName,
 				lastName: formValues.lastName,
 				email: formValues.email,
 				password: formValues.password
 			}).then((res) => {
+					
 					setFormValues(emptyVals);
 					formStateDispatch({ type: "SUCCESS" });
 			}).catch((err) => {
@@ -110,7 +121,8 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 
 	return (
 		<Container>
-			<h1>Individual Sign Up</h1>
+			<h1>User Information</h1>
+			<h3>Email: {formValues.email}</h3>
 			<Form
 				hidden={formState.success}
 				error={formState.requestError !== undefined}
@@ -123,40 +135,12 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 					label="First Name"
 					value={formValues.firstName }
 					onChange={(event, data) => setFormValues({ ...formValues, firstName: data.value })}
-					required
 				/>
 				<Form.Input
 					id="name"
 					label="Last Name"
 					value={formValues.lastName }
 					onChange={(event, data) => setFormValues({ ...formValues, lastName: data.value })}
-					required
-				/>
-				<Form.Input
-					id="email"
-					label="Email"
-					value={formValues.email}
-					onChange={(event, data) => setFormValues({ ...formValues, email: data.value })}
-					required
-					type="email"
-				/>
-				<Form.Input
-					error={
-						formState.confirmEmailError
-							? { content: "Email addresses do not match", pointing: "below" }
-							: undefined
-					}
-					id="confirmEmail"
-					label="Confirm Email"
-					value={formValues.confirmedEmail}
-					onChange={(event, data) => {
-						formStateDispatch({
-							type: "CONFIRM_EMAIL_ERROR",
-							payload: data.value !== formValues.email
-						});
-						setFormValues({ ...formValues, confirmedEmail: data.value });
-					}}
-					required
 				/>
 				<Form.Input
 					error={
@@ -173,7 +157,6 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 						});
 						setFormValues({ ...formValues, password: data.value });
 					}}
-					required
 					type="password"	
 				/>
 				<Form.Input
@@ -190,11 +173,8 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 						});
 						setFormValues({ ...formValues, confirmedPassword: data.value });
 					}}
-					required
 					type="password"
 				/>
-				<Form.Checkbox label="Request Admin access" />
-
 				<Message content={formState.requestError} error header="Error" />
 				<Button
 					active={
@@ -204,7 +184,7 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 					fluid
 					type="submit"
 				>
-					{formState.loading ? <Loader active inline="centered" /> : "Sign up"}
+					{formState.loading ? <Loader active inline="centered" /> : "Change Information"}
 				</Button>
 			</Form>
 			<Message
@@ -217,4 +197,4 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 	);
 };
 
-export default IndividualSignUpForm;
+export default UserInfoForm;

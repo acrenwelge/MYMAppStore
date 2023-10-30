@@ -61,8 +61,11 @@ export class UserEntity {
     public class: ClassEntity;
 
     @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
-    subscriptions: SubscriptionEntity[]
-    
+    usingSubscriptions: SubscriptionEntity[]
+
+    @OneToMany(() => SubscriptionEntity, subscription => subscription.user)
+    ownedSubscriptions: SubscriptionEntity[]
+
     constructor(userId?: number) {
         this.userId = userId;
     }

@@ -44,7 +44,7 @@ export class EmailService implements OnModuleDestroy {
 ) {
         {
             const appDirectory = process.cwd();
-            this.activateAccountTemplateDelegate = Handlebars.compile(
+            this.activateAccountTemplateDelegate = Handlebars.compile(  
                 readFileSync(path.resolve(appDirectory,"src","email","templates","activate-account.template.txt")).toString()
             );
             this.remindExpirationTemplateDelegate = Handlebars.compile(
