@@ -3,27 +3,11 @@ let { setDefaultTimeout } = require("@cucumber/cucumber")
 const { expect } = require('chai')
 const { isErrorResponse } = require("selenium-webdriver/lib/error")
 const webdriver = require("selenium-webdriver")
-
-setDefaultTimeout(60*1000)
-let driver
-
-Before(function () {
-	driver = new webdriver.Builder().forBrowser("chrome").build()
-})
-
-After(function () {
-	driver.quit()
-})
-
-// Scenario: Successfully accessing class management page as an instructor
-//        Given user is logged in as instructor
-//        When not accessing an item
-//        And go to the class management url
-//        Then the user should be at class management page with their class 
-//             information displayed and able to remove/add students and pay for 
-//             students' textbooks.
+const driverInstance = require('./WebDriver');
 
 Given('user is logged in as instructor', async function () {
+    driver = driverInstance.driver
+    
     // log in using a premade instructor account
     // this instructor account has a class with at least one student
     await driver.get('http://localhost:3000/login')
@@ -36,17 +20,23 @@ Given('user is logged in as instructor', async function () {
 })
 
 When('not accessing an item', async function () {
+    driver = driverInstance.driver
+    
     // not accessing an item, so navigate to root
     await driver.get("http://localhost:3000/")
 	await driver.sleep(3 * 1000)
 })
 
 When('go to the class management url', async function () {
+    driver = driverInstance.driver
+    
     await driver.get("http://localhost:3000/instructor/class")
 	await driver.sleep(1 * 1000)
 })
 
 Then('the user should be at class management page with their class information displayed.', async function () {
+    driver = driverInstance.driver
+    
     expect(function() { driver.findElement(webdriver.By.name("valid-instructor")) }).to.not.throw()
     let msg = await driver.findElement(webdriver.By.name("valid-instructor"))
     expect(msg).to.not.be.null
@@ -59,6 +49,8 @@ Then('the user should be at class management page with their class information d
 //         Then the user will not see any class data.
 
 Given('user is not logged in as instructor', async function () {
+    driver = driverInstance.driver
+    
     // log in using a premade user account
     await driver.get('http://localhost:3000/login')
  	await driver.sleep(1 * 1000)
@@ -70,6 +62,8 @@ Given('user is not logged in as instructor', async function () {
 })
 
 Then('the user will not see any class data.', async function () {
+    driver = driverInstance.driver
+    
     expect(function() { driver.findElement(webdriver.By.name("not-instructor")) }).to.not.throw()
     let msg = await driver.findElement(webdriver.By.name("not-instructor"))
     expect(msg).to.not.be.null
@@ -80,6 +74,8 @@ Then('the user will not see any class data.', async function () {
 //         When user is at the class management page
 let initialNumberOfRows = 0
 When('user is at the class management page', async function () {
+    driver = driverInstance.driver
+    
     await driver.get("http://localhost:3000/instructor/class")
 	await driver.sleep(1 * 1000)
     let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
@@ -92,16 +88,22 @@ When('user is at the class management page', async function () {
 //         Then student is added to the class and shows in the student list.
 
 When('inputs student\'s email under \'Add Existing User as Student\'', async function() {
+    driver = driverInstance.driver
+    
     await driver.findElement(webdriver.By.id("existing-email")).sendKeys('test1@test.com')
     await driver.sleep(1 * 1000)
 })
 
 When('clicks \'Add Student\'', async function() {
+    driver = driverInstance.driver
+    
     await driver.findElement(webdriver.By.id('existing-add')).click()
     await driver.sleep(1 * 1000)
 })
 
 Then('student is added to the class and shows in the student list.', async function() {
+    driver = driverInstance.driver
+    
     let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
     expect(array.length).to.equal(initialNumberOfRows+1)
 })
@@ -111,11 +113,15 @@ Then('student is added to the class and shows in the student list.', async funct
 //         And clicks 'Add Student'
 //         Then student is not added to the class.
 When('inputs student\'s email under \'Add Existing User as Student\' with nonexisting', async function() {
+    driver = driverInstance.driver
+    
     await driver.findElement(webdriver.By.id("existing-email")).sendKeys('doesnt@exist.com')
     await driver.sleep(1 * 1000)
 })
 
 Then('student is not added to the class.', async function() {
+    driver = driverInstance.driver
+    
     let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
     expect(array.length).to.equal(initialNumberOfRows)
 })
@@ -125,6 +131,8 @@ Then('student is not added to the class.', async function() {
 //         And inputs student's firstname, lastname, and email under 'Add New User as Student' section
 //         Then student is added to the class and shows in the student list.
 When('inputs student\'s firstname, lastname, and email without existing', async function() {
+    driver = driverInstance.driver
+    
     await driver.findElement(webdriver.By.id("new-first-name")).sendKeys('new')
     await driver.findElement(webdriver.By.id("new-last-name")).sendKeys('student')
     await driver.findElement(webdriver.By.id("new-email")).sendKeys('new@test.com')
@@ -139,6 +147,8 @@ When('inputs student\'s firstname, lastname, and email without existing', async 
 //         Then student is not added to the class.
 
 When('inputs student\'s firstname, lastname, and email with existing', async function() {
+    driver = driverInstance.driver
+    
     await driver.findElement(webdriver.By.id("new-first-name")).sendKeys('stu')
     await driver.findElement(webdriver.By.id("new-last-name")).sendKeys('test1')
     await driver.findElement(webdriver.By.id("new-email")).sendKeys('test1@test.com')
@@ -152,6 +162,8 @@ When('inputs student\'s firstname, lastname, and email with existing', async fun
 //         And clicks 'Remove Student' for a student listed
 //         Then the student is removed from the class.
 When('clicks \'Remove Student\' for a student listed', async function() {
+    driver = driverInstance.driver
+    
     let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
     let test1_idx = 0
     for (let i = 0; i < array.length; i++) {
@@ -164,6 +176,8 @@ When('clicks \'Remove Student\' for a student listed', async function() {
 })
 
 Then('the student is removed from the class.', async function() {
+    driver = driverInstance.driver
+    
     let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
     expect(array.length).to.equal(initialNumberOfRows-1)
 })

@@ -4,27 +4,11 @@ const { time, assert } = require("console");
 const webdriver = require("selenium-webdriver");
 var { setDefaultTimeout } = require("@cucumber/cucumber");
 const exp = require("constants");
-//const options = new Chrome.Options();
-setDefaultTimeout(60 * 1000);
-let driver;
-Before(function (env) {
-	driver = new webdriver.Builder().forBrowser("chrome").build();
-});
-
-After(function () {
-	driver.quit();
-});
-
-/*
-Scenario: Adding purchase code correctly
-    Given user is logged in as admin 
-    When go to purchase code page url
-    When type in valid purchase code
-	When click the add button
-    Then the purchase code should be added in
-*/
+const driverInstance = require('./WebDriver');
 
 Given("user is logged in as admin", async () => {
+	driver = driverInstance.driver
+    
 	//log in: 
 	await driver.get("http://localhost:3000/login");
  	await driver.sleep(3 * 1000);
@@ -43,6 +27,8 @@ Given("user is logged in as admin", async () => {
 });
 
 When("go to purchase code page url", async () => {
+	driver = driverInstance.driver
+    
     //driver.findElement(webdriver.By.id("email")).sendKeys("yushuang@me.com");
     //driver.findElement(webdriver.By.id("password")).sendKeys("yushuang");
 	//await driver.sleep(6 * 1000);
@@ -53,6 +39,8 @@ When("go to purchase code page url", async () => {
 
 
 When("type in valid purchase code", async () => {
+	driver = driverInstance.driver
+    
     driver.findElement(webdriver.By.id("name")).sendKeys("20percentoff");
 	driver.findElement(webdriver.By.id("priceOff")).sendKeys("20");
 	await driver.sleep(3 * 1000);
@@ -60,6 +48,8 @@ When("type in valid purchase code", async () => {
 });
 
 When("click the add button", async () => {
+	driver = driverInstance.driver
+    
     //driver.findElement(webdriver.By.id("name")).sendKeys(randomName);
     //await driver.sleep(3 * 1000);
 	await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/button`)).click();
@@ -67,6 +57,7 @@ When("click the add button", async () => {
 });
 
 Then("the purchase code should be added in", async () => {
+	driver = driverInstance.driver
 
 	let successMsg = await driver.findElement(webdriver.By.className("ui success message")).getText();
     expect(successMsg).to.contains("SUCCESS");
@@ -110,6 +101,7 @@ Scenario: Adding purchase code correctly
 //*[@id="root"]/div/main/div/div/div/div[2]/table/tbody/tr[6]/td[4]/button
 
 When("click the delete button at the end of row", async () => {
+	driver = driverInstance.driver
 
 	//should be working... but not
 	//let table = await driver.findElement(webdriver.By.className("ui table"));
@@ -123,6 +115,8 @@ When("click the delete button at the end of row", async () => {
 });
 
 Then("the purchase code should be deleted", async () => {
+	driver = driverInstance.driver
+    
 	//await driver.get("http://localhost:3000/admin/purchase-code");
 
 	let table = await driver.findElement(webdriver.By.className("ui table"));

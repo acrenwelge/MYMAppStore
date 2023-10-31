@@ -11,8 +11,7 @@ Scenario: Successful accessing products page as admin user with data
     Then the user should be at products page
     And the user should see product info
 
-
-Scenario: Failed accessing transaction page as general user
+Scenario: Failed accessing products page as general user
     Given user is at home page product
     When not logged in as admin product
     And go to the products url
