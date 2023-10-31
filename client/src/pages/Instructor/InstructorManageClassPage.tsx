@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect } from "react";
-import { Button, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
+import { Button, Checkbox, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
 import { getClassByInstructor, addStudentToClassByEmail, removeStudentFromClass } from "../../api/classes";
 import { ToastContainer, toast } from "react-toastify";
 import { ExpandedUser, ExpandedClass } from "../../entities";
@@ -69,7 +69,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       const instructorId = instructor.userId
       getClassByInstructor(instructorId)
         .then(res => {
-          console.log(res);
+          // THERE'S AN ERROR WHERE IF THE INSTRUCTOR TRIES TO ADD THEIR OWN EMAIL, THIS ALL BREAKS
           const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructorId));
           setClassData({id: res.data.classId, students: students});
           if (students.length === 0) {
@@ -105,6 +105,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const purchaseItems = (studentId: number) => {
     // just change the localStorage to the student's id so they get access to it
     // after the student buys it
+    //let studentArray = localStorage.getItem('buy_for_user_id')
+    //console.log(studentArray)
     localStorage.setItem('buy_for_user_id', JSON.stringify(studentId));
 
     // do the API calls and such
@@ -123,6 +125,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
     const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
     return addStudentToClassByEmail(classData.id, email)
       .then(res => {
+        console.log(res)
         const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructor.userId));
         setClassData({id: classData.id, students: students})
         setExistingStudentEmail("")
@@ -189,6 +192,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                               <Table.Cell>
                                 <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
                                 <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button>
+                                <Checkbox onChange={() => purchaseItems(student.id)} inputProps={{ 'aria-label': 'controlled' }}/>
                               </Table.Cell>
                             </Table.Row>
                         ))}
