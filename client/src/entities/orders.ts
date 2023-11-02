@@ -3,6 +3,7 @@ import { CartItem } from "./product"
 export interface PayPalOrderDetails {
   orderId: string,
   cart: CartDataDto,
+  recipientIds: number[]
 }
 
 export interface CartDataDto {

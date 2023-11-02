@@ -30,6 +30,8 @@ const Checkout: React.FC = (props): JSX.Element => {
 		}
 		const total = ctx.cart.reduce(sum, 0);
 		setTotalPrice(total);
+		console.log("__FUNCTION__useEffect()")
+		console.log("\tctx.students =", ctx.students)
 	}, [ctx.cart]);
 
 	const cartToData = (cart: CartItem[]): CartDataDto => {
@@ -59,9 +61,15 @@ const Checkout: React.FC = (props): JSX.Element => {
 	// Finalize the transaction after payer approval
 	const onApprove = async (data: {orderID: string, payerId: string, paymentId: string}, actions: any) => {
 		console.log("onApprove - payment being authorized", data);
+		const user = JSON.parse(localStorage.getItem('user') ?? 'null')
+		const isInstructor = (user.role.toLowerCase() === 'instructor')
+
+
+
 		const orderObj: PayPalOrderDetails = {
 			orderId: data.orderID,
 			cart: cartToData(ctx.cart),
+			recipientIds: isInstructor ? ctx.students : user.id
 		}
 		return capturePaypalOrder(orderObj)
 			.then((res) => {
@@ -177,6 +185,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 					<Table.Header>
 						<Table.Row>
 							<Table.HeaderCell width={4}>Product</Table.HeaderCell>
+							<Table.HeaderCell collapsing width={2}>Quantity</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}>Subscription Length</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}>Original Price (USD)</Table.HeaderCell>
 							<Table.HeaderCell collapsing width={2}>Final Price (USD)</Table.HeaderCell>
@@ -189,6 +198,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 						{ctx.cart.map(item => (
 							<Table.Row key={item.itemId}>
 								<Table.Cell>{item.name}</Table.Cell>
+								<Table.Cell>{item.quantity}</Table.Cell>
 								<Table.Cell>{item.subscriptionLengthMonths} months</Table.Cell>
 								<Table.Cell style={item.finalPrice !== item.price ? {"text-decoration": "line-through"} : null}>
 									${item.price.toFixed(2)}

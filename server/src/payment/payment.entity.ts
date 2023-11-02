@@ -23,4 +23,5 @@ export interface PaypalCreateOrderResponse {
 export interface PayPalOrderDetails {
   orderId: string,
   cart: Cart,
+  recipientIds: number[]
 }

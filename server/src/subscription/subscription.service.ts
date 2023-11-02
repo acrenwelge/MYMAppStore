@@ -44,32 +44,54 @@ export class SubscriptionService {
     return date;
 }
 
+  async addExtendSubscriptionLogic(order: Cart, item, subs: SubscriptionEntity[], recip: number) {
+    const now = new Date(Date.now());
+    const {subscriptionLengthMonths} = await this.itemService.findOne(item.itemId);
+    const subsForItem = subs.filter(s => s.item.itemId === item.itemId);
+    if (subsForItem.length > 0) { // user already has a subscription for this item
+      const sub = subsForItem[0];
+      if (sub.expirationDate < now) { // subscription has expired - replace it
+        const newdate = this.addMonthsUtil(now, subscriptionLengthMonths);
+        sub.expirationDate = newdate;
+      } else { // subscription expires in the future - extend it
+        sub.expirationDate = this.addMonthsUtil(sub.expirationDate, subscriptionLengthMonths);
+      }
+      return this.subscriptionRepo.save(sub);
+    } else { // no existing subscriptions for this user for this item
+      const newSub = this.subscriptionRepo.create();
+      newSub.item = <any> item.itemId;
+      newSub.user = <any> (recip != order.purchaserUserId ? recip : null)
+      newSub.owner = <any> order.purchaserUserId
+      newSub.expirationDate = this.addMonthsUtil(now, subscriptionLengthMonths);
+      await this.subscriptionRepo.save(newSub);
+    }
+  }
+
   /**
    * Updates the expiration date of a subscription for a user, or creates a new subscription if one does not exist.
    * @returns the updated or created subscription
    */
-  async addOrExtendSubscriptions(order: Cart) {
-    const subs: SubscriptionEntity[] = await this.findAllForOwner(order.purchaserUserId);
-    const now = new Date(Date.now());
+  async addOrExtendSubscriptions(order: Cart, recipientIds: number[]) {
+    console.log("\t__FUNCTION__addOrExtendSubscriptions")
+    console.log("\t\trecipientIds =", recipientIds)
     for (const item of order.items) {
-      const {subscriptionLengthMonths} = await this.itemService.findOne(item.itemId);
-      const subsForItem = subs.filter(s => s.item.itemId === item.itemId);
-      if (subsForItem.length > 0) { // user already has a subscription for this item
-        const sub = subsForItem[0];
-        if (sub.expirationDate < now) { // subscription has expired - replace it
-          const newdate = this.addMonthsUtil(now, subscriptionLengthMonths);
-          sub.expirationDate = newdate;
-        } else { // subscription expires in the future - extend it
-          sub.expirationDate = this.addMonthsUtil(sub.expirationDate, subscriptionLengthMonths);
+      for (let i = 0; i < item.quantity; i++) {
+        // get the next recipientId (item.quantity === recipientIds.length)
+        const recip = recipientIds[i]
+        console.log("\t\trecip =", recip)
+        console.log("\t\tpurchaserUserId =", order.purchaserUserId)
+        if (recip === order.purchaserUserId) {
+          // they purchase for themself, based off purchaserUserId
+          console.log("\t\tself-purchase")
+          const subs: SubscriptionEntity[] = await this.findAllForOwner(order.purchaserUserId);
+          this.addExtendSubscriptionLogic(order, item, subs, order.purchaserUserId)
+        } else {
+          // they are purchasing for someone else, find based off hasAccess
+          console.log("\t\tpurchase for someone else")
+          const subs: SubscriptionEntity[] = await this.findAllForOwner(recip);
+          console.log("subs = ", subs)
+          this.addExtendSubscriptionLogic(order, item, subs, recip)
         }
-        return this.subscriptionRepo.save(sub);
-      } else { // no existing subscriptions for this user for this item
-        const newSub = this.subscriptionRepo.create();
-        newSub.item = <any> item.itemId;
-        newSub.user = <any> order.hasAccessUserId
-        newSub.owner = <any> order.purchaserUserId
-        newSub.expirationDate = this.addMonthsUtil(now, subscriptionLengthMonths);
-        await this.subscriptionRepo.save(newSub);
       }
     }
   }
@@ -80,7 +102,7 @@ export class SubscriptionService {
    */
   async userHasValidSubscription(user_id: number, item_id: number) {
     const allUserSubscriptions = await this.subscriptionRepo.find({
-      where: {owner: {userId: user_id}, item: {itemId: item_id}}
+      where: {user: {userId: user_id}, item: {itemId: item_id}}
     })
     const now = new Date(Date.now())
     return allUserSubscriptions.some(sub => sub.expirationDate > now)

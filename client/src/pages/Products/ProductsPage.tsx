@@ -37,7 +37,17 @@ const TextbookHeader = (): JSX.Element => {
             return;
         }
         // default to the product's price, no purchase code
-        const cartItem: CartItem = { ...product, finalPrice: product.price, purchaseCode: undefined };
+        let quantity = 1
+        const user = JSON.parse(localStorage.getItem('user') ?? 'null')
+        if (user.role.toLowerCase() === 'instructor' && ctx.students.length > 0) {
+            quantity = ctx.students.length
+        }
+        const cartItem: CartItem = { 
+            ...product, 
+            finalPrice: product.price, 
+            quantity: quantity,
+            purchaseCode: undefined };
+            
         ctx.setCart([
             ...ctx.cart,
             { ...cartItem }

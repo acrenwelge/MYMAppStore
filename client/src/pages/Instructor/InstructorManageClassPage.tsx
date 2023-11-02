@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import React, { useEffect } from "react";
-import { Button, Checkbox, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
+import React, { useEffect, useContext } from "react";
+import { Button, Checkbox, CheckboxProps, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
 import { getClassByInstructor, addStudentToClassByEmail, removeStudentFromClass } from "../../api/classes";
 import { ToastContainer, toast } from "react-toastify";
 import { ExpandedUser, ExpandedClass } from "../../entities";
 import { localSignupApi } from "../../api/auth";
 import { validatePurchaseCode } from "../../api/checkout"
+import ApplicationContext from "../../context/application.context";
 
 // @ts-ignore
 //const PayPalButton = paypal.Buttons.driver("react", { React, ReactDOM });
@@ -38,13 +39,15 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const [newStudent, setNewStudent] = React.useState<NewStudent>({firstName: "", lastName: "", email: ""})
   const [addExistingStudentEmail, setExistingStudentEmail] = React.useState("")
   const [isInstructor, setIsInstructor] = React.useState<boolean>(true)
+  const [checkBoxStates, setCheckBoxStates] = React.useState<{number:boolean}>()
+  const ctx = useContext(ApplicationContext);
 
   const transformUserToStudent = (user: ExpandedUser, instructorId: number): Student => {
-    let ownerOfItem1 = -1
+    let ownsSub = false
     user.usingSubscriptions.forEach( subs => {
-      //console.log(subs)
-      if (subs.subscriptionId == 1) {
-        ownerOfItem1 = subs.owner.userId
+      console.log(subs)
+      if (subs.owner.userId == instructorId) {
+        ownsSub = true
       }
     })
     return {
@@ -53,7 +56,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       lastName: user.lastName,
       email: user.email,
       hasSubscription: user.usingSubscriptions.length != 0,
-      instructorOwnsSub: ownerOfItem1 === instructorId
+      instructorOwnsSub: ownsSub
     }
   }
 
@@ -72,6 +75,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
           // THERE'S AN ERROR WHERE IF THE INSTRUCTOR TRIES TO ADD THEIR OWN EMAIL, THIS ALL BREAKS
           const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructorId));
           setClassData({id: res.data.classId, students: students});
+          console.log("END OF LOADCLASS()")
           if (students.length === 0) {
             toast.warning("No students found in class");
           }
@@ -84,8 +88,23 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   }
 
   useEffect(() => {
+    console.log("__FUNCTION__useEffect")
     checkIsInstructor();
     loadClass();
+    
+    const checkboxes = {}
+    console.log("\tclassData.students =", classData.students)
+    for (const student of classData.students) {
+      // @ts-ignore
+      checkboxes[student.id] = false
+    }
+    for (const element of ctx.students) {
+      // @ts-ignore
+      checkboxes[element] = true
+    }
+    console.log("\tcheckboxes = ", checkboxes)
+    // @ts-ignore
+    setCheckBoxStates(checkboxes)
   }, []);
 
   const removeStudent = (studentId: number) => {
@@ -95,6 +114,11 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
         console.log(res)
         const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructor.userId))
         setClassData({id: classData.id, students: students})
+        const stuArray = ctx.students
+        if (stuArray.includes(studentId)) {
+          stuArray.splice(stuArray.indexOf(studentId), 1)
+        } 
+        ctx.setStudents(stuArray)
         toast.success("Student removed")
       }).catch(err => {
         console.log(err)
@@ -102,19 +126,30 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       });
   }
 
-  const purchaseItems = (studentId: number) => {
-    // just change the localStorage to the student's id so they get access to it
-    // after the student buys it
-    //let studentArray = localStorage.getItem('buy_for_user_id')
-    //console.log(studentArray)
-    localStorage.setItem('buy_for_user_id', JSON.stringify(studentId));
+  const purchaseItems = (studentId: number) => (event: React.FormEvent<HTMLInputElement>, data: CheckboxProps) => {
+    console.log("__FUNCTION__purchaseItems()")
 
-    // do the API calls and such
-    // includes API call to do PayPal purchase
-    // then API call to make the new subscription
-    const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
-    localStorage.setItem('buy_for_user_id', JSON.stringify(instructor.userId));
+    const stuArray = ctx.students
+    const checkboxes = checkBoxStates
+    console.log(checkboxes)
+    // @ts-ignore
+    checkboxes[studentId] = !checkboxes[studentId]    
+    setCheckBoxStates(checkboxes)
 
+    console.log("\tstuArray =", stuArray)
+    if (stuArray.includes(studentId)) {
+      stuArray.splice(stuArray.indexOf(studentId), 1)
+    } else {
+      stuArray.push(studentId)
+    }
+    console.log("\tdata.checked =", data.checked)
+    data.checked = !data.checked
+    console.log("\tdata.checked =", data.checked)
+
+    ctx.setStudents(stuArray)
+    console.log("\tstuArray =", stuArray)
+    console.log("\tctx.students =", ctx.students)
+    console.log("\tcheckboxStates =", checkBoxStates)
   }
 
   const addExistingUserAsStudent = () => {
@@ -192,7 +227,10 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                               <Table.Cell>
                                 <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
                                 <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button>
-                                <Checkbox onChange={() => purchaseItems(student.id)} inputProps={{ 'aria-label': 'controlled' }}/>
+                                
+                                <Checkbox checked={// @ts-ignore
+                                checkBoxStates[student.id]} 
+                                onChange={purchaseItems(student.id)} inputProps={{ 'aria-label': 'controlled' }}/>
                               </Table.Cell>
                             </Table.Row>
                         ))}

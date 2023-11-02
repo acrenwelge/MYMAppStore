@@ -28,6 +28,9 @@ export class TransactionDetailEntity {
     @Column()
     public finalPrice: number;
 
+    @Column()
+    public quantity: number;
+
     @ManyToOne(() => TransactionEntity, transaction => transaction.transactionDetails)
     @JoinColumn({ name: 'transaction_id' })
     public transaction: TransactionEntity;
