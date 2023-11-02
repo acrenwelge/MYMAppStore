@@ -37,7 +37,7 @@ import UserBasePage from "./pages/User/UserBasePage";
 
 const App: React.FC = (): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
-
+	console.log(ctx)
 	// eslint-disable-next-line
 	const [user, setUser] = useState<User>();
 	const [cart, setCart] = useState<CartItem[]>([]);

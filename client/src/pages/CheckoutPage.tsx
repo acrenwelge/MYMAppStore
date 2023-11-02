@@ -76,6 +76,14 @@ const Checkout: React.FC = (props): JSX.Element => {
 				ctx.setCart([]);
 				setPurchaseFinished(true);
 				console.log("Capture result:", res.data);
+				//@ts-ignore
+				const checkboxes = localStorage.getItem("selected_students") == null ? {} : JSON.parse(localStorage.getItem("selected_students"))
+				for (const key in checkboxes) {
+					checkboxes[key] = false
+				}
+				localStorage.setItem("selected_students", JSON.stringify(checkboxes))
+				ctx.setStudents([])
+				localStorage.setItem("sel_student_array", JSON.stringify([]))
 			}).catch((err) => {
 				console.error(err);
 				// Two cases to handle:
