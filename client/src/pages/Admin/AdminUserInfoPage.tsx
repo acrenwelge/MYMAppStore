@@ -47,7 +47,10 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
         if (state.filterRole !== null && user.role !== state.filterRole) {
             return false;
         }
-        if (state.filterText !== '' && !user.email.includes(state.filterText) && !user.firstName.includes(state.filterText)) {
+        if (state.filterText !== '' && 
+            !user.email.toLowerCase().includes(state.filterText.toLowerCase()) && 
+            !user.firstName.toLowerCase().includes(state.filterText.toLowerCase()) &&
+            !user.lastName.toLowerCase().includes(state.filterText.toLowerCase())) {
             return false;
         }
         return true;
@@ -59,24 +62,37 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
             case 'email':
                 sortedUsers = sortedUsers.sort((a, b) => a['email'].localeCompare(b['email']));
                 break;
-            case 'name':
+            case 'firstName':
                 sortedUsers = sortedUsers.sort((a, b) => a['firstName'].localeCompare(b['firstName']));
                 break;
+            case 'lastName':
+                sortedUsers = sortedUsers.sort((a, b) => a['lastName'].localeCompare(b['lastName']));
+                break;
             case 'createdAt':
-                // TODO: fix broken sort
-                // sortedUsers = sortedUsers.sort((a, b) => a['createdAt'].toISOString().localeCompare(b['createdAt'].toISOString()));
+                sortedUsers = sortedUsers.sort((a, b) => {
+                    const dateA = new Date(a['createdAt']);
+                    const dateB = new Date(b['createdAt']);
+                    return dateA.getTime() - dateB.getTime();
+                });
                 break;
         }
     } else if (state.sortBy != '' && state.sortDirection === 'descending') {
         switch (state.sortBy) {
             case 'email':
-                sortedUsers = sortedUsers.sort((a, b) => b['email'].localeCompare(a['email']));
+                sortedUsers = sortedUsers.sort((b, a) => a['email'].localeCompare(b['email']));
                 break;
-            case 'name':
-                sortedUsers = sortedUsers.sort((a, b) => b['firstName'].localeCompare(a['firstName']));
+            case 'firstName':
+                sortedUsers = sortedUsers.sort((b, a) => a['firstName'].localeCompare(b['firstName']));
+                break;
+            case 'lastName':
+                sortedUsers = sortedUsers.sort((b, a) => a['lastName'].localeCompare(b['lastName']));
                 break;
             case 'createdAt':
-                // sortedUsers = sortedUsers.sort((a, b) => b['createdAt'].toISOString().localeCompare(a['createdAt'].toISOString()));
+                sortedUsers = sortedUsers.sort((b, a) => {
+                    const dateA = new Date(a['createdAt']);
+                    const dateB = new Date(b['createdAt']);
+                    return dateA.getTime() - dateB.getTime();
+                });
                 break;
         }
     }
@@ -275,7 +291,7 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
                           onClick={() => handleSortChange('firstName')}
                       >First Name</Table.HeaderCell>
                       <Table.HeaderCell 
-                          sorted={state.sortBy === 'name' ? state.sortDirection : undefined}
+                          sorted={state.sortBy === 'lastName' ? state.sortDirection : undefined}
                           onClick={() => handleSortChange('lastName')}
                       >Last Name</Table.HeaderCell>
                       <Table.HeaderCell 

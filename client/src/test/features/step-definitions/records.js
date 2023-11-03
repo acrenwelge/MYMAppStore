@@ -6,12 +6,6 @@ var { setDefaultTimeout } = require("@cucumber/cucumber");
 const exp = require("constants");
 const driverInstance = require('./WebDriver');
 
-Given("user is in main page", async () => {
-	await driver.get("http://localhost:3000/");
-	await driver.sleep(3 * 1000);
-	//setTimeout(myFunction, 10000);
-});
-
 When("login as user",  async () => {
     driver = driverInstance.driver
     
