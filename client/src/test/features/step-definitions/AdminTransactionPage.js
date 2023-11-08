@@ -76,28 +76,22 @@ When("the user searches for a transaction",  async () => {
 Then("only the searched transactions appear", async () => {
     driver = driverInstance.driver
     
-    const tableElement = driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/table/tbody`));
-    const tableRows = tableElement.findElements(webdriver.By.tagName('tr'));
+    const table = await driver.findElement(webdriver.By.id("transactionTable"));
+    const rows = await table.findElements(webdriver.By.id("transactionRow"));
 
-    for (let i = 0; i < tableRows.length; i++) {
-        const row = tableRows[i];
-    
-        const rowCells = row.findElements(By.tagName('td'));
+    for (const row of rows) {
+        const cells = await row.findElements(webdriver.By.xpath(".//td"));
+
         const searchKeyword = "admin"
 
-        const fail = 0;
-        rowCells[1].getText().then(text => {
-            if (!text.lowerCase().includes(searchKeyword.lowerCase())) {
-                fail++;
-            }
-        });
-        rowCells[2].getText().then(text => {
-            if (!text.lowerCase().includes(searchKeyword.lowerCase())) {
-                fail++;
-            }
-        });
-
-        if (fail > 1) {
+        firstName = await cells[1].getText();
+        lastName = await cells[2].getText();
+        email = await cells[3].getText();
+        
+        if (!firstName.toLowerCase().includes(searchKeyword.toLowerCase()) && 
+            !lastName.toLowerCase().includes(searchKeyword.toLowerCase()) &&
+            !email.toLowerCase().includes(searchKeyword.toLowerCase())) 
+        {
             expect.fail(null, null, `Expected product name in row ${i + 1} to contain '${searchKeyword}'`);
         }
     }

@@ -222,9 +222,9 @@ const AdminTransactionPage: React.FC = (props): JSX.Element | null => {
                             >Purchase Date</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
-                    <Table.Body>
+                    <Table.Body id="transactionTable">
                         {sortedTransactions.map(tx => (
-                            <Table.Row key={tx.txId}>
+                            <Table.Row key={tx.txId} id="transactionRow">
                                 <Table.Cell>{tx.txId}</Table.Cell>
                                 <Table.Cell>{tx.user.firstName}</Table.Cell>
                                 <Table.Cell>{tx.user.lastName}</Table.Cell>

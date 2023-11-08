@@ -30,7 +30,6 @@ export class PurchaseCodeService {
     const entities = await this.purchaseCodeRepo.find({
       relations: ["item"]
     });
-    console.log(entities);
     return entities.map(purchaseCode => this.convertToDto(purchaseCode));
   }
 

@@ -38,7 +38,7 @@ describe('ItemController', () => {
   it('calling create method', () => {
     const testItem = new ItemDto();
     controller.create(testItem);
-    expect(service.update).toHaveBeenCalled();
+    expect(service.create).toHaveBeenCalled();
   });
 
   it('calling findOne method', () => {
@@ -61,7 +61,7 @@ describe('ItemController', () => {
 
   it('calling remove method', () => {
     const id = 1;
-    controller.remove(id);
+    controller.delete(id);
     expect(service.update).toHaveBeenCalled();
   });
 

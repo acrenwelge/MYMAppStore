@@ -37,6 +37,17 @@ Scenario: Successful sorting subscription length in product page
     When the user selects the category "Subscription Length" to sort
     Then the table will be sorted by "integer" in "descending" order
 
+Scenario: Successful creating, editing, and deleting of products
+    Given user is in the product page
+    When user presses the add product button
+    And enters in the new product info
+    Then the table will show the added product
+    When user presses the edit product button
+    And enters in the edited product info
+    Then the table will show the edited product
+    When user presses the delete product button
+    Then the table will not show the product
+
 Scenario: Failed accessing products page as general user
     Given user is in home page
     When the user is not logged in in as admin 

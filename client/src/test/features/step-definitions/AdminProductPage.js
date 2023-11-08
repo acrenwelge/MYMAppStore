@@ -77,20 +77,154 @@ When("the user searches for a product",  async () => {
 Then("only the searched products appear", async () => {
     driver = driverInstance.driver
     
-    const tableElement = driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/table/tbody`));
-    const tableRows = tableElement.findElements(webdriver.By.tagName('tr'));
+    const table = await driver.findElement(webdriver.By.id("productTable"));
+    const rows = await table.findElements(webdriver.By.id("productRow"));
 
-    for (let i = 0; i < tableRows.length; i++) {
-        const row = tableRows[i];
-    
-        const rowCells = row.findElements(By.tagName('td'));
+    for (const row of rows) {
+        const cells = await row.findElements(webdriver.By.xpath(".//td"));
+
         const searchKeyword = "text"
-        rowCells[0].getText().then(text => {
-            if (!text.lowerCase().includes(searchKeyword.lowerCase())) {
-                expect.fail(null, null, `Expected product name in row ${i + 1} to contain '${searchKeyword}'`);
-            }
-        });
+
+        productName = await cells[0].getText();
+        
+        if (!productName.toLowerCase().includes(searchKeyword.toLowerCase())) {
+            expect.fail(null, null, `Expected product name in row ${i + 1} to contain '${searchKeyword}'`);
+        }
     }
 
     await driver.sleep(1 * 1000);
 });
+
+// Used to keep track of producted being added, edited, and deleted
+productRowNumber = undefined
+
+When("user presses the add product button",  async () => {
+    driver = driverInstance.driver
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/button`)).click();
+
+    await driver.sleep(1 * 1000);
+});
+
+When("enters in the new product info",  async () => {
+    driver = driverInstance.driver
+    
+    driver.findElement(webdriver.By.id("name")).sendKeys("test");
+    driver.findElement(webdriver.By.id("price")).sendKeys("10");
+    driver.findElement(webdriver.By.id("subscriptionLengthMonths")).sendKeys("10");
+    await driver.sleep(1 * 1000);
+
+    await driver.findElement(webdriver.By.id("addButton")).click();
+    await driver.sleep(1 * 1000);
+});
+
+Then("the table will show the added product",  async () => {
+    driver = driverInstance.driver
+
+    const table = await driver.findElement(webdriver.By.id("productTable"));
+    const rows = await table.findElements(webdriver.By.id("productRow"));
+
+    productPresent = false;
+    rowNumber = 0;
+    for (const row of rows) {
+      const cells = await row.findElements(webdriver.By.xpath(".//td"));
+
+      productName = await cells[0].getText();
+      productPrice = await cells[1].getText();
+      productSub = await cells[2].getText();
+
+      if(productName == "test" && productPrice == "10" && productSub == "10 months") {
+        productPresent = true;
+        productRowNumber = rowNumber;
+        break;
+      }
+
+      rowNumber++;
+    }
+
+    if (!productPresent) {
+        expect.fail(null, null, "Expected product in not in Table");
+    }
+
+    await driver.sleep(1 * 1000);
+});
+
+When("user presses the edit product button", async () => {
+    driver = driverInstance.driver
+
+    const table = await driver.findElement(webdriver.By.id("productTable"));
+    const rows = await table.findElements(webdriver.By.id("productRow"));
+
+    const cells = await rows[productRowNumber].findElements(webdriver.By.xpath(".//td"));
+
+    const edit = await cells[3].findElement(webdriver.By.id("editButton"));
+    await edit.click();
+
+    await driver.sleep(1 * 1000);
+});
+
+When("enters in the edited product info",  async () => {
+    driver = driverInstance.driver
+
+    driver.findElement(webdriver.By.id("name")).sendKeys(" 2");
+    driver.findElement(webdriver.By.id("price")).sendKeys("2");
+    driver.findElement(webdriver.By.id("subscriptionLengthMonths")).sendKeys("2");
+    await driver.sleep(1 * 1000);
+
+    await driver.findElement(webdriver.By.id("saveButton")).click();
+    await driver.sleep(1 * 1000);
+});
+
+Then("the table will show the edited product",  async () => {
+    driver = driverInstance.driver
+    
+    const table = await driver.findElement(webdriver.By.id("productTable"));
+    const rows = await table.findElements(webdriver.By.id("productRow"));
+
+    const cells = await rows[productRowNumber].findElements(webdriver.By.xpath(".//td"));
+
+    productName = await cells[0].getText();
+    productPrice = await cells[1].getText();
+    productSub = await cells[2].getText();
+
+    if(productName != "test 2" || productPrice != "102" || productSub != "102 months") {
+        expect.fail(null, null, "Expected product in not in Table");
+    }
+
+    await driver.sleep(1 * 1000);
+});
+
+When("user presses the delete product button",  async () => {
+    driver = driverInstance.driver
+
+    const table = await driver.findElement(webdriver.By.id("productTable"));
+    const rows = await table.findElements(webdriver.By.id("productRow"));
+
+    const cells = await rows[productRowNumber].findElements(webdriver.By.xpath(".//td"));
+
+    const edit = await cells[3].findElement(webdriver.By.id("deleteButton"));
+    await edit.click();
+
+    await driver.sleep(1 * 1000);
+});
+
+Then("the table will not show the product",  async () => {
+    driver = driverInstance.driver
+    
+    const table = await driver.findElement(webdriver.By.id("productTable"));
+    const rows = await table.findElements(webdriver.By.id("productRow"));
+
+    for (const row of rows) {
+      const cells = await row.findElements(webdriver.By.xpath(".//td"));
+
+      productName = await cells[0].getText();
+      productPrice = await cells[1].getText();
+      productSub = await cells[2].getText();
+
+      if(productName == "test 2" && productPrice == "102" && productSub == "102 months") {
+        expect.fail(null, null, "Expected product in not in Table");
+      }
+    }
+
+    await driver.sleep(1 * 1000);
+});
+

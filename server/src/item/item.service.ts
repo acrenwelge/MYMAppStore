@@ -3,6 +3,7 @@ import { ItemDto } from './item.dto';
 import {InjectRepository} from "@nestjs/typeorm";
 import {Repository} from "typeorm";
 import { ItemEntity } from './item.entity';
+import { time } from 'console';
 
 @Injectable()
 export class ItemService {
@@ -26,7 +27,7 @@ export class ItemService {
     return this.ItemRepo.save(item);
   }
 
-  async findAll() {
+  async findAll(): Promise<ItemDto[]> {
     const items = await this.ItemRepo.find()
     return items.map((item) => this.convertToDto(item));
   }
@@ -36,21 +37,30 @@ export class ItemService {
     return ent ? this.convertToDto(ent) : undefined;
   }
 
-  async update(id: number, updateItemDto: ItemDto) {
-    const itemEnt = await this.ItemRepo.findOne({where: {itemId: id}});
-    if (itemEnt) {
-      return this.ItemRepo.save(itemEnt);
-    } else {
-      throw new NotFoundException("Item could not be updated; Item not found");
+  async update(itemId: number, item: ItemDto): Promise<ItemDto> {
+    console.log("updating item:", item);
+    const findItem = await this.ItemRepo.findOne({where: {itemId}});
+    if (findItem === undefined) {
+      throw new NotFoundException("Item doesn't exist!");
     }
+    findItem.name = item.name;
+    findItem.price = item.price;
+    findItem.subscriptionLengthMonths = item.subscriptionLengthMonths
+    await this.ItemRepo.save(findItem);
+    if (findItem.itemId !== itemId) {
+      await this.delete(itemId);
+    }
+    return Promise.resolve(this.convertToDto(findItem));
   }
 
-  async remove(id: number) {
-    const itemEnt = await this.ItemRepo.findOne({where: {itemId: id}});
-    if (itemEnt) {
-      return this.ItemRepo.remove(itemEnt);
+  async delete(itemId: number): Promise<boolean> {
+    const findItem = await this.ItemRepo.findOne({where: {itemId}});
+    if (findItem != undefined) {
+      await this.ItemRepo.remove(findItem);
+      return Promise.resolve(true);
     } else {
-      throw new NotFoundException("Item could not be deleted; Item not found");
+      throw new NotFoundException("Product doesn't exist!");
     }
   }
+  
 }

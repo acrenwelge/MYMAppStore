@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import PurchaseCode from "../entities/purchaseCode";
 import { PurchaseCodeFormValues } from "../pages/Admin/AdminPurchaseCodePage";
+import { ProductFormValues } from "../pages/Admin/AdminProductInfoPage";
 import { request } from "./baseRequest"
 import User from "../entities/user";
 import { Product, Subscription } from "../entities";
@@ -64,6 +65,30 @@ export function getProduct(data:any): Promise<any> {
         method : 'GET',
         url: `api/item/id`,
         data: data
+    })
+}
+
+export function addProductApi(data: ProductFormValues): Promise<AxiosResponse<Product>> {
+    return request({
+        method: 'POST',
+        url: `api/item`,
+        data: data
+    })
+}
+
+export function deleteProductApi(itemId: number): Promise<AxiosResponse<null>> {
+    return request({
+        method: 'DELETE',
+        url: `api/item/${itemId}`
+    })
+}
+
+export function updateProductApi(id: number, newProduct: ProductFormValues): Promise<AxiosResponse<Product>> {
+    console.log(newProduct);
+    return request({
+        method: 'PUT',
+        url: `api/item/${id}`,
+        data: newProduct
     })
 }
 

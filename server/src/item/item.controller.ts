@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseGuards, HttpStatus} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, UseGuards, HttpStatus, Put} from '@nestjs/common';
 import { ItemService } from './item.service';
 import { ItemDto } from './item.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,7 +28,7 @@ export class ItemController {
     return this.itemService.findOne(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @NeedRole(Roles.Admin)
@@ -36,11 +36,11 @@ export class ItemController {
     return this.itemService.update(+id, updateItemDto);
   }
 
-  @Delete(':id')
+  @Delete(":id")
   @HttpCode(HttpStatus.NO_CONTENT)
-  @UseGuards(AuthGuard('jwt'),RolesGuard)
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
   @NeedRole(Roles.Admin)
-  remove(@Param('id') id: number) {
-    this.itemService.remove(+id);
+  public async delete(@Param('id') id: number) {
+      return this.itemService.delete(id);
   }
 }

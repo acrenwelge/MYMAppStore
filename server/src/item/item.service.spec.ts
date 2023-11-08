@@ -120,18 +120,17 @@ describe('ItemService', () => {
       const itemId = 1;
       const itemEntity = new ItemEntity();
       itemRepository.findOne.mockResolvedValue(itemEntity);
-      itemRepository.remove.mockResolvedValue({});
 
-      const result = await itemService.remove(itemId);
+      const result = await itemService.delete(itemId);
 
-      expect(JSON.stringify(result)).toBe('{}');
+      expect(result).toBe(true);
     });
 
     it('should throw NotFoundException if item is not found', async () => {
-      const itemId = 1;
+      const itemId = 2;
       itemRepository.findOne.mockResolvedValue(undefined);
 
-      await expect(itemService.remove(itemId)).rejects.toThrow(NotFoundException);
-    });
+      await expect(itemService.delete(itemId)).rejects.toThrow(NotFoundException);
+      });
   });
 });

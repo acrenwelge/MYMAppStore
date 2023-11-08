@@ -1,13 +1,26 @@
 import React, {useEffect, useState, useReducer} from "react";
 import {
     Table,
+    Icon,
     Input,
     Container,
-    Loader, Dimmer
+    Button,
+    Loader, Dimmer, Message, Modal, Form, Dropdown
 } from "semantic-ui-react";
-import { getAllProductData } from "../../api/admin";
+import {addProductApi, deleteProductApi, updateProductApi, getAllProductData } from "../../api/admin";
 import Product from "../../entities/product";
 import AdminBasePage from "./AdminBasePage";
+
+export type ProductFormValues = {
+  name: string;
+  price: number;
+  subscriptionLengthMonths: number;
+};
+
+type MessageValues = {
+  type: string,
+  message: string
+}
 
 interface localState {
   sortBy: string;
@@ -20,6 +33,99 @@ interface localState {
 const AdminEditProductInfo: React.FC = (props): JSX.Element => {
     const [productData, setAllProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+
+
+    const initFormState: ProductFormValues = {
+      name: '',
+      price: 0,
+      subscriptionLengthMonths: 0
+    }
+    const [formValues, setFormValues] = useState<ProductFormValues>(initFormState);
+    const [addModalOpen, setAddModalOpen] = useState(false);
+    const [updateModalOpen, setUpdateModalOpen] = useState(false);
+    const [productEditID, setProductEditID] = useState<number>(0);
+    const [message, setMessage] = useState<MessageValues>({
+      type:'none',
+      message:''
+    });
+
+    const refreshAllProducts = () => {
+      setLoading(true);
+      getAllProductData()
+      .then(res => {
+          console.log(res.data)
+          setAllProducts(res.data)
+          setLoading(false)
+      })
+      .catch(error => {
+          console.error(error)
+          setLoading(false)
+      });
+    }
+
+    useEffect(() => {
+      refreshAllProducts()
+    }, []);
+
+    const handleAdd = () => {
+      addProductApi(formValues)
+      .then((product) => {
+          setAddModalOpen(false)
+          setMessage({type:'success',message:`Product ${product.data.name} has been added successfully.`})
+          refreshAllProducts()
+      }).catch((err) => {
+          console.log(err)
+          setAddModalOpen(false)
+          setMessage({type:'fail',message:`Error: Product ${formValues.name} not added`})
+      });
+    };
+
+    const handleCancel = () => {
+        setAddModalOpen(false)
+        setUpdateModalOpen(false)
+        setFormValues(initFormState)
+        setProductEditID(0)
+    }
+    
+    const handleDelete = (prodcut: Product) => {
+        console.log(prodcut)
+        deleteProductApi(prodcut.itemId)
+            .then(() => {
+                setMessage({type:'success',message:`Product ${prodcut.name} has been deleted successfully.`})
+                refreshAllProducts();
+            })
+            .catch(error => {
+                console.error(error)
+                setMessage({type:'fail',message:`Fail to delete product ${prodcut.name}. Please try again.`})
+            });
+    };
+
+    const handleEditOpen = (prodcut: Product) => {
+        console.log(prodcut)
+        setProductEditID(prodcut.itemId)
+        setFormValues({
+            ...formValues,
+            name: prodcut.name,
+            price: prodcut.price,
+            subscriptionLengthMonths: prodcut.subscriptionLengthMonths
+        })
+        setUpdateModalOpen(true)
+    };
+    
+
+    const handleEdit = () => {
+        updateProductApi(productEditID, formValues)
+        .then((res) => {
+            setUpdateModalOpen(false)
+            setMessage({type:'success',message:`Product ${res.data.name} has been updated successfully.`})
+            refreshAllProducts()
+        }).catch((err) => {
+            console.log(err)
+            setUpdateModalOpen(false)
+            setMessage({type:'fail',message:`Failed to update product ${formValues.name}. Please try again.`})
+        });
+    }
+
     const initlocalState: localState = {
         sortBy: '',
         sortDirection: undefined,
@@ -131,29 +237,34 @@ const AdminEditProductInfo: React.FC = (props): JSX.Element => {
       }
   }
 
-    const refreshAllProducts = () => {
-      setLoading(true);
-      getAllProductData()
-      .then(res => {
-          console.log(res.data)
-          setAllProducts(res.data)
-          setLoading(false)
-      })
-      .catch(error => {
-          console.error(error)
-          setLoading(false)
-      });
-    }
-
-    useEffect(() => {
-      refreshAllProducts()
-    }, []);
-
     return (
       <AdminBasePage>
+        <div>
+            {message.type === 'none' && (
+                <></>
+            )}
+
+            {message.type === 'success' && (
+                <Message positive>
+                    <Message.Header>Success</Message.Header>
+                    <p>{message.message}</p>
+                </Message>
+            )}
+
+            {message.type === 'fail' && (
+                <Message negative>
+                    <Message.Header>Oops</Message.Header>
+                    <p>{message.message}</p>
+                </Message>
+            )}
+
+            <Button icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
+                <Icon name="add circle"/>Add New Product
+            </Button>
+        </div>
         <div style={{marginTop: '10px', height: '80vh', overflowY: 'auto'}}>
           {loading === true ? <Dimmer active inverted>
-              <Loader inverted>Loading Transactions</Loader>
+              <Loader inverted>Loading Products</Loader>
           </Dimmer> : <></>
           }
           <Container>
@@ -185,19 +296,123 @@ const AdminEditProductInfo: React.FC = (props): JSX.Element => {
                   sorted={state.sortBy === 'subLength' ? state.sortDirection : undefined} 
                   onClick={() => handleSortChange('subLength')}
                 >Subscription Length</Table.HeaderCell>
+                <Table.HeaderCell>Operation</Table.HeaderCell>
               </Table.Row>
             </Table.Header>
-            <Table.Body>
+            <Table.Body id="productTable">
                 {sortedProducts.map(product => (
-                    <Table.Row key={product.itemId}>
+                    <Table.Row key={product.itemId} id="productRow">
                         <Table.Cell>{product.name}</Table.Cell>
                         <Table.Cell>{product.price}</Table.Cell>
                         <Table.Cell>{product.subscriptionLengthMonths} months</Table.Cell>
+                        <Table.Cell>
+                            <Button primary basic id="editButton"
+                                onClick={() => handleEditOpen(product)}>
+                                EDIT
+                            </Button>
+                            <Button negative basic id="deleteButton"
+                                onClick={() => handleDelete(product)}>
+                                DELETE
+                            </Button>
+                        </Table.Cell>
                     </Table.Row>
                 ))}
             </Table.Body>
           </Table>
         </div>
+
+        <Modal
+            onClose={() => setAddModalOpen(false)}
+            onOpen={() => setAddModalOpen(true)}
+            open={addModalOpen}
+        >
+            <Modal.Header>Add New Product</Modal.Header>
+            <Modal.Content>
+                <Form>
+                    <Form.Input
+                        id="name"
+                        label="Name"
+                        onChange={(event, data) => setFormValues({...formValues, name: data.value})}
+                        required
+                    />
+                    <Form.Input
+                        type="number"
+                        id="price"
+                        label="Price"
+                        onChange={(event, data) => setFormValues({...formValues, price: Number(data.value)})}
+                        required
+                    />
+                    <Form.Input
+                        type="number"
+                        id="subscriptionLengthMonths"
+                        label="Subscription Length in Months"
+                        onChange={(event, data) => setFormValues({...formValues, subscriptionLengthMonths: Number(data.value)})}
+                        required
+                    />
+                </Form>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button
+                    color='black'
+                    onClick={handleCancel}>
+                    Cancel
+                </Button>
+                <Button
+                    content="Add"
+                    id="addButton"
+                    onClick={handleAdd}
+                    positive
+                />
+            </Modal.Actions>
+        </Modal>
+
+        <Modal
+            onClose={() => setUpdateModalOpen(false)}
+            onOpen={() => setUpdateModalOpen(true)}
+            open={updateModalOpen}
+        >
+            <Modal.Header>Edit Purchase Code</Modal.Header>
+            <Modal.Content>
+                <Form>
+                <Form.Input
+                    id="name"
+                    label="Name"
+                    value={formValues.name}
+                    onChange={(event, data) => setFormValues({...formValues, name: data.value})}
+                    required
+                />
+                <Form.Input
+                    type="number"
+                    id="price"
+                    label="Price"
+                    value={formValues.price}
+                    onChange={(event, data) => setFormValues({...formValues, price: Number(data.value)})}
+                    required
+                />
+                <Form.Input
+                    type="number"
+                    id="subscriptionLengthMonths"
+                    label="Subscription Length in Months"
+                    value={formValues.subscriptionLengthMonths}
+                    onChange={(event, data) => setFormValues({...formValues, subscriptionLengthMonths: Number(data.value)})}
+                    required
+                />
+                </Form>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button
+                    color='black'
+                    onClick={handleCancel}>
+                    Cancel
+                </Button>
+                <Button
+                    content="Save"
+                    id="saveButton"
+                    onClick={handleEdit}
+                    positive
+                />
+            </Modal.Actions>
+        </Modal>
       </AdminBasePage>
     );
 };
