@@ -1,4 +1,4 @@
-const { Before, After } = require("@cucumber/cucumber");
+const { Before, After, BeforeAll, AfterAll } = require("@cucumber/cucumber");
 const webdriver = require("selenium-webdriver");
 const { setDefaultTimeout } = require("@cucumber/cucumber");
 
@@ -24,11 +24,11 @@ class WebDriver {
 
 const driverInstance = new WebDriver();
 
-Before(function () {
+BeforeAll(function () {
   return driverInstance.initializeDriver();
 });
 
-After(function () {
+AfterAll(function () {
   return driverInstance.quitDriver();
 });
 
