@@ -197,8 +197,8 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 
 				<Message content={formState.requestError} error header="Error" />
 				<Button
-					active={
-						!formState.success && !formState.confirmEmailError && !formState.confirmPasswordError
+					disable={
+						formState.success || formState.confirmEmailError || formState.confirmPasswordError
 					}
 					color="green"
 					fluid

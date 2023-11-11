@@ -82,14 +82,17 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 		formStateReducer,
 		{ loading: false, success: false, confirmEmailError: false, passwordError: false, confirmPasswordError: false }
 	);
-
+	
+	const ctx = useContext(ApplicationContext)
 	useEffect(() => {
-        getProfileApi().then( return_data => {
+
+		getProfileApi().then( return_data => {
 		
-			setFormValues({...formValues, email: return_data.data.email})
-			// TODO: I want to get more user info and set the old values so we can display some information.
+			// We have to do this all on the same line because it overwrites everything otherwise.
+			// How does the setFormValues for the user input work then? Confusing.
+			setFormValues({...formValues, email: return_data.data.email, firstName: ctx.user!.firstName, lastName: ctx.user!.lastName})
 		})
-    }, []);
+	}, []);
 	
 	const onSubmit = useCallback(
 		(data: FormProps) => {
@@ -100,15 +103,19 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 				email: formValues.email,
 				password: formValues.password
 			}).then((res) => {
-					
+					// TODO: Update local storage, refer to local signup form
+					const user = ctx.user
+					user!.firstName = formValues.firstName
+					user!.lastName = formValues.lastName
+					ctx.setUser!(user);
 					setFormValues(emptyVals);
 					formStateDispatch({ type: "SUCCESS" });
 			}).catch((err) => {
 					let text = ""
 					if (err.response.status == 409) {
-						text = "Unable to Signup. The account has already been created."
+						text = "Unable to change information. The account has already been created."
 					} else if (err.response.status >= 500) {
-						text = "Unable to Signup due to server error. Please try again later."
+						text = "Unable to change information due to server error. Please try again later."
 					}
 					formStateDispatch({
 						type: "REQUEST_ERROR",
@@ -123,6 +130,7 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 		<Container>
 			<h1>User Information</h1>
 			<h3>Email: {formValues.email}</h3>
+			<p>Edit your profile information here.</p>
 			<Form
 				hidden={formState.success}
 				error={formState.requestError !== undefined}
@@ -153,7 +161,7 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 						console.log(data.value);
 						formStateDispatch({
 							type: "PASSWORD_ERROR",
-							payload: data.value.length < 8
+							payload: data.value.length != 0 && data.value.length < 8
 						});
 						setFormValues({ ...formValues, password: data.value });
 					}}
@@ -177,8 +185,8 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 				/>
 				<Message content={formState.requestError} error header="Error" />
 				<Button
-					active={
-						!formState.success && !formState.confirmEmailError && !formState.confirmPasswordError
+					disabled={
+						formState.success || formState.confirmEmailError || formState.confirmPasswordError
 					}
 					color="green"
 					fluid
@@ -189,7 +197,7 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 			</Form>
 			<Message
 					hidden={!formState.success}
-					content="Your account has been successfully created. To login, first confirm your email using the link that was sent to the email address you provided."
+					content="Your account information has been updated."
 					header="SUCCESS"
 					success
 				/>
