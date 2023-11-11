@@ -91,7 +91,6 @@ When("There is a Book which is not Finance with Maple Subscription", async() => 
         let tds = await row.findElements(webdriver.By.tagName('td'));
         for (let td of tds) {
             if("Finance with Maple" != await td.getText()) {
-                console.log(await td.getText());
                 ele = row;
                 break;
             }
@@ -105,7 +104,6 @@ When("There is a Book which is not Finance with Maple Subscription", async() => 
 Then("The download button should not be present", async() => {
     let tds = await ele.findElements(webdriver.By.tagName('td'));
     for (let td of tds) {
-        console.log(await td.getText());
         if("Download" === await td.getText()) {
             dwn = td;
             break;
