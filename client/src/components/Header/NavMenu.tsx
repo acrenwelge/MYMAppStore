@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Menu, Dropdown } from "semantic-ui-react";
 import { Link } from "react-router-dom";
 import ApplicationContext from "../../context/application.context";
