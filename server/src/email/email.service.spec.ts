@@ -84,11 +84,45 @@ describe('EmailService', () => {
     await expect(service.sendActivateAccountEmail(testuser)).resolves.not.toThrow();
   });
 
+  xit('should handle active account emails when mail is false', async () => {
+    // Check log for mail disabled
+  })
+
+  xit('should send a reminder email', async () => {
+    // Ensure reminder email code runs
+  })
+
+  xit('should not send an email if feature is disabled', async () => { 
+    // Check for console log output
+  })
+
+  xit('should send a url when env email_enable is test', async () => {
+    // Check to make sure email is being logged to console 
+  })
+
+  xit('should send an email with transporter', async () => {
+    // Ensure that transporter.sendMail works
+  })
+
+  xit('should handle an error if transporter mail fails', async () => {
+    // Make sure error runs
+  })
+
+  xit('should close transporter on destroy', async () => {
+    // See if our transporter is being closed when onModuleDestroy is called
+    // Might be a good idea to look into the close function rather
+  })
+
   it('should check healthy', async () => {
     const result = true;
     //jest.spyOn(Mail, 'verify').mockImplementation(async() => result);
     expect(await service.healthy()).not.toBe(result);
   });
+
+  xit('should check if not healthy', async () => {
+    // have the transporter verify fail,
+    // see if we return false
+  })
 
 
 

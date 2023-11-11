@@ -99,6 +99,7 @@ export class EmailService implements OnModuleDestroy {
 
     /**
      * TODO: retrieve subscription expiration date from database
+     * Where would this be called? Does the logic for expiring need to be in here? - Spencer
      **/
     public async sendReminderEmail(user: UserDto): Promise<void> {
         const htmlText = this.remindExpirationTemplateDelegate({
