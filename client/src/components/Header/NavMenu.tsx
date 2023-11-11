@@ -5,9 +5,61 @@ import ApplicationContext from "../../context/application.context";
 import Cart from "./Cart";
 import Profile from "./Profile";
 import LoginSignUp from "./LoginSignUp";
+import { getUserSubscriptions } from "../../api/user";
+import { Subscription } from "../../entities";
+import { MongoMissingCredentialsError } from "typeorm";
+
+function renderSwitch(param: string) {
+	switch(param) {
+		case 'Calculus':
+			return <Dropdown className="link item" pointing="left" text="Calculus">
+						<Dropdown.Menu>
+							<Dropdown.Item as={Link} to="/read">
+								{"Calculus 1"}
+							</Dropdown.Item>
+							<Dropdown.Item as={Link} to="/read">
+								{"Calculus 2"}
+							</Dropdown.Item>
+							<Dropdown.Item as={Link} to="/read">
+								{"Calculus 3"}
+							</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>;
+		default:
+			return <Dropdown.Item as={Link} to="/read">
+						{param}
+					</Dropdown.Item>
+	}
+  }
 
 const NavMenu: React.FC = (): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
+    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+    const [loading, setLoading] = useState(false);
+
+	if (ctx.user) {
+		useEffect(() => {
+			setLoading(true);
+			getUserSubscriptions()
+				.then(res => {
+					// conversion from string to date must be done manually
+					setSubscriptions(res.data.map((sub: Subscription) => {
+						sub.expirationDate = new Date(sub.expirationDate); 
+						return sub
+					}));
+					setLoading(false)
+				})
+				.catch(error => {
+					console.error(error)
+					setLoading(false)
+				});
+		}, []);
+	} else {
+		useEffect(() => {
+			setLoading(true);
+		})
+	}
+
 
 	return (
 		<nav>
@@ -49,9 +101,18 @@ const NavMenu: React.FC = (): JSX.Element => {
 				{/*<Menu.Item as={Link} to="/contact">*/}
 				{/*	{"Contact"}*/}
 				{/*</Menu.Item>*/}
-				{ctx.user && (
-				<Menu.Item as={Link} to="/read">Read Book</Menu.Item >
-				)}
+				{
+					ctx.user && (
+						<Dropdown item text="Read Book">
+						<Dropdown.Menu> {
+								subscriptions.map((subscription) => 
+									renderSwitch(subscription.item.name)
+								)
+							}
+						</Dropdown.Menu>
+					</Dropdown>
+					)
+				}
 
 				<Menu.Item fitted position="right">
 					{ctx.user ? <Menu.Item as={Link} to="/subscriptions">My Subscriptions</Menu.Item> : null}
