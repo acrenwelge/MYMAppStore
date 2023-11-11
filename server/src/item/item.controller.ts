@@ -32,7 +32,7 @@ export class ItemController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @NeedRole(Roles.Admin)
-  update(@Param('id') id: string, @Body() updateItemDto: ItemDto) {
+  update(@Param('id') id: number, @Body() updateItemDto: ItemDto) {
     return this.itemService.update(+id, updateItemDto);
   }
 
@@ -40,7 +40,7 @@ export class ItemController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AuthGuard('jwt'),RolesGuard)
   @NeedRole(Roles.Admin)
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     this.itemService.remove(+id);
   }
 }

@@ -3,6 +3,9 @@ const { expect } = require("chai");
 const { time, assert } = require("console");
 const webdriver = require("selenium-webdriver");
 var { setDefaultTimeout } = require("@cucumber/cucumber");
+const driverInstance = require('./WebDriver');
+
+driver = driverInstance.driver
 
 //const options = new Chrome.Options();
 
@@ -10,18 +13,19 @@ var { setDefaultTimeout } = require("@cucumber/cucumber");
 setDefaultTimeout(60 * 1000);
 
 // Declare driver variable
-let driver;
+// let driver;
 
-// Set up Before and After hooks
-Before(function (env) {
- driver = new webdriver.Builder().forBrowser("chrome").build();
-});
+// // Set up Before and After hooks
+// Before(function (env) {
+//  driver = new webdriver.Builder().forBrowser("chrome").build();
+// });
 
-After(function () {
- driver.quit();
-});
+// After(function () {
+//  driver.quit();
+// });
 
 Given("user is at home page", async () => {
+    driver = driverInstance.driver
 	await driver.get("http://localhost:3000/");
 	await driver.sleep(3 * 1000);
 	//setTimeout(myFunction, 10000);
@@ -29,6 +33,7 @@ Given("user is at home page", async () => {
 
 
 When("logged in as admin",  async () => {
+    driver = driverInstance.driver
 //When("the user enters their email and password", async () => {
 
     await driver.get("http://localhost:3000/login");
@@ -46,26 +51,31 @@ When("logged in as admin",  async () => {
 });
 
 When("not logged in as admin",  async () => {
+    driver = driverInstance.driver
     //When("the user enters their email and password", async () => {
     });
 
 When("go to the admin menu",  async () => {
+    driver = driverInstance.driver
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/nav/div/div[2]/a[2]`)).click();
     await driver.sleep(2 * 1000);
     });
 
 When("go to the transaction page",  async () => {
+    driver = driverInstance.driver
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[1]/div/div/a[3]`)).click();
     await driver.sleep(2 * 1000);
     });
 
 When("go to the transaction url",  async () => {
+    driver = driverInstance.driver
     await driver.get("http://localhost:3000/admin/transaction");
     await driver.sleep(2 * 1000);
     });
     
 // Scenario 1: Successful accessing transaction page as admin user
 Then("the user should be at transaction page", async () => {
+    driver = driverInstance.driver
     let curURL =  await driver.getCurrentUrl();
     expect(curURL).to.equal("http://localhost:3000/admin/transaction");
     //let tablebody = await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/table/tbody`));
@@ -76,11 +86,13 @@ Then("the user should be at transaction page", async () => {
 });
 
 Then("the user should be at home page", async () => {
+    driver = driverInstance.driver
     let curURL =  await driver.getCurrentUrl();
     expect(curURL).to.equal("http://localhost:3000/");
 });
 
 Then("the user should see info", async () => {
+    driver = driverInstance.driver
     //let curURL =  await driver.getCurrentUrl();
     //expect(curURL).to.equal("http://localhost:3000/admin/transaction");
     //let tablebody = await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/table/tbody`));
@@ -96,6 +108,7 @@ Then("the user should see info", async () => {
 
 //Scenario 2: Unsuccessful Login with Invalid Password
 Then("the user will not see any data", async () => {
+    driver = driverInstance.driver
     let tablebody = await driver.findElements(webdriver.By.tagName("td"));
     expect(tablebody.length).to.equal(+0);
     //let tablebody = await driver.findElements(webdriver.By.tagName("tr"));

@@ -66,7 +66,8 @@ export class SubscriptionService {
       } else { // no existing subscriptions for this user for this item
         const newSub = this.subscriptionRepo.create();
         newSub.item = <any> item.itemId;
-        // newSub.user = <any> order.purchaserUserId;
+        newSub.user = <any> order.hasAccessUserId
+        newSub.owner = <any> order.purchaserUserId
         newSub.expirationDate = this.addMonthsUtil(now, subscriptionLengthMonths);
         await this.subscriptionRepo.save(newSub);
       }
