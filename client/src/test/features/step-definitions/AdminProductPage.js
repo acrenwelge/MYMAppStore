@@ -100,7 +100,7 @@ productRowNumber = undefined
 
 When("user presses the add product button",  async () => {
     driver = driverInstance.driver
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/button`)).click();
+    await driver.findElement(webdriver.By.id(`addNewButton`)).click();
 
     await driver.sleep(1 * 1000);
 });
@@ -132,7 +132,7 @@ Then("the table will show the added product",  async () => {
       productPrice = await cells[1].getText();
       productSub = await cells[2].getText();
 
-      if(productName == "test" && productPrice == "10" && productSub == "10 months") {
+      if(productName == "test" && productPrice == "$10.00" && productSub == "10 months") {
         productPresent = true;
         productRowNumber = rowNumber;
         break;
@@ -186,7 +186,7 @@ Then("the table will show the edited product",  async () => {
     productPrice = await cells[1].getText();
     productSub = await cells[2].getText();
 
-    if(productName != "test 2" || productPrice != "102" || productSub != "102 months") {
+    if(productName != "test 2" || productPrice != "$102.00" || productSub != "102 months") {
         expect.fail(null, null, "Expected product in not in Table");
     }
 
@@ -220,8 +220,8 @@ Then("the table will not show the product",  async () => {
       productPrice = await cells[1].getText();
       productSub = await cells[2].getText();
 
-      if(productName == "test 2" && productPrice == "102" && productSub == "102 months") {
-        expect.fail(null, null, "Expected product in not in Table");
+      if(productName == "test 2" && productPrice == "$102.00" && productSub == "102 months") {
+        expect.fail(null, null, "Expected product in Table");
       }
     }
 

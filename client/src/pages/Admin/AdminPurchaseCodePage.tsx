@@ -1,10 +1,11 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useReducer} from "react";
 import {
-    Form,
     Table,
     Icon,
+    Input,
+    Container,
     Button,
-    Modal, Dimmer, Loader, Message, Dropdown
+    Loader, Dimmer, Message, Modal, Form, Dropdown
 } from "semantic-ui-react";
 import {addPurchaseCodeApi, deleteCodeApi, getAllProductData, getAllPurchaseCodeData, updateCodeApi} from "../../api/admin";
 import AdminBasePage from "./AdminBasePage";
@@ -27,6 +28,14 @@ interface ProductSelection {
     text: string;
     value: number;
 }
+
+interface localState {
+    sortBy: string;
+    sortDirection: 'ascending' | 'descending' | undefined;
+    filterActivated: boolean | null;
+    filterRole: "admin" | "user" | "instructor" | null;
+    filterText: string;
+  }
 
 const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
 
@@ -145,6 +154,109 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
         });
     }
 
+    const initlocalState: localState = {
+        sortBy: '',
+        sortDirection: undefined,
+        filterActivated: null,
+        filterRole: null,
+        filterText: '',
+    };
+    const [state, dispatch] = useReducer(sortingReducer, initlocalState);
+    const filteredCodes = purchaseCodeList.filter(code => {
+        if (state.filterText !== '' && !code.name.toLowerCase().includes(state.filterText.toLowerCase())) {
+            return false;
+        }
+        return true;
+    });
+
+    let sortedCodes = filteredCodes;
+    if (state.sortBy != '' && state.sortDirection === 'ascending') {
+        switch (state.sortBy) {
+            case 'name':
+                sortedCodes = sortedCodes.sort((a, b) => a['name'].localeCompare(b['name']));
+                break;
+            case 'productName':
+                sortedCodes = sortedCodes.sort((a, b) => a.item['itemName'].localeCompare(b.item['itemName']));
+                break;
+            case 'priceOff':
+                sortedCodes = sortedCodes.sort((a, b) => {
+                    if (a['priceOff'] < b['priceOff']) return -1;
+                    if (a['priceOff'] > b['priceOff']) return 1;
+                    return 0;
+                });
+            break;
+        }
+    } else if (state.sortBy != '' && state.sortDirection === 'descending') {
+        switch (state.sortBy) {
+            case 'name':
+                sortedCodes = sortedCodes.sort((b, a) => a['name'].localeCompare(b['name']));
+                break;
+            case 'productName':
+                sortedCodes = sortedCodes.sort((b, a) => a.item['itemName'].localeCompare(b.item['itemName']));
+                break;
+            case 'priceOff':
+                sortedCodes = sortedCodes.sort((b, a) => {
+                    if (a['priceOff'] < b['priceOff']) return -1;
+                    if (a['priceOff'] > b['priceOff']) return 1;
+                    return 0;
+                });
+                break;
+        }
+    }
+
+    const handleFilterChange = (field: string) => {
+        dispatch({ type: 'FILTER', payload: field });
+    };
+
+    const handleSortChange = (field: string) => {
+        if (state.sortBy === field) {
+            dispatch({ type: 'CHANGE_SORT_DIRECTION', payload: field});
+        } else {
+            dispatch({ type: 'CHANGE_SORT_FIELD', payload: field });
+        }
+    };
+
+    const handleFilterTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch({ type: 'FILTER_TEXT', payload: e.target.value });
+    };
+
+    function sortingReducer(state: localState, action: {type: string, payload: string}): localState {
+      switch (action.type) {
+          case 'CHANGE_SORT_FIELD':
+            return {
+              ...state,
+              sortBy: action.payload,
+              sortDirection: 'ascending',
+            }
+          case 'CHANGE_SORT_DIRECTION':
+              return {
+                  ...state,
+                  sortDirection: state.sortDirection === 'ascending' ? 'descending' : 'ascending',
+          }
+          case 'FILTER':
+              switch (action.payload) {
+                  case 'activated':
+                      return {
+                          ...state,
+                          filterActivated: state.filterActivated === null ? true : state.filterActivated === true ? false : null,
+                      }
+                  case 'role':
+                      return {
+                          ...state,
+                          filterRole: state.filterRole === null ? "admin" : state.filterRole === "admin" ? "user" : null,
+                      }
+                  default: throw new Error("invalid filter field")
+              }
+          case 'FILTER_TEXT':
+              return {
+                  ...state,
+                  filterText: action.payload,
+              }
+        default:
+          throw new Error("invalid action type")
+      }
+  }
+
     return (
         <AdminBasePage>
             <div>
@@ -166,7 +278,11 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                     </Message>
                 )}
 
-                <Button icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
+                
+            </div>
+
+            <div style={{ position: 'absolute', marginTop: '10px', right: 10, overflowY: 'auto' }}>
+                <Button id='addNewButton' icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
                     <Icon name="add circle"/>Add New Purchase Code
                 </Button>
             </div>
@@ -176,27 +292,52 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                     <Loader inverted>Loading Purchase Code</Loader>
                 </Dimmer> : <div></div>
                 }
-                <Table>
+                <Container>
+                    {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
+                    {state.filterActivated === null ? null : 
+                        <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
+                        </div>
+                    }
+                    {state.filterRole === null ? null : 
+                        <div>Filtering by: {state.filterRole}
+                        </div>
+                    }
+                </Container>
+
+                <Input label="Search by Code:" icon='search' placeholder='code'
+                    onChange={(e) => handleFilterTextChange(e)}/> 
+                <Table sortable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell>Code</Table.HeaderCell>
-                            <Table.HeaderCell>Product</Table.HeaderCell>
-                            <Table.HeaderCell>Percent Off</Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={state.sortBy === 'name' ? state.sortDirection : undefined} 
+                                onClick={() => handleSortChange('name')}
+                            >Code</Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={state.sortBy === 'productName' ? state.sortDirection : undefined} 
+                                onClick={() => handleSortChange('productName')}
+                            >Product</Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={state.sortBy === 'priceOff' ? state.sortDirection : undefined} 
+                                onClick={() => handleSortChange('priceOff')}
+                            >Percent Off</Table.HeaderCell>
                             <Table.HeaderCell>Operation</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
-                    <Table.Body>
-                        {purchaseCodeList.map(purchaseCode => (
-                            <Table.Row key={purchaseCode.name}>
+                    <Table.Body id="codeTable">
+                        {sortedCodes.map(purchaseCode => (
+                            <Table.Row key={purchaseCode.name} id="codeRow">
                                 <Table.Cell>{purchaseCode.name}</Table.Cell>
                                 <Table.Cell>{`${purchaseCode.item.itemName} - ${purchaseCode.item.itemSubscriptionLength} months`}</Table.Cell>
-                                <Table.Cell>{purchaseCode.priceOff}</Table.Cell>
+                                <Table.Cell>{purchaseCode.priceOff}%</Table.Cell>
                                 <Table.Cell>
                                     <Button primary basic
+                                        id="editButton"
                                         onClick={() => handleEditOpen(purchaseCode)}>
                                         EDIT
                                     </Button>
                                     <Button negative basic
+                                        id="deleteButton"
                                         onClick={() => handleDelete(purchaseCode)}>
                                         DELETE
                                     </Button>
@@ -216,6 +357,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                 <Modal.Content>
                     <Form>
                         <Dropdown
+                            id="product"
                             placeholder='Select Item'
                             fluid
                             selection
@@ -244,6 +386,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                         Cancel
                     </Button>
                     <Button
+                        id = "addButton"
                         content="Add"
                         onClick={handleAdd}
                         positive
@@ -283,6 +426,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
                         Cancel
                     </Button>
                     <Button
+                        id="saveButton"
                         content="Save"
                         onClick={handleEdit}
                         positive

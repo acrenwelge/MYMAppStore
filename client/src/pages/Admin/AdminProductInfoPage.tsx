@@ -257,11 +257,14 @@ const AdminEditProductInfo: React.FC = (props): JSX.Element => {
                     <p>{message.message}</p>
                 </Message>
             )}
+        </div>
 
-            <Button icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
+        <div style={{ position: 'absolute', marginTop: '10px', right: 10, overflowY: 'auto' }}>
+            <Button id='addNewButton' icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
                 <Icon name="add circle"/>Add New Product
             </Button>
         </div>
+
         <div style={{marginTop: '10px', height: '80vh', overflowY: 'auto'}}>
           {loading === true ? <Dimmer active inverted>
               <Loader inverted>Loading Products</Loader>
@@ -303,7 +306,7 @@ const AdminEditProductInfo: React.FC = (props): JSX.Element => {
                 {sortedProducts.map(product => (
                     <Table.Row key={product.itemId} id="productRow">
                         <Table.Cell>{product.name}</Table.Cell>
-                        <Table.Cell>{product.price}</Table.Cell>
+                        <Table.Cell>${product.price.toFixed(2)}</Table.Cell>
                         <Table.Cell>{product.subscriptionLengthMonths} months</Table.Cell>
                         <Table.Cell>
                             <Button primary basic id="editButton"

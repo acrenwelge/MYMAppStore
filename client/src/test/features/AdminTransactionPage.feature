@@ -1,6 +1,6 @@
 Feature: Access Admin Transaction Page
 As the seller
-So that I can access the user transaction purchase code in my admin page 
+So that I can access all available transactions in my admin page 
 I want to manage the customer info
 
 Scenario: Successful accessing transaction page as admin user with data

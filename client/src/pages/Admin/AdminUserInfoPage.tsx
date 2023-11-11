@@ -303,9 +303,9 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
                       <Table.HeaderCell>Actions</Table.HeaderCell>
                   </Table.Row>
               </Table.Header>
-              <Table.Body>
+              <Table.Body id="userTable">
                 {sortedUsers.map(user => (
-                  <Table.Row key={user.userId}>
+                  <Table.Row key={user.userId} id="userRow">
                     <Table.Cell>{user.email}</Table.Cell>
                     <Table.Cell>{user.firstName}</Table.Cell>
                     <Table.Cell>{user.lastName}</Table.Cell>

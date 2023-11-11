@@ -117,6 +117,46 @@ Then("the table will be sorted by {string} in {string} order", async (dataType, 
                 break;
         }
     }
+});
+
+Then("the table will only have rows where column number {int} is true", async (columnNumber) => {
+    driver = driverInstance.driver
+
+    const tableElement = driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/table/tbody`));
+    const tableRows = tableElement.findElements(webdriver.By.tagName('tr'));
+
+    for (let i = 0; i < tableRows.length; i++) {
+        const row = tableRows[i];
+    
+        const rowCells = row.findElements(By.tagName('td'));
+
+        const cellnumber = rowCells[columnNumber];
+
+        const hasBlueCheck = await cellnumber.getAttribute('class').includes('checkmark');
+
+        assert.strictEqual(hasBlueCheck, true);
+    }
+
+    await driver.sleep(1 * 1000);
+});
+
+Then("the table will only have rows where column number {int} is false", async (columnNumber) => {
+    driver = driverInstance.driver
+
+    const tableElement = driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/table/tbody`));
+    const tableRows = tableElement.findElements(webdriver.By.tagName('tr'));
+
+    for (let i = 0; i < tableRows.length; i++) {
+        const row = tableRows[i];
+    
+        const rowCells = row.findElements(By.tagName('td'));
+
+        const cellnumber = rowCells[columnNumber];
+
+        const hasBlueCheck = await cellnumber.getAttribute('class').includes('checkmark');
+
+        assert.strictEqual(hasBlueCheck, false);
+    }
 
     await driver.sleep(1 * 1000);
 });
