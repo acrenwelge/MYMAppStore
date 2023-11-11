@@ -84,7 +84,7 @@ const TextbookHeader = (): JSX.Element => {
                             <Table.Cell>{item.subscriptionLengthMonths} Months</Table.Cell>
                             <Table.Cell>${item.price.toFixed(2)}</Table.Cell>
                             <Table.Cell>
-                                <Button color='green' animated='fade' onClick={e => addItemToCart(item)}>
+                                <Button id={"add-to-cart-"+item.itemId} color='green' animated='fade' onClick={e => addItemToCart(item)}>
                                     <Button.Content visible>Add to Cart</Button.Content>
                                     <Button.Content hidden>
                                         <Icon name='shopping bag' />

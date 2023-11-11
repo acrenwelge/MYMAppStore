@@ -262,7 +262,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 				{ctx.user != undefined && totalPrice != 0 ? (
 					<div>
 						<script defer src="https://www.paypal.com/sdk/js?client-id=AWuJ4TbTs8TF4PCyNsC3nZo-gJNpUTvebNbns0AvJWuAirsC3BRoTs4lW4_okNlpb0OQNtSZmada8Qtm&currency=USD"></script>
-						<PayPalButton
+						<PayPalButton id='paypal-button'
 							createOrder={(data: any, actions: any) => createOrder(data, actions)}
 							onApprove={(data: any, actions: any) => onApprove(data, actions)}
 						/>

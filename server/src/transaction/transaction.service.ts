@@ -35,6 +35,7 @@ export class TransactionService {
     let txDetails: TransactionDetailEntity[] = [];
     for (const purchasedItem of cart.items) {
       let detail = this.txDetailRepo.create();
+      //console.log
       detail.item = <any> purchasedItem.itemId;
       detail.finalPrice = purchasedItem.finalPrice;
       detail.quantity = purchasedItem.quantity

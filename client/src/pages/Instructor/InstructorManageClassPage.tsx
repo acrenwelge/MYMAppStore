@@ -80,12 +80,11 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
           const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructorId));
           setClassData({id: res.data.classId, students: students});
           localStorage.setItem("current_students", JSON.stringify(students.map(stu => stu.id)))
-
           console.log("LOADCLASS(), CLASSDATA SET")
-          if (isEmpty(checkBoxStates)) {
+          // if (isEmpty(checkBoxStates)) {
             const checkboxes: {[key:number]:boolean} = {}
-            console.log("\tclassData.students =", classData.students)
-            for (const student of classData.students) {
+            console.log("\tstudents =", students)
+            for (const student of students) {
               checkboxes[student.id] = false
             }
             // @ts-ignore
@@ -97,7 +96,7 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
             console.log("\tcheckboxes = ", checkboxes)
             localStorage.setItem("selected_students", JSON.stringify(checkboxes))
             setCheckBoxStates(checkboxes)
-          }
+          // }
 
           console.log("END OF LOADCLASS(), CHECKBOXES DONE")
           if (students.length === 0) {
@@ -115,8 +114,6 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
     console.log("__FUNCTION__useEffect")
     checkIsInstructor();
     loadClass();
-    
-    
   }, []);
 
   const removeStudent = (studentId: number) => {
@@ -237,12 +234,13 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
                               <Table.Cell>{student.lastName}</Table.Cell>
                               <Table.Cell id="instructor-class-table-cell-email">{student.email}</Table.Cell>
                               <Table.Cell id="instructor-class-table-cell-has_subscription">{(student.hasSubscription).toString().toUpperCase()}</Table.Cell>
-                              <Table.Cell>{(student.instructorOwnsSub).toString().toUpperCase()} </Table.Cell>
-                              <Table.Cell>
+                              <Table.Cell id={"instructor-class-table-cell-instr_owns-"+student.id}>{(student.instructorOwnsSub).toString().toUpperCase()} </Table.Cell>
+                              <Table.Cell id="action-cell">
                                 <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
                                 {/* <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button> */}
                                 {/* @ts-ignore */}
-                                <Checkbox checked={checkBoxStates[student.id]} onChange={purchaseItems(student.id)} inputprops={{ 'aria-label': 'controlled' }}/>
+                                <Checkbox id={"toggle-buy-"+student.id} checked={checkBoxStates[student.id]} onChange={purchaseItems(student.id)} inputprops={{ 'aria-label': 'controlled' }}/>
+                                {/* Add Student to Purchase List */}
                               </Table.Cell>
                             </Table.Row>
                         ))}
