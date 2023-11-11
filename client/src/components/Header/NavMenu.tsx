@@ -7,7 +7,6 @@ import Profile from "./Profile";
 import LoginSignUp from "./LoginSignUp";
 import { getUserSubscriptions } from "../../api/user";
 import { Subscription } from "../../entities";
-import { MongoMissingCredentialsError } from "typeorm";
 
 function renderSwitch(param: string) {
 	switch(param) {
