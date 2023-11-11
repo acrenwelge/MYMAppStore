@@ -37,7 +37,17 @@ const TextbookHeader = (): JSX.Element => {
             return;
         }
         // default to the product's price, no purchase code
-        const cartItem: CartItem = { ...product, finalPrice: product.price, purchaseCode: undefined };
+        let quantity = 1
+        const user = JSON.parse(localStorage.getItem('user') ?? 'null')
+        if (user.role.toLowerCase() === 'instructor' && ctx.students.length > 0) {
+            quantity = ctx.students.length
+        }
+        const cartItem: CartItem = { 
+            ...product, 
+            finalPrice: product.price, 
+            quantity: quantity,
+            purchaseCode: undefined };
+            
         ctx.setCart([
             ...ctx.cart,
             { ...cartItem }
@@ -74,7 +84,7 @@ const TextbookHeader = (): JSX.Element => {
                             <Table.Cell>{item.subscriptionLengthMonths} Months</Table.Cell>
                             <Table.Cell>${item.price.toFixed(2)}</Table.Cell>
                             <Table.Cell>
-                                <Button color='green' animated='fade' onClick={e => addItemToCart(item)}>
+                                <Button id={"add-to-cart-"+item.itemId} color='green' animated='fade' onClick={e => addItemToCart(item)}>
                                     <Button.Content visible>Add to Cart</Button.Content>
                                     <Button.Content hidden>
                                         <Icon name='shopping bag' />

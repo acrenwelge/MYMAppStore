@@ -7,7 +7,6 @@ import Cart, { PayPalOrderDetails } from './payment.entity';
 export class PaymentService {
 
     constructor(private readonly txService: TransactionService) {}
-
     /**
      * Creates a PayPal order for the cart and returns the order details.
      * Client can use the order details to call PaymentController again and confirm the purchase and record the transaction.
@@ -46,7 +45,7 @@ export class PaymentService {
         } catch (err) {
             console.error(err);
             res.status(500).send(err.message);
-            return Promise.resolve(false);
+            return Promise.resolve(false)
         }
     }
 }

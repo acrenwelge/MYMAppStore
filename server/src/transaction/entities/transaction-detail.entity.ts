@@ -17,7 +17,11 @@ export class TransactionDetailEntity {
     @PrimaryGeneratedColumn({ name: "transaction_detail_id" })
     public txDetailId: number;
 
-    @OneToOne(() => ItemEntity, item => item.itemId)
+    // @ManyToOne(() => ItemEntity)
+    // @OneToOne(() => ItemEntity)
+    // @JoinColumn({ name: 'item_id' })
+    // public item: ItemEntity
+    @ManyToOne(() => ItemEntity, item => item.itemId)
     @JoinColumn({ name: 'item_id' })
     public item: ItemEntity;
 
@@ -27,6 +31,9 @@ export class TransactionDetailEntity {
 
     @Column()
     public finalPrice: number;
+
+    @Column()
+    public quantity: number;
 
     @ManyToOne(() => TransactionEntity, transaction => transaction.transactionDetails)
     @JoinColumn({ name: 'transaction_id' })
