@@ -16,28 +16,43 @@ Scenario: Successful seaching user in user page
     When the user searches for a user
     Then only the searched users appear
 
-Scenario: Successful sorting in user page
+Scenario: Successful sorting email in user page
     Given user is in the user page
     When the user selects the category "Email" to sort
     Then the table will be sorted by "string" in "ascending" order
     When the user selects the category "Email" to sort
     Then the table will be sorted by "string" in "descending" order
+
+Scenario: Successful sorting first name in user page
+    Given user is in the user page  
     When the user selects the category "First Name" to sort
     Then the table will be sorted by "string" in "ascending" order
     When the user selects the category "First Name" to sort
     Then the table will be sorted by "string" in "descending" order
+
+Scenario: Successful sorting last name in user page
+    Given user is in the user page
     When the user selects the category "Last Name" to sort
     Then the table will be sorted by "string" in "ascending" order
     When the user selects the category "Last Name" to sort
     Then the table will be sorted by "string" in "descending" order
+
+Scenario: Successful sorting register time in user page
+    Given user is in the user page
     When the user selects the category "Register Time" to sort
     Then the table will be sorted by "string" in "ascending" order
     When the user selects the category "Register Time" to sort
     Then the table will be sorted by "string" in "descending" order
+
+Scenario: Successful sorting admin in user page
+    Given user is in the user page
     When the user selects the category "Admin" to sort
     Then the table will only have rows where column number 4 is true
     When the user selects the category "Admin" to sort
     Then the table will only have rows where column number 4 is false
+
+Scenario: Successful sorting activated in user page
+    Given user is in the user page
     When the user selects the category "Activated" to sort
     Then the table will only have rows where column number 5 is true
     When the user selects the category "Activated" to sort

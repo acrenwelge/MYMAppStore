@@ -35,7 +35,7 @@ Then("the user should see purchase code info", async () => {
 When("the user goes to the purchase codes url",  async () => {
     driver = driverInstance.driver
 
-    await driver.get("http://localhost:3000/admin/purchase-codes");
+    await driver.get("http://localhost:3000/admin/purchase-code");
     await driver.sleep(1 * 1000);
 });
 
@@ -69,7 +69,7 @@ Given("user is in the purchase code page", async () => {
 When("the user searches for a purchase code",  async () => {
     driver = driverInstance.driver
 
-    driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/div[2]/input`)).sendKeys("free");
+    driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[3]/div[3]/input`)).sendKeys("free");
 
     await driver.sleep(1 * 1000);
 });

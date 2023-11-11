@@ -117,6 +117,7 @@ Then("the table will be sorted by {string} in {string} order", async (dataType, 
                 break;
         }
     }
+    await driver.sleep(1 * 1000);
 });
 
 Then("the table will only have rows where column number {int} is true", async (columnNumber) => {
