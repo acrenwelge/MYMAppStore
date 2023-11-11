@@ -8,7 +8,7 @@ import { SubscriptionService } from 'src/subscription/subscription.service';
 
 @Controller('payment')
 export class PaymentController {
-
+    
     constructor(
         private readonly paymentService: PaymentService,
         private readonly subService: SubscriptionService) {}
@@ -24,12 +24,21 @@ export class PaymentController {
     @Post('capture-paypal-order')
     @HttpCode(HttpStatus.OK)
     async capture(@Body() orderData: PayPalOrderDetails, @Res() res: Response) {
+        console.log("__FUNCTION__capture-paypal-order()")
         const result = await this.paymentService.captureAndRecordTx(orderData, res);
         if (result) {
-            await this.subService.addOrExtendSubscriptions(orderData.cart);
+            console.log("__FUNCTION__capture-paypal-order()")
+            console.log("\tbefore addOrExtendSubs, recipientIds =", orderData.recipientIds)
+            await this.subService.addOrExtendSubscriptions(orderData.cart, orderData.recipientIds);
+            console.log("\tafter addOrExtendSubs")
+            
         } else {
             console.error('Failed to capture payment');
         }
     }
+}
+
+function useContext(ApplicationContext: any) {
+    throw new Error('Function not implemented.');
 }
 

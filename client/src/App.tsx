@@ -37,10 +37,11 @@ import UserBasePage from "./pages/User/UserBasePage";
 
 const App: React.FC = (): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
-
+	console.log(ctx)
 	// eslint-disable-next-line
 	const [user, setUser] = useState<User>();
 	const [cart, setCart] = useState<CartItem[]>([]);
+	const [students, setStudents] = useState<number[]>([]);
 
 	useEffect(() => {
 		const storedUser = localStorage.getItem('user');
@@ -68,7 +69,7 @@ const App: React.FC = (): JSX.Element => {
 					revalidateOnReconnect: false
 				}}
 			>
-				<ApplicationContext.Provider value={{ user, setUser, cart, setCart}}>
+				<ApplicationContext.Provider value={{ user, setUser, cart, setCart, students, setStudents}}>
 					<div className="App" style={{ display: "flex", flexDirection: "column" }}>
 						<NavMenu />
 						<br></br>

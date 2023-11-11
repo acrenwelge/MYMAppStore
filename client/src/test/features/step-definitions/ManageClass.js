@@ -54,7 +54,7 @@ Given('user is not logged in as instructor', async function () {
     // log in using a premade user account
     await driver.get('http://localhost:3000/login')
  	await driver.sleep(1 * 1000)
-    await driver.findElement(webdriver.By.id("email")).sendKeys('test1@test.com')
+    await driver.findElement(webdriver.By.id("email")).sendKeys('stutest@test.com')
     await driver.findElement(webdriver.By.id("password")).sendKeys('password')
     await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
@@ -90,7 +90,7 @@ When('user is at the class management page', async function () {
 When('inputs student\'s email under \'Add Existing User as Student\'', async function() {
     driver = driverInstance.driver
     
-    await driver.findElement(webdriver.By.id("existing-email")).sendKeys('test1@test.com')
+    await driver.findElement(webdriver.By.id("existing-email")).sendKeys('stutest@test.com')
     await driver.sleep(1 * 1000)
 })
 
@@ -151,7 +151,7 @@ When('inputs student\'s firstname, lastname, and email with existing', async fun
     
     await driver.findElement(webdriver.By.id("new-first-name")).sendKeys('stu')
     await driver.findElement(webdriver.By.id("new-last-name")).sendKeys('test1')
-    await driver.findElement(webdriver.By.id("new-email")).sendKeys('test1@test.com')
+    await driver.findElement(webdriver.By.id("new-email")).sendKeys('stutest@test.com')
     await driver.sleep(1 * 1000)
     // click button to submit
     await driver.findElement(webdriver.By.id('new-add')).click()
@@ -182,6 +182,138 @@ Then('the student is removed from the class.', async function() {
     expect(array.length).to.equal(initialNumberOfRows-1)
 })
 
-// Scenario: Successfully purchase a textbook for a student from the class
-//         And clicks 'Purchase Items' for a student listed
-//         Then the instructor is redirected to the product page.
+// Feature: Manage Student Subscriptions On Class Management Page
+// I want to manage my class' subscriptions
+// As an instructor
+// So that I can pay for their textbook subscription
+
+//     Background:
+//         Given user is logged in as instructor with 5 students in their class
+//         When user is at the class management page
+
+Given('user is logged in as instructor with 5 students in their class', async function () {
+    driver = driverInstance.driver
+    
+    // log in using a premade instructor account
+    await driver.get('http://localhost:3000/login')
+ 	await driver.sleep(1 * 1000)
+    await driver.findElement(webdriver.By.id("email")).sendKeys('instrtest_2@test.com')
+    await driver.findElement(webdriver.By.id("password")).sendKeys('password')
+    await driver.sleep(1 * 1000)
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
+    await driver.sleep(1 * 1000)
+})
+
+// Scenario: Successfully Toggle Checkbox On 
+//         And toggles checkbox for a student listed without a subscription on
+//         Then the student is on purchase list.
+
+Given('toggles checkbox for a student listed without a subscription on', async function () {
+    driver = driverInstance.driver
+    // driver.findElements(By.css("input[type=\'checkbox\']"))
+    let box = await driver.findElement(webdriver.By.id('toggle-buy-18'))
+    box = await box.findElement(webdriver.By.xpath('..'))
+    console.log(box)
+    await box.click()
+})
+
+Then('the student is on purchase list.', async function () {
+    driver = driverInstance.driver
+    const localStorage = await driver.executeScript('return window.localStorage;');
+    console.log(localStorage)
+    let sel_student_array = JSON.parse(localStorage['sel_student_array'])
+    expect(sel_student_array[0]).to.equal(18)
+})
+
+// Scenario: Successfully Toggle Checkbox Off
+//         And toggles checkbox for a student listed without a subscription on
+//         And toggles checkbox for a student listed without a subscription off
+//         Then the student is not on purchase list.
+
+Given('toggles checkbox for a student listed without a subscription off', async function () {
+    driver = driverInstance.driver
+    // driver.findElements(By.css("input[type=\'checkbox\']"))
+    let box = await driver.findElement(webdriver.By.id('toggle-buy-18'))
+    box = await box.findElement(webdriver.By.xpath('..'))
+    console.log(box)
+    await box.click()
+})
+
+Then('the student is not on purchase list.', async function () {
+    driver = driverInstance.driver
+    const localStorage = await driver.executeScript('return window.localStorage;');
+    console.log(localStorage)
+    let sel_student_array = JSON.parse(localStorage['sel_student_array'])
+    expect(sel_student_array.length).to.equal(0)
+})
+
+// Scenario: Successfully Purchase Subscription for Students
+//         And toggles checkbox for a student listed without a subscription on
+//         And goes to Product Pricing Page
+//         And adds the subscription item to cart
+//         And goes to checkout page
+//         And buys the subscription
+//         And goes to Manage Class page
+//         Then the instructor now owns the student's subscription
+
+Given('goes to Product Pricing Page', async function () {
+    driver = driverInstance.driver
+    await driver.get('http://localhost:3000/products')
+})
+
+Given('adds the subscription item to cart', async function () {
+    driver = driverInstance.driver
+    await driver.findElement(webdriver.By.id('add-to-cart-1')).click()
+    await driver.sleep(3000)
+})
+
+Given('goes to checkout page', async function () {
+    driver = driverInstance.driver
+    await driver.findElement(webdriver.By.xpath("//a[@class='ui green button']")).click()
+    await driver.sleep(2000)
+})
+
+Given('buys the subscription', async function () {
+    driver = driverInstance.driver
+    const container = await driver.wait(
+        webdriver.until.elementLocated(webdriver.By.id("buttons-container")), 
+        2000
+    );
+    // let container = await driver.findElement(webdriver.By.xpath("div[@class='buttons-container']"))
+    await container.findElement(webdriver.By.xpath("//div[@role='link']")).click()
+    // const paypalButton = await driver.findElement(webdriver.By.id('paypal-button'));
+    // await paypalButton.click();
+    // Wait for the new window to appear or handle the redirect
+    const handles = await driver.getAllWindowHandles();
+    const newWindowHandle = handles[1]; // Assuming PayPal opens in a new window
+    await driver.switchTo().window(newWindowHandle);
+
+    // Find and fill in the email field
+    const emailField = await driver.findElement(By.id('email'));
+    await emailField.sendKeys('sb-gyqyi27742548@personal.example.com');
+
+    // Find and fill in the password field
+    const passwordField = await driver.findElement(By.id('password'));
+    await passwordField.sendKeys('eCDsju2<');
+
+    // Submit the login form
+    const loginButton = await driver.findElement(By.id('btnLogin'));
+    await loginButton.click();
+
+    const purchaseButton = await driver.findElement(By.id('payment-submit-btn'))
+    await purchaseButton.click()
+
+    // Switch back to the original window
+    await driver.switchTo().window(handles[0]);
+})
+
+Given('goes to Manage Class page', async function () {
+    driver = driverInstance.driver
+    await driver.get("http://localhost:3000/instructor/class")
+})
+
+Then('the instructor now owns the student\'s subscription', async function () {
+    driver = driverInstance.driver
+    let element = await driver.findElement(webdriver.By.id('instructor-class-table-cell-instr_owns-18'))
+    expect(element.getText()).to.equal("TRUE")
+})

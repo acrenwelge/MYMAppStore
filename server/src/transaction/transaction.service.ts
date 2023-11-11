@@ -25,23 +25,25 @@ export class TransactionService {
   //   dto.transactionDetails = tx.transactionDetails;
   //   return dto;
   // }
-
   /**
    * Creates Transaction and TransactionDetail entities from the cart that the user has purchased.
    * @param cart 
    * @returns 
    */
   async createAndSaveFromPurchaseCart(cart: Cart) {
+    console.log("__FUNCTION__createAndSaveFromPurchaseCart()")
     let txDetails: TransactionDetailEntity[] = [];
     for (const purchasedItem of cart.items) {
-        let detail = this.txDetailRepo.create();
-        detail.item = <any> purchasedItem.itemId;
-        // detail.quantity: purchasedItem.quantity
-        detail.finalPrice = purchasedItem.finalPrice;
-        if (purchasedItem.purchaseCode) {
-            detail.purchaseCode = <any> purchasedItem.purchaseCode
-        }
-        txDetails.push(detail)
+      let detail = this.txDetailRepo.create();
+      //console.log
+      detail.item = <any> purchasedItem.itemId;
+      detail.finalPrice = purchasedItem.finalPrice;
+      detail.quantity = purchasedItem.quantity
+      if (purchasedItem.purchaseCode) {
+        detail.purchaseCode = <any> purchasedItem.purchaseCode
+      }
+      console.log("\tdetail = ", detail)
+      txDetails.push(detail)
     }
     // assign fields and save
     const newTxEnt = this.txRepo.create()

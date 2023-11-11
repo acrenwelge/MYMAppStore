@@ -1,7 +1,7 @@
 Feature: Edit Class Management Page
 I want to edit my class' info
 As an instructor
-So that I can add/remove students and pay for their textbooks
+So that I can add/remove students
 
     Background:
         Given user is logged in as instructor
