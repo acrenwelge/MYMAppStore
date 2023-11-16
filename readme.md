@@ -81,3 +81,4 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
 
 ## Contributors
 Cheng Niu, Shuang Yu, Zhiting Zhao, Yongqing Liang, Shuyu Wang, Yun Du, Andrew Crenwelge, Spencer Banasik, Nikhil Nehra, Nick Robert, Arunim Samudra
+Contact: smb200007@tamu.edu
