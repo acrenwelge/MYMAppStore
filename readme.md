@@ -10,21 +10,25 @@ This project is a full-stack web application ecommerce site that allows users to
 ## Technical Description
 The application is built using React, Node.js, Express, and MySQL. Both front and back-end are written in TypeScript. The web client communicates with the backend REST API using Axios. The backend uses TypeORM to communicate with the MySQL database.
 
-## To test with this iteration
 
-### Spec Tests
-1. cd ./server
-2. yarn test
 
-### Cucumber tests
-1. cd ./client
-2. yarn cucumber-test
-
-## Getting Started
+## Development Environment Setup
 1. Install nodejs (it will automatically install npm)
 2. Install yarn
    `npm install -g yarn`
-3. Prepare different .env configuration files as .env.example in `Server` folder
+3. Install nestjs
+   `npm install @nestjs/cli`
+4. Install Docker Desktop and set it up
+   ```bash
+      # Start the MySQL server container
+      docker run --name local-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:8.0
+      # Connect to the MySQL server container
+      docker exec -it local-db bash
+      # Start MySQL client
+      mysql -u root -p
+      # enter your password from first command
+      ```
+5. Prepare different .env configuration files as .env.example in `Server` folder
   The configuration files are as lists:
 
   | Name        | Environment               |
@@ -34,20 +38,18 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
   | .env.heroku | Deploy on Heroku          |
   | .env.prod   | Deploy on CLient's server |
 
-### Setup a local MySQL database on Docker:
-```bash
-# Start the MySQL server container
-docker run --name local-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:8.0
-# Copy SQL script to container
-docker cp ./init.sql container_id:/tmp/init.sql
-# Connect to the MySQL server container
-docker exec -it local-db bash
-# Start MySQL client
-mysql -u root -p
-# enter your password from first command
-# Run SQL script
-mysql> source init.sql
-```
+   For the .env.dev file:
+     ```
+      ENV_TYPE = dev
+      SERVER_PORT = [enter your docker port]
+      DB_HOST = localhost
+      DB_Port = 3306
+      DB_Username = [enter your DB username set in Docker]
+      DB_Password = [enter your DB password set in Docker]
+      DB_Database = mymathapps
+      CLIENT_ID = [enter your PayPal sandbox ID]
+      APP_SECRET = [enter your PayPal sandbox secret ID]
+     ```
 
 ### To Run Backend Server:
 1. `cd server/`
@@ -58,6 +60,17 @@ mysql> source init.sql
 1. `cd client/`
 2. `yarn`
 3. `yarn start`
+
+
+## To test with this iteration
+
+### Spec Tests
+1. cd ./server
+2. yarn test
+
+### Cucumber tests
+1. cd ./client
+2. yarn cucumber-test
 
 ## To Deploy On Heroku:
 1. Enter the root folder
