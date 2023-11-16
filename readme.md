@@ -74,10 +74,21 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
 2. yarn cucumber-test
 
 ## To Deploy On Heroku:
+This article is extremely helpful, refer to it:
+[Deploying With Git On Heroku](https://devcenter.heroku.com/articles/git)
+Here's the steps we used to deploy to Heroku. We recommend finding a safer way to do so.
 1. Enter the root folder
-2. `Heroku login`
-3. `Heroku create -a mymathapp`
-4. `git push heroku main`
+2. `heroku login`
+3. This step only has to be done the first time: `heroku git:remote -a example-app`
+4. Create a local branch off of dev
+5. Modify the .gitignore to allow .env.heroku to be permitted
+6. Create a .env.heroku, it's almost the same as the .env.dev but the DB information is replaced with a dburl.
+    - Refer to app.module.ts for more information on the differences. Heroku should also have some information
+7. **Be careful**, your .env.heroku has sensitive information. Do not allow your local repo to go onto github or anywhere public.
+8. Use `git status` and add/commit anything that still needs to be added. Be sure to add your .env.heroku
+10. `git push heroku your_local_branch:main` **Do not** push the local repo to anywhere else.
+    - Since your heroku branch may be multiple versions off, you may need to add `-f` after the push to overwrite what's there.
+11. That's it!
 
 ## Contributors
 Cheng Niu, Shuang Yu, Zhiting Zhao, Yongqing Liang, Shuyu Wang, Yun Du, Andrew Crenwelge, Spencer Banasik, Nikhil Nehra, Nick Robert, Arunim Samudra
