@@ -27,6 +27,7 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
       # Start MySQL client
       mysql -u root -p
       # enter your password from first command
+      create database 'mymathapps';
       ```
 5. Prepare different .env configuration files as .env.example in `Server` folder
   The configuration files are as lists:
