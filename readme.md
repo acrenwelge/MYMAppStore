@@ -39,7 +39,7 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
   | .env.prod   | Deploy on CLient's server |
 
    For the .env.dev file:
-     ```
+     ```bash
       ENV_TYPE = dev
       SERVER_PORT = [enter your docker port]
       DB_HOST = localhost
