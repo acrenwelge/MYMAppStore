@@ -39,7 +39,7 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
   | .env.prod   | Deploy on CLient's server |
 
    For the .env.dev file:
-     ```bash
+   ```bash
       ENV_TYPE = dev
       SERVER_PORT = [enter your docker port]
       DB_HOST = localhost
@@ -49,7 +49,7 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
       DB_Database = mymathapps
       CLIENT_ID = [enter your PayPal sandbox ID]
       APP_SECRET = [enter your PayPal sandbox secret ID]
-     ```
+   ```
 
 ### To Run Backend Server:
 1. `cd server/`
