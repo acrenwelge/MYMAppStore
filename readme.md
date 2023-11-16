@@ -18,7 +18,7 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
    `npm install -g yarn`
 3. Install nestjs
    `npm install @nestjs/cli`
-4. Install Docker Desktop and set it up
+4. Install Docker and set it up. This can be done from the CLI or from Docker Desktop itself (you can run the shell commands in a container's "exec" tab once the container is created).
    ```bash
       # Start the MySQL server container
       docker run --name local-db -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password -d mysql:8.0
