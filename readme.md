@@ -68,7 +68,7 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
 ### Spec Tests
 1. cd ./server
 2. yarn test
-
+### Before running the Cucumber tests, some test data must be inserted into the database. Copy the init.sql file into the Docker container, run it, then run the tests.
 ### Cucumber tests
 1. cd ./client
 2. yarn cucumber-test
