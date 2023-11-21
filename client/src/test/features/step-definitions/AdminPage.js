@@ -35,7 +35,7 @@ When("the user is not logged in in as admin",  async () => { });
 When("the user clicks on admin button",  async () => {
     driver = driverInstance.driver
 
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/nav/div/div[2]/a[2]`)).click();    
+    await driver.findElement(webdriver.By.id("adminButton")).click();    
     await driver.sleep(1 * 1000);
 });
 

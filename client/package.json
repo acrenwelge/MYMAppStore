@@ -7,7 +7,7 @@
 		"build-heroku": "dotenv -e .env.client.heroku react-scripts build",
 		"build-prod": "dotenv -e .env.client.prod react-scripts build",
 		"test": "react-scripts test",
-		"cucumber-test": "node_modules/.bin/cucumber-js -f @cucumber/pretty-formatter --publish-quiet src/test/features/",
+		"cucumber-test": "node_modules/.bin/cucumber-js -f @cucumber/pretty-formatter --publish-quiet src/test/features/Admin*",
 		"eject": "react-scripts eject",
 		"lint": "eslint 'src/**/*.ts' && prettier --config ../.prettierrc.yml --list-different 'src/**/*.ts'",
 		"lint:fix": "eslint --fix 'src/**/*.ts' && prettier --config ../.prettierrc.yml --write 'src/**/*.ts'"

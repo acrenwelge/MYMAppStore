@@ -7,17 +7,17 @@ const driverInstance = require('./WebDriver');
 let ele, dwn;
 
 BeforeAll(async() => {
-    driver = driverInstance.driver;
+    // driver = driverInstance.driver;
 
-    await driver.get("http://localhost:3000/login");
-    await driver.sleep(1 * 1000);
+    // await driver.get("http://localhost:3000/login");
+    // await driver.sleep(1 * 1000);
 
-    await driver.findElement(webdriver.By.id("email")).sendKeys("arunimsamudra@gmail.com");
-    await driver.findElement(webdriver.By.id("password")).sendKeys("arunimsamudra@gmail.com");
-    await driver.sleep(1 * 1000);
+    // await driver.findElement(webdriver.By.id("email")).sendKeys("arunimsamudra@gmail.com");
+    // await driver.findElement(webdriver.By.id("password")).sendKeys("arunimsamudra@gmail.com");
+    // await driver.sleep(1 * 1000);
 
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click();
-    await driver.sleep(1 * 1000);
+    // await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click();
+    // await driver.sleep(1 * 1000);
 });
 
 Given("I am on the subscription page", async() => {

@@ -11,7 +11,7 @@ const Profile: React.FC = (): JSX.Element => {
 	const history = useHistory();
 
 	return (
-		<Dropdown as={Menu.Item} item text={ctx.user!.firstName}>
+		<Dropdown as={Menu.Item} item text={ctx.user!.firstName + " " + ctx.user!.lastName}>
 			<Dropdown.Menu>
 				<Dropdown.Item
 					onClick={(event, data) => history.push({
