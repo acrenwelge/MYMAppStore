@@ -1,4 +1,4 @@
-const { Given, When, Then, BeforeAll } = require("@cucumber/cucumber");
+const { Given, When, Then } = require("@cucumber/cucumber");
 const { expect } = require("chai");
 const fs = require('fs');
 const webdriver = require("selenium-webdriver");
@@ -6,7 +6,7 @@ const driverInstance = require('./WebDriver');
 
 let ele, dwn;
 
-BeforeAll(async() => {
+Given("user is logged in on test arunim account", async() => {
     driver = driverInstance.driver;
 
     await driver.get("http://localhost:3000/login");
