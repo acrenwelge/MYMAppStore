@@ -125,7 +125,7 @@ export function updateCodeApi(name: string, newCode: PurchaseCodeFormValues): Pr
 export function getAllSubscriptions(): Promise<AxiosResponse<Subscription[]>> {
     return request({
         method: 'GET',
-        url: 'api/subscription/all',
+        url: 'api/subscription',
     })
 }
 

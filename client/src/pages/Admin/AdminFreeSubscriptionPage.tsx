@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useReducer} from "react";
 import {
     Form,
     Table,
     Icon,
+    Input,
     Grid,
     GridColumn,
     Container,
@@ -24,19 +25,93 @@ type MessageValues = {
     message: string
 }
 
+interface localState {
+    sortBy: string; // 'email', 'name', 'createdAt'
+    sortDirection: 'ascending' | 'descending' | undefined;
+    filterActivated: boolean | null;
+    filterText: string;
+}
+
 const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
-    const [newSuffix, setNewSuffix] = useState("");
+    const [suffixData, setSuffixData] = useState('');
     const [updateSuffixData, setUpdateSuffix] = useState<FreeSubscription>({email_sub_id: NaN, suffix: ''});
     const [addModalOpen, setAddModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
     const [freeSubscriptionData, setfreeSubscriptionData] = useState<FreeSubscription[]>([]);
     const [loading, setLoading] = useState(false);
     const [buttonLoading, setButtonLoading] = useState(false);
-
+    const initlocalState: localState = {
+        sortBy: '',
+        sortDirection: undefined,
+        filterActivated: null,
+        filterText: '',
+    };
     const [message, setMessage] = useState<MessageValues>({
         type:'none',
         message:''
     });
+
+    const [state, dispatch] = useReducer(sortingReducer, initlocalState);
+    const filteredUsers = freeSubscriptionData.filter(suffix => {
+        if (state.filterActivated !== null) {
+            return false;
+        }
+        if (state.filterText !== '' && 
+            !suffix.suffix.toLowerCase().includes(state.filterText.toLowerCase())) {
+            return false;
+        }
+        return true;
+    });
+
+    let sortedFreeSubs = filteredUsers;
+    if (state.sortBy != '' && state.sortDirection === 'ascending') {
+        switch (state.sortBy) {
+            case 'suffix':
+                sortedFreeSubs = sortedFreeSubs.sort((a, b) => a['suffix'].localeCompare(b['suffix']));
+                break;
+        }
+    } else if (state.sortBy != '' && state.sortDirection === 'descending') {
+        switch (state.sortBy) {
+            case 'suffix':
+                sortedFreeSubs = sortedFreeSubs.sort((b, a) => a['suffix'].localeCompare(b['suffix']));
+                break;
+        }
+    }
+
+    const handleSortChange = (field: string) => {
+        if (state.sortBy === field) {
+            dispatch({ type: 'CHANGE_SORT_DIRECTION', payload: field});
+        } else {
+            dispatch({ type: 'CHANGE_SORT_FIELD', payload: field });
+        }
+    };
+
+    const handleFilterTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        dispatch({ type: 'FILTER_TEXT', payload: e.target.value });
+    };
+
+    function sortingReducer(state: localState, action: {type: string, payload: string}): localState {
+        switch (action.type) {
+            case 'CHANGE_SORT_FIELD':
+              return {
+                ...state,
+                sortBy: action.payload,
+                sortDirection: 'ascending',
+              }
+            case 'CHANGE_SORT_DIRECTION':
+                return {
+                    ...state,
+                    sortDirection: state.sortDirection === 'ascending' ? 'descending' : 'ascending',
+            }
+            case 'FILTER_TEXT':
+                return {
+                    ...state,
+                    filterText: action.payload,
+                }
+          default:
+            throw new Error("invalid action type")
+        }
+      }
 
     const getFreeSubscriptions = () => {
         setLoading(true)
@@ -57,24 +132,24 @@ const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
     const handleAdd = () => {
         setButtonLoading(true)
         addFreeSub({
-            suffix: newSuffix,
+            suffix: suffixData,
         }).then(async (res) => {
             setButtonLoading(false)
             setAddModalOpen(false)
-            setMessage({type:'success',message:`Free subscription with suffix "${newSuffix}" has been added successfully. All users with emails that match this suffix will be able to access all textbooks for free.`})
+            setMessage({type:'success',message:`Free subscription with suffix "${suffixData}" has been added successfully. All users with emails that match this suffix will be able to access all textbooks for free.`})
             getFreeSubscriptions()
         }).catch((err) => {
             console.log(err)
             setButtonLoading(false)
             setAddModalOpen(false)
-            setMessage({type:'fail',message:`Unable to add free subscriptions for users with email suffix ${newSuffix}`})
+            setMessage({type:'fail',message:`Unable to add free subscriptions for users with email suffix ${suffixData}`})
         });
     };
 
     const handleCancel = () => {
         setAddModalOpen(false)
         setUpdateModalOpen(false)
-        setNewSuffix('')
+        setSuffixData('')
         setUpdateSuffix({
             email_sub_id: NaN,
             suffix: ''
@@ -143,46 +218,46 @@ const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
                         <p>{message.message}</p>
                     </Message>
                 )}
+            </div>
 
-                <Button icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
-                    <Icon name="add circle"/>Add New Free Email Subscription
-                </Button>
-            </div>
             <div style={{marginTop: '10px'}}>
-                <h2>Free Subscriptions by Email Suffix</h2>
-                <p>
-                    User accounts with emails that match the suffixes in the table below will have free access to all textbooks.
-                    The <strong>end of the user&apos;s email must match exactly with the suffix provided</strong>. 
-                    For example, if the suffix &quot;<strong>tamu.edu</strong>&quot; is listed, the following users will have free access:
-                </p>
-                <ul>
-                    <li>student@tamu.edu</li>
-                    <li>student@email.tamu.edu</li>
-                    <li>student@tamu.edu</li>
-                </ul>
-                <p>
-                    The following users would <strong>NOT</strong> have free access:
-                </p>
-                <ul>
-                    <li>student@tamu.email.edu</li>
-                    <li>tamu.edu@gmail.com</li>
-                </ul>
+                <h1>Free Subscriptions by Email Suffix</h1>
             </div>
+
+            <div style={{ position: 'absolute', marginTop: '10px', right: 10, overflowY: 'auto' }}>
+            <Button id='addNewButton' icon labelPosition='left' primary onClick={() => setAddModalOpen(true)}>
+                <Icon name="add circle"/>Add New Free Email Subscription
+            </Button>
+            </div>
+
             <div style={{marginTop: '10px', height: '80vh', overflowY: 'auto'}}>
-                {loading == true ? <Dimmer active inverted>
-                    <Loader inverted>Loading Email Subscription</Loader>
-                </Dimmer> : <div></div>
+                {loading==true?<Dimmer active inverted>
+                    <Loader inverted>Loading User</Loader>
+                </Dimmer>:<div></div>
                 }
-                <Table>
+                <Container>
+                    {state.sortBy === '' ? null : <div>Sorting by: {state.sortBy}</div>}
+                    {state.filterActivated === null ? null : 
+                        <div>Filtering by: {state.filterActivated ? 'Activated' : 'Deactivated'}
+                        </div>
+                    }
+                </Container>
+
+                <Input label="Search by Suffix:" icon='search' placeholder='domain.com'
+                    onChange={(e) => handleFilterTextChange(e)}/>
+                <Table sortable>
                     <Table.Header>
                         <Table.Row>
-                            <Table.HeaderCell>Email Suffix</Table.HeaderCell>
+                            <Table.HeaderCell
+                                sorted={state.sortBy === 'suffix' ? state.sortDirection : undefined}
+                                onClick={() => handleSortChange('suffix')}
+                            >Email Suffix</Table.HeaderCell>
                             <Table.HeaderCell>Operation</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
-                    <Table.Body>
-                        {freeSubscriptionData.map(sub => (
-                            <Table.Row key={sub.email_sub_id}>
+                    <Table.Body id="freeSubTable">
+                        {sortedFreeSubs.map(sub => (
+                            <Table.Row key={sub.email_sub_id} id="freeSubRow">
                                 <Table.Cell>{sub.suffix}</Table.Cell>
                                 <Table.Cell>
                                     <Button primary basic
@@ -213,7 +288,7 @@ const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
                         <Form.Input
                             id="name"
                             label="Email Suffix (eg: tamu.edu)"
-                            onChange={(event, data) => setNewSuffix(data.value)}
+                            onChange={(event, data) => setSuffixData(data.value)}
                             required
                         />
                     </Form>

@@ -239,6 +239,7 @@ const AdminEditProductInfo: React.FC = (props): JSX.Element => {
 
     return (
       <AdminBasePage>
+        <h1>Manage Products</h1>
         <div>
             {message.type === 'none' && (
                 <></>
@@ -282,7 +283,7 @@ const AdminEditProductInfo: React.FC = (props): JSX.Element => {
               }
           </Container>
 
-          <Input label="Search by Product Name:" icon='search' placeholder='email@domain.com'
+          <Input label="Search by Product Name:" icon='search' placeholder='product'
               onChange={(e) => handleFilterTextChange(e)}/>
           <Table sortable>
             <Table.Header>

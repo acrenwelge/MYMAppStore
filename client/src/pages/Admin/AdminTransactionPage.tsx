@@ -174,6 +174,7 @@ const AdminTransactionPage: React.FC = (props): JSX.Element | null => {
 
     return (
         <AdminBasePage>
+            <h1>Manage Transactions</h1>
             <div style={{height:'80vh',overflowY:'auto'}}>
                 {loading === true ? <Dimmer active inverted>
                     <Loader inverted>Loading Transactions</Loader>

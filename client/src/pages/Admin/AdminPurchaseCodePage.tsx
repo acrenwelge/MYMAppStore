@@ -259,6 +259,7 @@ const AdminPurchaseCodePage: React.FC = (props): JSX.Element => {
 
     return (
         <AdminBasePage>
+            <h1>Manage Purchase Codes</h1>
             <div>
                 {message.type === 'none' && (
                     <></>
