@@ -86,7 +86,7 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                             }
                             <h1>Owned Subscriptions</h1>
                             <h3>Subscriptions that you own and can change who has the ability to use it</h3>
-                            <Table>
+                            <Table id="owned-subs">
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell>Item Name</Table.HeaderCell>
@@ -110,7 +110,7 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                             </Table>
                             <h1>Accessible Subscriptions</h1>
                             <h3>Subscriptions that you may or may not own, but have access to (i.e., can use them to access the book)</h3>
-                            <Table>
+                            <Table id="usable-subs">
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell>Item Name</Table.HeaderCell>
@@ -132,7 +132,7 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                                             {
                                                 sub.item.name != "Finance with Maple" ?
                                                 <Table.Cell colSpan = "2" textAlign="center">
-                                                    <Button onClick={readBook} animated='fade'>
+                                                    <Button id="read-button" onClick={readBook} animated='fade'>
                                                     <Button.Content visible>Read</Button.Content>
                                                     <Button.Content hidden>
                                                         <Icon name='book' />
@@ -140,7 +140,7 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                                                 </Button>
                                                 </Table.Cell> :
                                                 <Table.Cell textAlign="right">
-                                                    <Button onClick={readBook} animated='fade'>
+                                                    <Button id="read-button" onClick={readBook} animated='fade'>
                                                     <Button.Content visible>Read</Button.Content>
                                                     <Button.Content hidden>
                                                         <Icon name='book' />
@@ -152,7 +152,7 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                                                 sub.item.name != "Finance with Maple" ? 
                                                 null:
                                                 <Table.Cell textAlign="center">
-                                                    <Button onClick={download} animated='fade'>
+                                                    <Button id="download-button" onClick={download} animated='fade'>
                                                         <Button.Content visible>Download</Button.Content>
                                                         <Button.Content hidden>
                                                             <Icon name='download' />

@@ -17,6 +17,19 @@ class WebDriver {
 
   async quitDriver() {
     if (this.driver) {
+      // Clear browser storage (local storage, session storage, etc.)
+      await this.driver.executeScript('window.localStorage.clear();');
+      await this.driver.executeScript('window.sessionStorage.clear();');
+
+      // Delete cookies
+      await this.driver.manage().deleteAllCookies();
+
+      // Close all open browser windows
+      const windowHandles = await this.driver.getAllWindowHandles();
+      for (let handle of windowHandles) {
+        await this.driver.switchTo().window(handle);
+        await this.driver.close();
+      }
       await this.driver.quit();
     }
   }

@@ -30,7 +30,7 @@ Given("I am on the subscription page", async() => {
 When("I click on Read", async() => {
     driver = driverInstance.driver;
 
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div/div/table/tbody/tr[1]/td[3]/button`)).click();
+    await driver.findElement(webdriver.By.id("read-button")).click();
     await driver.sleep(3 * 1000);
 });
 
@@ -43,7 +43,7 @@ Then("I should be redirected to the Read page", async() => {
 When("There is a Finance with Maple Book Subscription", async() => {
     driver = driverInstance.driver;
 
-    let table = driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div/div/table`));
+    let table = driver.findElement(webdriver.By.id(`usable-subs`));
     let rows = await table.findElements(webdriver.By.tagName('tr'));
     for (let row of rows) {
         let tds = await row.findElements(webdriver.By.tagName('td'));
@@ -57,24 +57,19 @@ When("There is a Finance with Maple Book Subscription", async() => {
 });
 
 Then("The Download button should be present", async() => {
-    let tds = await ele.findElements(webdriver.By.tagName('td'));
-    for (let td of tds) {
-        if("Download" === await td.getText()) {
-            dwn = td;
-            break;
-        }
-    }
-    expect(dwn).to.not.be.null;
+    const button = await ele.findElement(webdriver.By.id('download-button'));
+    expect(button).to.not.be.null;
 });
 
 When("I click on the download button", async() => {
     driver = driverInstance.driver;
-    await dwn.click();
+    const button = await ele.findElement(webdriver.By.id('download-button'));
+    await button.click();
     await driver.sleep(3 * 1000);
 });
 
 Then("The PDF book should be downloaded", async() => {
-    let filePath = '/Users/arunimsamudra/Downloads/Finance with Maple.pdf';
+    let filePath = '/Users/nickr/Downloads/Finance with Maple.pdf';
     let fileExists = fs.existsSync(filePath);
     expect(fileExists).to.be.not.null;
 });
@@ -85,7 +80,7 @@ When("There is a Book which is not Finance with Maple Subscription", async() => 
     ele = null;
     dwn = null;
     
-    let table = driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div/div/table`));
+    let table = driver.findElement(webdriver.By.id('usable-subs'));
     let rows = await table.findElements(webdriver.By.tagName('tr'));
     for (let row of rows) {
         let tds = await row.findElements(webdriver.By.tagName('td'));
@@ -111,3 +106,91 @@ Then("The download button should not be present", async() => {
     }
     expect(dwn).to.be.null;
 });
+
+
+// Scenario: Correct Subscription in Owned
+//     Then The subscription with a 2025 expiration date should be in owned
+Then("The subscription with a 2025 expiration date should be in owned", async function () {
+    let table = driver.findElement(webdriver.By.id('owned-subs'));
+    let rows = await table.findElements(webdriver.By.tagName('tr'));
+    let found = false
+    for (let row of rows) {
+        let tds = await row.findElements(webdriver.By.tagName('td'));
+        for (let td of tds) {
+            if((await td.getText()).includes("2025")) {
+                found = true
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    expect(found).to.equal(true)
+})
+
+// Scenario: Correct Subscription not in Access
+//     Then The subscription with a 2025 expiration date should not be in access
+
+Then("The subscription with a 2025 expiration date should not be in access", async function () {
+    let table = driver.findElement(webdriver.By.id('usable-subs'));
+    let rows = await table.findElements(webdriver.By.tagName('tr'));
+    let found = false
+    for (let row of rows) {
+        let tds = await row.findElements(webdriver.By.tagName('td'));
+        for (let td of tds) {
+            if((await td.getText()).includes("2025")) {
+                found = true
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    expect(found).to.equal(false)
+})
+
+// Scenario: Correct Subscription in Access
+//     Then The subscription with a 2042 expiration date should be in access
+
+Then("The subscription with a 2042 expiration date should be in access", async function () {
+    let table = driver.findElement(webdriver.By.id('usable-subs'));
+    let rows = await table.findElements(webdriver.By.tagName('tr'));
+    let found = false
+    for (let row of rows) {
+        let tds = await row.findElements(webdriver.By.tagName('td'));
+        for (let td of tds) {
+            if((await td.getText()).includes("2042")) {
+                found = true
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    expect(found).to.equal(true)
+})
+
+// Scenario: Correct Subscription not in Owned
+//     Then The subscription with a 2042 expiration date should not be in owned
+
+Then("The subscription with a 2042 expiration date should not be in owned", async function () {
+    let table = driver.findElement(webdriver.By.id('owned-subs'));
+    let rows = await table.findElements(webdriver.By.tagName('tr'));
+    let found = false
+    for (let row of rows) {
+        let tds = await row.findElements(webdriver.By.tagName('td'));
+        for (let td of tds) {
+            if((await td.getText()).includes("2042")) {
+                found = true
+                break;
+            }
+        }
+        if (found) {
+            break;
+        }
+    }
+    expect(found).to.equal(false)
+})

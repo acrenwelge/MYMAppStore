@@ -213,14 +213,12 @@ Given('toggles checkbox for a student listed without a subscription on', async f
     // driver.findElements(By.css("input[type=\'checkbox\']"))
     let box = await driver.findElement(webdriver.By.id('toggle-buy-18'))
     box = await box.findElement(webdriver.By.xpath('..'))
-    console.log(box)
     await box.click()
 })
 
 Then('the student is on purchase list.', async function () {
     driver = driverInstance.driver
     const localStorage = await driver.executeScript('return window.localStorage;');
-    console.log(localStorage)
     let sel_student_array = JSON.parse(localStorage['sel_student_array'])
     expect(sel_student_array[0]).to.equal(18)
 })
@@ -235,16 +233,77 @@ Given('toggles checkbox for a student listed without a subscription off', async 
     // driver.findElements(By.css("input[type=\'checkbox\']"))
     let box = await driver.findElement(webdriver.By.id('toggle-buy-18'))
     box = await box.findElement(webdriver.By.xpath('..'))
-    console.log(box)
     await box.click()
 })
 
 Then('the student is not on purchase list.', async function () {
     driver = driverInstance.driver
     const localStorage = await driver.executeScript('return window.localStorage;');
-    console.log(localStorage)
     let sel_student_array = JSON.parse(localStorage['sel_student_array'])
     expect(sel_student_array.length).to.equal(0)
+})
+
+// Scenario: Successfully Show No Student Information on Product Page
+//         And goes to Product Pricing Page
+//         Then no student information is shown.
+
+Then('no student information is shown.', async function () {
+    driver = driverInstance.driver
+    const elements = await driver.findElements(webdriver.By.id('student-info'))
+    expect(elements.length).to.equal(0)
+})
+
+// Scenario: Successfully Show No Student Information on Checkout Page
+//         And goes to checkout page
+//         Then no student information is shown.
+
+
+// Scenario: Successfully Show Student Information on Product Page
+//         And toggles checkbox for a student listed without a subscription on
+//         And goes to Product Pricing Page
+//         Then that student's information is shown.
+
+Then("that student's information is shown.", async function () {
+    driver = driverInstance.driver
+    const elements = await driver.findElements(webdriver.By.id('studentId_18'))
+    expect(elements.length).to.equal(1)
+})
+
+// Scenario: Successfully Show Student Information on Checkout Page
+//         And toggles checkbox for a student listed without a subscription on
+//         And goes to checkout page
+//         Then that student's information is shown.
+
+// Scenario: Quantity on Checkout Successfully Does Not Increment when Adding a Student
+//         And goes to Product Pricing Page
+//         And adds the subscription item to cart
+//         And goes to checkout page
+//         And records the quantity
+//         And goes to the class management page
+//         And toggles checkbox for a student listed without a subscription on
+//         And goes to checkout page
+//         Then the quantity should still be 1
+let old_quantity = 0
+Given('records the quantity', async function () {
+    driver = driverInstance.driver
+    const table = await driver.findElement(webdriver.By.id('cart-table'))
+    let quantity = await table.findElement(webdriver.By.xpath('//h:td[2]')).getText()
+    console.log("quantity = ", quantity)
+    old_quantity = quantity
+    console.log("old_quantity = ", old_quantity)
+})
+
+Given('goes to the class management page', async function () {
+    driver = driverInstance.driver
+    
+    await driver.get("http://localhost:3000/instructor/class")
+})
+
+Then(`the quantity should still be 1`, async function () {
+    driver = driverInstance.driver
+    const quantity = await driver.findElement(webdriver.By.id('1_quantity')).getText()
+    console.log("quantity = ", quantity)
+    expect(quantity).to.equal("1")
 })
 
 // Scenario: Successfully Purchase Subscription for Students
@@ -278,9 +337,14 @@ Given('buys the subscription', async function () {
     const container = await driver.wait(
         webdriver.until.elementLocated(webdriver.By.id("buttons-container")), 
         2000
-    );
+    )
     // let container = await driver.findElement(webdriver.By.xpath("div[@class='buttons-container']"))
-    await container.findElement(webdriver.By.xpath("//div[@role='link']")).click()
+    await driver.wait(
+        webdriver.until.elementLocated(
+            container.findElement(webdriver.By.xpath("//div[@role='link']"))
+        ),
+        2000
+    ).click()
     // const paypalButton = await driver.findElement(webdriver.By.id('paypal-button'));
     // await paypalButton.click();
     // Wait for the new window to appear or handle the redirect

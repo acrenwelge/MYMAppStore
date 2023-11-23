@@ -14,6 +14,18 @@ Scenario: Download Finance with Maple Book
     When I click on the download button 
     Then The PDF book should be downloaded
 
+Scenario: Correct Subscription in Owned
+    Then The subscription with a 2025 expiration date should be in owned
+
+Scenario: Correct Subscription not in Access
+    Then The subscription with a 2025 expiration date should not be in access
+
+Scenario: Correct Subscription in Access
+    Then The subscription with a 2042 expiration date should be in access
+
+Scenario: Correct Subscription not in Owned
+    Then The subscription with a 2042 expiration date should not be in owned
+
 Scenario: Download Option Not present for Other Subscriptions
     And There is a Book which is not Finance with Maple Subscription
     Then The download button should not be present 

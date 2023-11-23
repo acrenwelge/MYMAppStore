@@ -44,6 +44,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 			return item.quantity ? total + (item.finalPrice * item.quantity) : total + item.finalPrice;
 		}
 		const total = ctx.cart.reduce(sum, 0);
+		console.log("checkout, total = ", total)
 		setTotalPrice(total);
 		console.log("__FUNCTION__useEffect()")
 		console.log("\tctx.students =", ctx.students)
@@ -237,7 +238,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 			<>
 			{isInstructor && purchaseForStudentArray.length > 0 && (
 				<Container style={{ marginTop: 10, marginBottom: 30 }}>
-				<><div style={{ display: 'flex' }}>
+				<><div id='student-info' style={{ display: 'flex' }}>
 						<h1>Purchasing for Following Students</h1>
 					</div>
 						<div>
@@ -251,7 +252,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 								</Table.Header>
 								<Table.Body>
 									{purchaseForStudentArray.map(user => (
-										<Table.Row key={"studentId_" + user.id}>
+										<Table.Row id={"studentId_"+user.id} key={"studentId_" + user.id}>
 											<Table.Cell>{user.firstName}</Table.Cell>
 											<Table.Cell>{user.lastName}</Table.Cell>
 											<Table.Cell>{user.email}</Table.Cell>
@@ -264,7 +265,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 					</Container>)}
 			<Container>
 					<h1>Cart</h1>
-					<Table>
+					<Table id="cart-table">
 						<Table.Header>
 							<Table.Row>
 								<Table.HeaderCell width={4}>Product</Table.HeaderCell>
@@ -281,7 +282,7 @@ const Checkout: React.FC = (props): JSX.Element => {
 							{ctx.cart.map(item => (
 								<Table.Row key={item.itemId}>
 									<Table.Cell>{item.name}</Table.Cell>
-									<Table.Cell>{item.quantity}</Table.Cell>
+									<Table.Cell id={item.itemId+"_quantity"}>{item.quantity}</Table.Cell>
 									<Table.Cell>{item.subscriptionLengthMonths} months</Table.Cell>
 									<Table.Cell style={item.finalPrice !== item.price ? { "text-decoration": "line-through" } : null}>
 										${item.price.toFixed(2)}

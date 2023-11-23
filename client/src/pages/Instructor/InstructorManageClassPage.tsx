@@ -150,30 +150,28 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
     console.log(checkboxes)
     setCheckBoxStates(checkboxes)
     localStorage.setItem("selected_students", JSON.stringify(checkboxes))
-    console.log("\tstuArray =", stuArray)
+
     if (stuArray.includes(studentId)) {
       stuArray.splice(stuArray.indexOf(studentId), 1)
       const temp: CartItem[] = ctx.cart
-      console.log("cart = ", temp)
       for (let i = 0; i < temp.length; i++) {
         if (temp[i].quantity) {
           temp[i].quantity = temp[i].quantity! > 1 ? temp[i].quantity! - 1 : 1
         }
       }
-      console.log("cart = ", temp)
       ctx.setCart(temp)
 
     } else {
-      stuArray.push(studentId)
-      const temp: CartItem[] = ctx.cart
-      console.log("cart = ", temp)
-      for (let i = 0; i < temp.length; i++) {
-        if (temp[i].quantity) {
-          temp[i].quantity! += 1
+      if (stuArray.length != 0) {
+        const temp: CartItem[] = ctx.cart
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].quantity) {
+            temp[i].quantity! += 1
+          }
         }
+        ctx.setCart(temp)
       }
-      console.log("cart = ", temp)
-      ctx.setCart(temp)
+      stuArray.push(studentId)
     }
 
     ctx.setStudents(stuArray)

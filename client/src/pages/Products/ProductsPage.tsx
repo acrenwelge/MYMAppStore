@@ -107,7 +107,7 @@ const TextbookHeader = (): JSX.Element => {
 	return (
 		<Container style={{ marginTop: 10,marginBottom: 30 }}>
         {isInstructor && purchaseForStudentArray.length > 0 && (
-            <><div style={{ display: 'flex' }}>
+            <><div id='student-info' style={{ display: 'flex' }}>
                 <h1>Purchasing for Following Students</h1>
             </div>
             <div>
@@ -121,7 +121,7 @@ const TextbookHeader = (): JSX.Element => {
                     </Table.Header>
                     <Table.Body>
                         {purchaseForStudentArray.map(user => (
-                            <Table.Row key={"studentId_"+user.id}>
+                            <Table.Row id={"studentId_"+user.id} key={"studentId_"+user.id}>
                                 <Table.Cell>{user.firstName}</Table.Cell>
                                 <Table.Cell>{user.lastName}</Table.Cell>
                                 <Table.Cell>{user.email}</Table.Cell>
