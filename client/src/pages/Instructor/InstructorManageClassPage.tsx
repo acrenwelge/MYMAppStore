@@ -6,6 +6,8 @@ import { ToastContainer, toast } from "react-toastify";
 import { ExpandedUser, ExpandedClass } from "../../entities";
 import { localSignupApi } from "../../api/auth";
 import ApplicationContext from "../../context/application.context";
+import { CartItem } from "../../entities/product";
+
 
 interface Student {
   id: number;
@@ -151,8 +153,27 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
     console.log("\tstuArray =", stuArray)
     if (stuArray.includes(studentId)) {
       stuArray.splice(stuArray.indexOf(studentId), 1)
+      const temp: CartItem[] = ctx.cart
+      console.log("cart = ", temp)
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i].quantity) {
+          temp[i].quantity = temp[i].quantity! > 1 ? temp[i].quantity! - 1 : 1
+        }
+      }
+      console.log("cart = ", temp)
+      ctx.setCart(temp)
+
     } else {
       stuArray.push(studentId)
+      const temp: CartItem[] = ctx.cart
+      console.log("cart = ", temp)
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i].quantity) {
+          temp[i].quantity! += 1
+        }
+      }
+      console.log("cart = ", temp)
+      ctx.setCart(temp)
     }
 
     ctx.setStudents(stuArray)

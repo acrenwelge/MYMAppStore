@@ -25,10 +25,21 @@ export class SubscriptionService {
   }
 
   async findAllForOwner(user_id: number) {
-    return await this.subscriptionRepo.find({
+    const subs = await this.subscriptionRepo.find({
       relations: ["user", "item"],
       where: { owner: { userId: user_id } }
     });
+    console.log("in owner, subs = ", subs)
+    return subs
+  }
+
+  async findAllForUser(user_id: number) {
+    const subs = await this.subscriptionRepo.find({
+      relations: ["user", "item"],
+      where: { user: { userId: user_id } }
+    });
+    console.log("in user, subs = ", subs)
+    return subs
   }
 
   async findOne(id: number) {
@@ -60,7 +71,7 @@ export class SubscriptionService {
     } else { // no existing subscriptions for this user for this item
       const newSub = this.subscriptionRepo.create();
       newSub.item = <any> item.itemId;
-      newSub.user = <any> (recip != order.purchaserUserId ? recip : null)
+      newSub.user = <any> recip
       newSub.owner = <any> order.purchaserUserId
       newSub.expirationDate = this.addMonthsUtil(now, subscriptionLengthMonths);
       await this.subscriptionRepo.save(newSub);
@@ -83,15 +94,12 @@ export class SubscriptionService {
         if (recip === order.purchaserUserId) {
           // they purchase for themself, based off purchaserUserId
           console.log("\t\tself-purchase")
-          const subs: SubscriptionEntity[] = await this.findAllForOwner(order.purchaserUserId);
-          this.addExtendSubscriptionLogic(order, item, subs, order.purchaserUserId)
         } else {
           // they are purchasing for someone else, find based off hasAccess
           console.log("\t\tpurchase for someone else")
-          const subs: SubscriptionEntity[] = await this.findAllForOwner(recip);
-          console.log("subs = ", subs)
-          this.addExtendSubscriptionLogic(order, item, subs, recip)
         }
+        const subs: SubscriptionEntity[] = await this.findAllForOwner(recip);
+        this.addExtendSubscriptionLogic(order, item, subs, recip)
       }
     }
   }

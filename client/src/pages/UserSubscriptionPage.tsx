@@ -8,7 +8,7 @@ import {
     Loader, Dimmer, Button
 } from "semantic-ui-react";
 import { useHistory } from "react-router-dom";
-import { getUserSubscriptions } from "../api/user";
+import { getUserSubscriptions, getOwnerSubscriptions } from "../api/user";
 import { Subscription } from "../entities";
 
 interface localUser {
@@ -24,15 +24,30 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
         history.push('/');
         return null;
     }
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+    const [userSubscriptions, setUserSubscriptions] = useState<Subscription[]>([]);
+    const [ownedSubscriptions, setOwnedSubscriptions] = useState<Subscription[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         setLoading(true);
         getUserSubscriptions()
             .then(res => {
+                console.log("user res = ", res)
                 // conversion from string to date must be done manually
-                setSubscriptions(res.data.map((sub: Subscription) => {
+                setUserSubscriptions(res.data.map((sub: Subscription) => {
+                    sub.expirationDate = new Date(sub.expirationDate); 
+                    console.log("\t sub = ", sub)
+                    return sub
+                }));
+            })
+            .catch(error => {
+                console.error(error)
+            });
+        getOwnerSubscriptions()
+            .then(res => {
+                console.log("owner res = ", res)
+                // conversion from string to date must be done manually
+                setOwnedSubscriptions(res.data.map((sub: Subscription) => {
                     sub.expirationDate = new Date(sub.expirationDate); 
                     return sub
                 }));
@@ -69,19 +84,51 @@ const UserSubscriptionPage: React.FC = (props): JSX.Element | null => {
                                 <Loader inverted>Loading Subscriptions of {user.name}</Loader>
                             </Dimmer> : <div></div>
                             }
+                            <h1>Owned Subscriptions</h1>
+                            <h3>Subscriptions that you own and can change who has the ability to use it</h3>
                             <Table>
                                 <Table.Header>
                                     <Table.Row>
                                         <Table.HeaderCell>Item Name</Table.HeaderCell>
                                         <Table.HeaderCell>Expiration Date</Table.HeaderCell>
+                                        <Table.HeaderCell>Accessor Email</Table.HeaderCell>
+                                        <Table.HeaderCell>Accessor First Name</Table.HeaderCell>
+                                        <Table.HeaderCell>Accessor Last Name</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {ownedSubscriptions.map(sub => (
+                                        <Table.Row key={"owned_"+sub.subscriptionId}>
+                                            <Table.Cell>{sub.item.name}</Table.Cell>
+                                            <Table.Cell>{sub.expirationDate.toLocaleDateString()}</Table.Cell>
+                                            <Table.Cell>{sub.user.email}</Table.Cell>
+                                            <Table.Cell>{sub.user.firstName}</Table.Cell>
+                                            <Table.Cell>{sub.user.lastName}</Table.Cell>
+                                        </Table.Row>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                            <h1>Accessible Subscriptions</h1>
+                            <h3>Subscriptions that you may or may not own, but have access to (i.e., can use them to access the book)</h3>
+                            <Table>
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Item Name</Table.HeaderCell>
+                                        <Table.HeaderCell>Expiration Date</Table.HeaderCell>
+                                        <Table.HeaderCell>Owner Email</Table.HeaderCell>
+                                        <Table.HeaderCell>Owner First Name</Table.HeaderCell>
+                                        <Table.HeaderCell>Owner Last Name</Table.HeaderCell>
                                         <Table.HeaderCell colSpan = "2" textAlign="center">Operation</Table.HeaderCell>
                                     </Table.Row>
                                 </Table.Header>
                                 <Table.Body>
-                                    {subscriptions.map(sub => (
-                                        <Table.Row key={sub.id}>
+                                    {userSubscriptions.map(sub => (
+                                        <Table.Row key={"user_"+sub.subscriptionId}>
                                             <Table.Cell>{sub.item.name}</Table.Cell>
                                             <Table.Cell>{sub.expirationDate.toLocaleDateString()}</Table.Cell>
+                                            <Table.Cell>{sub.user.email}</Table.Cell>
+                                            <Table.Cell>{sub.user.firstName}</Table.Cell>
+                                            <Table.Cell>{sub.user.lastName}</Table.Cell>
                                             {
                                                 sub.item.name != "Finance with Maple" ?
                                                 <Table.Cell colSpan = "2" textAlign="center">
