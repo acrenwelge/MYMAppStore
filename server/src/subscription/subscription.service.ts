@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SubscriptionDto } from './subscription.dto';
 import { SubscriptionEntity } from './subscription.entity';
-import Cart, { PayPalOrderDetails } from 'src/payment/payment.entity';
-import { Subscription } from 'rxjs';
+import Cart from 'src/payment/payment.entity';
 import { ItemService } from 'src/item/item.service';
 
 @Injectable()
@@ -44,7 +43,7 @@ export class SubscriptionService {
     return date;
 }
 
-  async addExtendSubscriptionLogic(order: Cart, item, subs: SubscriptionEntity[], recip: number) {
+  private async addExtendSubscriptionLogic(order: Cart, item, subs: SubscriptionEntity[], recip: number) {
     const now = new Date(Date.now());
     const {subscriptionLengthMonths} = await this.itemService.findOne(item.itemId);
     const subsForItem = subs.filter(s => s.item.itemId === item.itemId);
@@ -102,9 +101,9 @@ export class SubscriptionService {
    */
   async userHasValidSubscription(user_id: number, item_id: number) {
     const allUserSubscriptions = await this.subscriptionRepo.find({
-      where: {user: {userId: user_id}, item: {itemId: item_id}}
+      where: {owner: {userId: user_id}, item: {itemId: item_id}}
     })
-    const now = new Date(Date.now())
+    const now = new Date(Date.now());
     return allUserSubscriptions.some(sub => sub.expirationDate > now)
   }
 

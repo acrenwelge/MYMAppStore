@@ -1,4 +1,4 @@
-import {Controller, Get, Request, Res, UseGuards} from '@nestjs/common';
+import {Controller, Get, Request, Res, Param, UseGuards} from '@nestjs/common';
 import {BookService} from "../book/book.service";
 import {JwtAuthGuard} from "../auth/guards/jwt-auth.guard";
 
@@ -9,12 +9,12 @@ export class BookController {
     constructor(private readonly bookService:BookService) {}
 
     @UseGuards(JwtAuthGuard)
-    @Get("read")
-    async read(@Request() req) {
+    @Get("read/:name")
+    async read(@Request() req, @Param("name") name: string) {
         const userId = req.user.user_id
         // TODO: differentiate between items instead of hard-coding
         const itemId = 1
-        const readValidation = await this.bookService.getBookURL(userId,itemId)
+        const readValidation = await this.bookService.getBookURL(userId,itemId,name)
         return {readValidation}
     }
 

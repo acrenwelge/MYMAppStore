@@ -69,7 +69,8 @@ describe('PaymentController', () => {
   it('should capture order', () => {
     const orderDetails:PayPalOrderDetails = {
       orderId: "1",
-      cart: cartData
+      cart: cartData,
+      recipientIds: [1]
     };
     const res = createResponse({});
     controller.capture(orderDetails, res);

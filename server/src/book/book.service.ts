@@ -1,7 +1,4 @@
 import {Controller, ForbiddenException, Get, Injectable, Res} from '@nestjs/common';
-import { Response } from 'express';
-import * as path from 'path';
-import * as fs from 'fs';
 import {SubscriptionService} from "../subscription/subscription.service";
 import {FreeSubscriptionService} from "../free-subscription/free-subscription.service";
 import { UserService } from 'src/user/user.service';
@@ -23,13 +20,28 @@ export class BookService {
     //    return fileContent
     // }
 
-    async getBookURL(userID: number, itemId: number) {
+    private getLink(name: string): string {
+        switch (name) {
+            case "Calculus 1":
+                return "/MYMACalc1/MContents.html";
+            case "Calculus 2":
+                return "/MYMACalc2/MContents.html";
+            case "Calculus 3":
+                return "/MYMACalc3/MContents.html";
+            case "Maplets for Calculus":
+                return "/M4C/MapletsForCalculus.html";
+            default:
+                return "";
+        }
+    }
+
+    async getBookURL(userID: number, itemId: number, itemName: string) {
         const user = await this.userService.findOneById(userID);
         const hasSubscription = await this.subscriptionService.userHasValidSubscription(userID, itemId);
         const hasFreeAccess = await this.freeSubsService.userEmailHasFreeSubscription(user.email);
         if (hasSubscription || hasFreeAccess || user.role == Roles.Admin) {
             return  {
-                bookURL: process.env.BOOK_ROOT_PATH,
+                bookURL: process.env.BOOK_ROOT_PATH + this.getLink(itemName),
                 hasSubscription: hasSubscription,
                 hasFreeAccess: hasFreeAccess,
             }
