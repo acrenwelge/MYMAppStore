@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {readBook} from "../../api/read";
-import { getUserSubscriptions } from "../../api/user";
-import { Subscription } from "../../entities";
 import {Container, Icon, Message} from "semantic-ui-react";
 
 interface IframeProps {
@@ -13,63 +11,14 @@ interface IframeProps {
     frameBorder?: number;
 }
 
-function getLink(name: string): string {
-	switch (name) {
-        case "Calculus":
-            return "";
-		case "MYMACalc1":
-			return "MYMACalc1" + "/MContents.html";
-		case "MYMACalc2":
-			return "MYMACalc2" + "/MContents.html";
-		case "MYMACalc3":
-			return "MYMACalc3" + "/MContents.html";
-		case "M4C":
-			return "M4C" + "/MapletsForCalculus.html";
-		default:
-			return "matthew";
-	}
-}
-
-
 const ReadBookPage: React.FC = (props): JSX.Element | null => {
     const [loading,setLoading] = useState<boolean>(false)
     const [src, setSrc] = useState<string|undefined>("");
 
-    const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
-
-    useEffect(() => {
-        getUserSubscriptions()
-            .then(res => {
-                // conversion from string to date must be done manually
-                setSubscriptions(res.data.map((sub: Subscription) => {
-                    sub.expirationDate = new Date(sub.expirationDate); 
-                    return sub
-                }));
-                setLoading(false)
-            })
-            .catch(error => {
-                console.error(error)
-                setLoading(false)
-            });
-    }, []);
-
-
     useEffect(()=> {
-        // setLoading(true);
-        // getUserSubscriptions()
-        // .then(res => {
-        //     // conversion from string to date must be done manually
-        //     setSubscriptions(res.data.map((sub: Subscription) => {
-        //         sub.expirationDate = new Date(sub.expirationDate); 
-        //         return sub
-        //     }));
-        //     setLoading(false)
-        // })
-        // .catch(error => {
-        //     console.error(error)
-        //     setLoading(false)
-        // });
-        readBook().then((res)=>{
+        const book = JSON.parse(localStorage.getItem('book') ?? 'null');
+        localStorage.removeItem('book');
+        readBook(book).then((res)=>{
             setSrc(res.data.readValidation.bookURL);
             setLoading(false);
         }).catch((error)=> {
