@@ -166,7 +166,6 @@ describe('UserService', () => {
 	it('should hash a password', async () => {
 		const plaintext = "123"
 		const res = await hash(plaintext, 10)
-		console.log(res)
 		expect(res).toHaveLength(60)
 	})
 

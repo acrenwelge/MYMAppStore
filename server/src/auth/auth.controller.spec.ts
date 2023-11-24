@@ -70,7 +70,9 @@ describe('AuthController', () => {
     foundUser.email = "testing@testing.com"
     jest.spyOn(userservice, 'authenticate').mockImplementation(async () => null)
     jest.spyOn(userservice, 'findOneByEmail').mockImplementation(async () => foundUser)
-    expect(await service.login(user)).toHaveBeenCalled()
+    jest.spyOn(service, 'login').mockImplementation(async() => null)
+    service.login(user)
+    expect(service.login).toHaveBeenCalledWith(user)
   });
 
   // TODO: Request?

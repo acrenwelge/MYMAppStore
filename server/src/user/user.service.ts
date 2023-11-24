@@ -36,13 +36,11 @@ export class UserService {
 	async localSignUp(userFromClient: UserDto): Promise<UserDto> {
 		const exists = await this.userRepo.exist({where: {email: userFromClient.email}})
 		if (exists) {
-			console.log(`User email address ${userFromClient.email} already exists`)
 			throw new ConflictException("User email address already exists")
 		}
 		const newUserToCreate = this.userRepo.create(userFromClient)
 		if (userFromClient.password) {
 			if(userFromClient.password.length < 12 || this.doesPasswordRepeat(userFromClient.password)) {
-				console.log('User password does not match requirements.')
 				throw new ConflictException("User password invalid")
 			}
 			const hashed = await hash(userFromClient.password, 10)
@@ -62,7 +60,6 @@ export class UserService {
 	 **/
 	async localSignUpForClass(createUsers: UserDto[]) {
 		const createResults: Promise<UserDto>[] = []
-		console.log(createUsers)
 		for (const newUser of createUsers) {
 			let res = this.localSignUp(newUser)
 			createResults.push(res)
@@ -78,8 +75,6 @@ export class UserService {
 		const email = loginUser.email
 		const password = loginUser.password
 		const user = await this.userRepo.findOne({ where:{email} });
-		console.log("hashed comparison value:",user.passwordHash)
-		console.log("password:",password)
 		const validCredentials = await compare(password, user.passwordHash)
 		if (!validCredentials) {
 			Promise.reject(new UnauthorizedException("Incorrect email or password"))
@@ -147,7 +142,6 @@ export class UserService {
 		if (user.password) {
 				const hashed = await hash(user.password, 10)
 				userToUpdate.passwordHash =  hashed
-				console.log(`new password set for user ${user.firstName} ${user.lastName} - ${hashed}`);
 		}
 		await this.userRepo.update(userToUpdate.userId,userToUpdate);
 		return userToUpdate

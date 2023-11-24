@@ -94,7 +94,6 @@ export class PurchaseCodeService {
    * @returns 
    */
   async update(name: string, code: PurchaseCodeDto): Promise<PurchaseCodeDto> {
-    console.log("updating purchase code:", code);
     const findCode = await this.purchaseCodeRepo.findOne({where: {name}});
     if (findCode === null) {
       throw new NotFoundException("Purchase code doesn't exist!");

@@ -19,7 +19,7 @@ export class PaymentService {
             const order = await paypal.createOrder(cart.grandTotal);
             res.json(order);
         } catch (err) {
-            console.log("__FUNCTION__createPaypalOrder err.message = ", err.message)
+            console.error("__FUNCTION__createPaypalOrder err.message = ", err.message)
             res.status(500).send(err.message);
         }
     }

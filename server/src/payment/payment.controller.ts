@@ -17,21 +17,15 @@ export class PaymentController {
     @Post('create-paypal-order')
     @HttpCode(HttpStatus.OK)
     async create(@Body() cartData: Cart, @Res() res: Response<PaypalCreateOrderResponse>) {
-        console.log('create-paypal-order', cartData);
         await this.paymentService.createPaypalOrder(cartData, res);
     }
     
     @Post('capture-paypal-order')
     @HttpCode(HttpStatus.OK)
     async capture(@Body() orderData: PayPalOrderDetails, @Res() res: Response) {
-        console.log("__FUNCTION__capture-paypal-order()")
         const result = await this.paymentService.captureAndRecordTx(orderData, res);
         if (result) {
-            console.log("__FUNCTION__capture-paypal-order()")
-            console.log("\tbefore addOrExtendSubs, recipientIds =", orderData.recipientIds)
             await this.subService.addOrExtendSubscriptions(orderData.cart, orderData.recipientIds);
-            console.log("\tafter addOrExtendSubs")
-            
         } else {
             console.error('Failed to capture payment');
         }

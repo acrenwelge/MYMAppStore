@@ -190,7 +190,7 @@ const AdminPaidSubscriptionPage: React.FC = (props): JSX.Element => {
                     </Table.Header>
                     <Table.Body id="subscriptionTable">
                         {sortedSubscriptions.map(sub => (
-                            <Table.Row key={sub.id} id="subscriptionTable">
+                            <Table.Row key={sub.subscriptionId} id="subscriptionTable">
                                 <Table.Cell>{sub.user.email}</Table.Cell>
                                 <Table.Cell>
                                     {sub.user.firstName} {sub.user.lastName}

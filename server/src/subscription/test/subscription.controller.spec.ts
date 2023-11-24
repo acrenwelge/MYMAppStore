@@ -73,6 +73,12 @@ describe('SubscriptionConstroller', () => {
     it('calling findAllForUser method', () => {
         const req = createRequest({user: { user_id: 1}});
         controller.findAllForUser(req);
+        expect(service.findAllForUser).toHaveBeenCalledWith(1);
+    });
+
+    it('calling findAllForOwner method', () => {
+        const req = createRequest({user: { user_id: 1}});
+        controller.findAllForOwner(req);
         expect(service.findAllForOwner).toHaveBeenCalledWith(1);
     });
     

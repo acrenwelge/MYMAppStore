@@ -38,7 +38,6 @@ export class ItemService {
   }
 
   async update(itemId: number, item: ItemDto): Promise<ItemDto> {
-    console.log("updating item:", item);
     const findItem = await this.ItemRepo.findOne({where: {itemId}});
     if (findItem === undefined) {
       throw new NotFoundException("Item doesn't exist!");

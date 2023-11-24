@@ -50,8 +50,6 @@ export class ClassService {
       where: {classId}
     })
     
-    console.log(classId)
-    console.log("classEntity = ", classEntity)
     let userEntity = await this.userRepo.findOne({
       relations: ['usingSubscriptions', 'usingSubscriptions.owner'],
       where: { email: studentEmail }
@@ -60,7 +58,6 @@ export class ClassService {
     if (!userEntity) {
       throw new Error(`No user with email ${studentEmail} found.`)
     }
-    console.log("userEntity.userId = ", userEntity.userId)
     classEntity.students.push(userEntity)
     return await this.classRepo.save(classEntity)
   }

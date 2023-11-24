@@ -22,19 +22,13 @@ export class SubscriptionController {
   @UseGuards(JwtAuthGuard)
   @Get('user')
   findAllForUser(@Request() req) {
-    console.log("in user subscription, req = ", req.user.user_id)
-    const res = this.subscriptionService.findAllForUser(req.user.user_id);
-    console.log(res)
-    return res
+    return this.subscriptionService.findAllForUser(req.user.user_id);
   }
   
   @UseGuards(JwtAuthGuard)
   @Get('owner')
   findAllForOwner(@Request() req) {
-    console.log("in owner subscription, req = ",  req.user.user_id)
-    const res = this.subscriptionService.findAllForOwner(req.user.user_id);
-    console.log(res)
-    return res
+    return this.subscriptionService.findAllForOwner(req.user.user_id);
   }
 
   @Get(':id')
