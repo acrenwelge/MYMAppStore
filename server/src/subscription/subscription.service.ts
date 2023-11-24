@@ -83,21 +83,10 @@ export class SubscriptionService {
    * @returns the updated or created subscription
    */
   async addOrExtendSubscriptions(order: Cart, recipientIds: number[]) {
-    console.log("\t__FUNCTION__addOrExtendSubscriptions")
-    console.log("\t\trecipientIds =", recipientIds)
     for (const item of order.items) {
       for (let i = 0; i < item.quantity; i++) {
         // get the next recipientId (item.quantity === recipientIds.length)
         const recip = recipientIds[i]
-        console.log("\t\trecip =", recip)
-        console.log("\t\tpurchaserUserId =", order.purchaserUserId)
-        if (recip === order.purchaserUserId) {
-          // they purchase for themself, based off purchaserUserId
-          console.log("\t\tself-purchase")
-        } else {
-          // they are purchasing for someone else, find based off hasAccess
-          console.log("\t\tpurchase for someone else")
-        }
         const subs: SubscriptionEntity[] = await this.findAllForOwner(recip);
         this.addExtendSubscriptionLogic(order, item, subs, recip)
       }

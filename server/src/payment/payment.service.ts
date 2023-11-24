@@ -15,12 +15,9 @@ export class PaymentService {
      */
     async createPaypalOrder(cart: Cart, res) {
         // TODO: validate purchase codes and grand total
-        console.log("__FUNCTION__createPaypalOrder")
         try {
-            console.log("__FUNCTION__createPaypalOrder in try")
             const order = await paypal.createOrder(cart.grandTotal);
             res.json(order);
-            console.log("__FUNCTION__createPaypalOrder, res = ", res)
         } catch (err) {
             console.log("__FUNCTION__createPaypalOrder err.message = ", err.message)
             res.status(500).send(err.message);
@@ -34,10 +31,8 @@ export class PaymentService {
      * @returns 
      */
     async captureAndRecordTx(orderData: PayPalOrderDetails, res): Promise<boolean> {
-        console.log('Record a payment for order:', orderData.orderId);
         try {
             const captureData = await paypal.capturePayment(orderData.orderId);
-            console.log('Capture data:', captureData);
             // now that the payment has been captured, record the transaction
             this.txService.createAndSaveFromPurchaseCart(orderData.cart);
             res.json(captureData);

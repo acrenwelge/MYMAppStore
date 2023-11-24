@@ -60,7 +60,7 @@ describe('PaymentController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should create oder', () => {
+  it('should create order', () => {
     const res = createResponse({});
     controller.create(cartData, res);
     expect(res.statusCode).toBe(200);
@@ -69,7 +69,8 @@ describe('PaymentController', () => {
   it('should capture order', () => {
     const orderDetails:PayPalOrderDetails = {
       orderId: "1",
-      cart: cartData
+      cart: cartData,
+      recipientIds: [10]
     };
     const res = createResponse({});
     controller.capture(orderDetails, res);
