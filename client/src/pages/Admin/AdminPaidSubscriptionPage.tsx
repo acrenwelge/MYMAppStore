@@ -188,9 +188,9 @@ const AdminPaidSubscriptionPage: React.FC = (props): JSX.Element => {
                             >End Date</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
-                    <Table.Body>
+                    <Table.Body id="subscriptionTable">
                         {sortedSubscriptions.map(sub => (
-                            <Table.Row key={sub.id}>
+                            <Table.Row key={sub.id} id="subscriptionTable">
                                 <Table.Cell>{sub.user.email}</Table.Cell>
                                 <Table.Cell>
                                     {sub.user.firstName} {sub.user.lastName}

@@ -69,7 +69,7 @@ Given("user is in the product page", async () => {
 When("the user searches for a product",  async () => {
     driver = driverInstance.driver
 
-    driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/div[2]/input`)).sendKeys("Text");
+    driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div/div[2]/input`)).sendKeys("2");
 
     await driver.sleep(1 * 1000);
 });
@@ -83,7 +83,7 @@ Then("only the searched products appear", async () => {
     for (const row of rows) {
         const cells = await row.findElements(webdriver.By.xpath(".//td"));
 
-        const searchKeyword = "text"
+        const searchKeyword = "2"
 
         productName = await cells[0].getText();
         

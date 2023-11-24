@@ -255,17 +255,19 @@ const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
                             <Table.HeaderCell>Operation</Table.HeaderCell>
                         </Table.Row>
                     </Table.Header>
-                    <Table.Body id="freeSubTable">
+                    <Table.Body id="suffixTable">
                         {sortedFreeSubs.map(sub => (
-                            <Table.Row key={sub.email_sub_id} id="freeSubRow">
+                            <Table.Row key={sub.email_sub_id} id="suffixRow">
                                 <Table.Cell>{sub.suffix}</Table.Cell>
                                 <Table.Cell>
                                     <Button primary basic
+                                            id="editButton"
                                             onClick={() => handleEditOpen(sub)}
                                     >
                                         EDIT
                                     </Button>
                                     <Button negative basic loading={buttonLoading}
+                                            id="deleteButton"
                                             onClick={() => handleDelete(sub)}
                                     >
                                         DELETE
@@ -300,6 +302,7 @@ const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
                         Cancel
                     </Button>
                     <Button
+                        id="addButton"
                         content="Add"
                         onClick={handleAdd}
                         positive
@@ -332,6 +335,7 @@ const AdminFreeSubscriptionPage: React.FC = (props): JSX.Element => {
                         Cancel
                     </Button>
                     <Button
+                        id="saveButton"
                         content="Save"
                         onClick={handleEdit}
                         positive
