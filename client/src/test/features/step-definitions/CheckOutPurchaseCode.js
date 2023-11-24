@@ -6,35 +6,62 @@ var { setDefaultTimeout } = require("@cucumber/cucumber");
 const exp = require("constants");
 const driverInstance = require('./WebDriver');
 
-Given("I am on the checkout page", async () => {
+// Background:
+//     Given user is logged in
+//     And has an item in the cart
+//     And is on the checkout page
+
+Given("user is logged in", async function () {
 	driver = driverInstance.driver
     
-	await driver.get("http://localhost:3000/checkout/0");
-	await driver.sleep(6 * 1000);
+    // log in using a premade instructor account
+    // this instructor account has a class with at least one student
+    await driver.get('http://localhost:3000/login')
+    await driver.findElement(webdriver.By.id("email")).sendKeys('test@test.com')
+    await driver.findElement(webdriver.By.id("password")).sendKeys('password')
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
+    await driver.sleep(500)
+})
+
+Given("has an item in the cart", async function () {
+	driver = driverInstance.driver
+    await driver.get('http://localhost:3000/products')
+	const addBtn = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.id('add-to-cart-1')),
+		2000
+	)
+	await addBtn.click()
+	
+})
+
+Given("is on the checkout page", async () => {
+	driver = driverInstance.driver
+	const toCheckoutBtn = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.xpath("//a[@class='ui green button']")),
+		2000
+	)
+	await toCheckoutBtn.click()
 });
 
 
 When("I enter a valid purchase code",  async () => {
 	driver = driverInstance.driver
-    
-	//driver.findElement(webdriver.By.id("purchasecode")).sendKeys("FUCKGIT");
-	//await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/table/tbody/tr/td[4]/div/input`)).sendKeys("FUCKGIT");
-	//*[@id="root"]/div/main/div/table/tbody/tr/td[4]/div/input
-	driver.findElement(webdriver.By.id("purchasecode")).sendKeys("FUCKGIT");
-	//let temp = await driver.findElement(webdriver.By.className("ui input"));
-	//let temp = await driver.findElement(webdriver.By.tagName("li"));
-	//await temp.findElement(webdriver.By.name("purchasecode")).sendKeys("FUCKGIT");
-	//List<WebElement> elements = driver.findElements(By.tagName("input"));
-	//*[@id="root"]/div/main/div/table/tbody/tr/td[4]/div/input
-	await driver.sleep(3 * 1000);
+	const pcField = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.id("purchasecode")),
+		2000
+	)
+	await pcField.sendKeys("free");
 });
 
 
 When("I click the apply button", async () => {
 	driver = driverInstance.driver
     
-	await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/table/tbody/tr/td[5]/button`)).click();
-	await driver.sleep(6 * 1000);
+	const applyBtn = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.className(`ui small positive button`)),
+		2000
+	)
+	await applyBtn.click()
 });
 
 
@@ -42,8 +69,11 @@ When("I click the apply button", async () => {
 // Then the purchase code should be applied and the discount should be reflected in the total amount to be paid
 Then("the purchase code should be applied", async () => {
 	driver = driverInstance.driver
-    
-	let successMsg = await driver.findElement(webdriver.By.className("ui success message")).getText();
+    const successToast = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.className("ui success message")),
+		2000
+	)
+	const successMsg = await successToast.getText();
 	expect(successMsg).to.contains("SUCCESS");
 });
 
@@ -52,24 +82,17 @@ Then("the purchase code should be applied", async () => {
 // Then an error message should be displayed, indicating that the purchase code is invalid
 When("I enter an invalid purchase code",  async () => {
 	driver = driverInstance.driver
-    
-	//driver.findElement(webdriver.By.id("purchasecode")).sendKeys("FUCKGIT");
-	//await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/table/tbody/tr/td[4]/div/input`)).sendKeys("FUCKGIT");
-	//*[@id="root"]/div/main/div/table/tbody/tr/td[4]/div/input
-	driver.findElement(webdriver.By.id("purchasecode")).sendKeys("duyun");
-	//let temp = await driver.findElement(webdriver.By.className("ui input"));
-	//let temp = await driver.findElement(webdriver.By.tagName("li"));
-	//await temp.findElement(webdriver.By.name("purchasecode")).sendKeys("FUCKGIT");
-	//List<WebElement> elements = driver.findElements(By.tagName("input"));
-	//*[@id="root"]/div/main/div/table/tbody/tr/td[4]/div/input
-	await driver.sleep(3 * 1000);
+	await driver.findElement(webdriver.By.id("purchasecode")).sendKeys("duyun");
 });
 
 
 Then("an error message should be displayed", async () => {
-	driver = driverInstance.driver
-    
-	let successMsg = await driver.findElement(webdriver.By.className("ui error message")).getText();
+    driver = driverInstance.driver
+    const successToast = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.className("ui error message")),
+		2000
+	)
+	const successMsg = await successToast.getText();
 	expect(successMsg).to.contains("ERROR");
 });
 

@@ -35,9 +35,13 @@ update class set instructor_id=7 where class_id=2;
 
 -- Item init
 insert into item (item_id, name, price, subscriptionLengthMonths) values (1, 'textbook', 60, 6);
+insert into item (item_id, name, price, subscriptionLengthMonths) values (2, 'Finance with Maple', 60, 12);
 
 -- Subscription init
 insert into subscription (subscription_id, expirationDate, item_id, owner_id, user_id) values (1, '2024-11-08 18:35:01', 1, 26, 26);
+insert into subscription (subscription_id, expirationDate, item_id, owner_id, user_id) values (2, '2030-11-08 18:35:01', 2, 26, 26);
+insert into subscription (subscription_id, expirationDate, item_id, owner_id, user_id) values (3, '2025-11-08 18:35:01', 1, 26, 1);
+insert into subscription (subscription_id, expirationDate, item_id, owner_id, user_id) values (4, '2042-11-08 18:35:01', 1, 1, 26);
 
 
 -- Purchase Code init

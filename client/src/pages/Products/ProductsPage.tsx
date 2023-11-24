@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useState,useEffect, useContext } from "react";
 import {
     Container,
@@ -7,19 +8,35 @@ import {
     Dimmer, Loader
 } from "semantic-ui-react";
 import { getAllProductData } from "../../api/admin";
+import { getUserInfoById } from "../../api/user"
 import { Product } from "../../entities";
+import { User } from "../../entities";
+
 import ApplicationContext from "../../context/application.context";
 import { ToastContainer, toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import { CartItem } from "../../entities/product";
 
+interface Student {
+    id: number,
+    firstName: string;
+    lastName: string;
+    email: string;
+  }
+
 const TextbookHeader = (): JSX.Element => {
     const [productData, setproductData] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isInstructor, setIsInstructor] = React.useState<boolean>(true)
+    const [purchaseForStudentArray, setPurchaseForStudentArray] = React.useState<Student[]>([]);
     const ctx = useContext(ApplicationContext);
 
     useEffect(() => {
+        checkIsInstructor();
         setLoading(true);
+            if (isInstructor) {
+                getInstrStudentInfo()
+            }
             getAllProductData()
             .then(res => {
                 setproductData(res.data);
@@ -30,6 +47,38 @@ const TextbookHeader = (): JSX.Element => {
                 setLoading(false)
             });
     }, []);
+
+    const checkIsInstructor = () => {
+        const user = JSON.parse(localStorage.getItem('user') ?? 'null')
+        setIsInstructor(user.role.toLowerCase() === 'instructor')
+      }
+
+    const pruneStudentData = (user:any):Student => {
+        console.log("\tuser = ", user)
+        return {
+            id: user.userId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email
+        }
+    }
+
+    const getInstrStudentInfo = () => {
+        (async function () {
+            // @ts-ignore
+            const stuArray = localStorage.getItem("sel_student_array") == null ? [] : JSON.parse(localStorage.getItem("sel_student_array"))
+            ctx.setStudents(stuArray)
+            
+            return await Promise.all(stuArray.map((id:number) => getUserInfoById(id)))
+        })()
+        .then(res => {
+            const stuInfo: Student[] = res.map(userPromise => pruneStudentData(userPromise.data))
+            setPurchaseForStudentArray(stuInfo)
+        })
+        .catch(error => {
+            console.log("Error in getting student info:", error)
+        })
+    }
 
     const addItemToCart = (product: Product) => {
         if (ctx.cart.find(item => item.itemId === product.itemId)) {
@@ -57,6 +106,32 @@ const TextbookHeader = (): JSX.Element => {
 
 	return (
 		<Container style={{ marginTop: 10,marginBottom: 30 }}>
+        {isInstructor && purchaseForStudentArray.length > 0 && (
+            <><div id='student-info' style={{ display: 'flex' }}>
+                <h1>Purchasing for Following Students</h1>
+            </div>
+            <div>
+                <Table>
+                    <Table.Header>
+                    <Table.Row>
+                        <Table.HeaderCell>First Name</Table.HeaderCell>
+                        <Table.HeaderCell>Last Name</Table.HeaderCell>
+                        <Table.HeaderCell>Email</Table.HeaderCell>
+                    </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {purchaseForStudentArray.map(user => (
+                            <Table.Row id={"studentId_"+user.id} key={"studentId_"+user.id}>
+                                <Table.Cell>{user.firstName}</Table.Cell>
+                                <Table.Cell>{user.lastName}</Table.Cell>
+                                <Table.Cell>{user.email}</Table.Cell>
+                            </Table.Row>
+                        ))}
+                    </Table.Body>
+                </Table>
+            </div>
+            </>
+        )}
         <div style = {{display:'flex'}}>
             <h1>Products</h1>
             <a href="https://mymathapps.com/mymacalc-sample" style={{ marginBottom: 10, marginLeft: 'auto' }}>

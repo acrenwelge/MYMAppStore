@@ -116,9 +116,9 @@ const NavMenu: React.FC = (): JSX.Element => {
 				<Menu.Item fitted position="right">
 					{ctx.user ? <Menu.Item as={Link} to="/subscriptions">My Subscriptions</Menu.Item> : null}
 					{ctx.user?.role === "admin" ?
-						<Menu.Item as={Link} to="/admin/user">Admin</Menu.Item> : null}
+						<Menu.Item id="admin-link" as={Link} to="/admin/user">Admin</Menu.Item> : null}
 					{ctx.user?.role === "instructor" ?
-						<Menu.Item as={Link} to="/instructor/class">Manage Class</Menu.Item>: null}
+						<Menu.Item id="class-mng-link" as={Link} to="/instructor/class">Manage Class</Menu.Item>: null}
 					<Cart />
 					{ctx.user ? <Profile /> : <LoginSignUp />}
 				</Menu.Item>

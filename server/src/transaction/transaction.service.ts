@@ -31,7 +31,6 @@ export class TransactionService {
    * @returns 
    */
   async createAndSaveFromPurchaseCart(cart: Cart) {
-    console.log("__FUNCTION__createAndSaveFromPurchaseCart()")
     let txDetails: TransactionDetailEntity[] = [];
     for (const purchasedItem of cart.items) {
       let detail = this.txDetailRepo.create();
@@ -42,7 +41,6 @@ export class TransactionService {
       if (purchasedItem.purchaseCode) {
         detail.purchaseCode = <any> purchasedItem.purchaseCode
       }
-      console.log("\tdetail = ", detail)
       txDetails.push(detail)
     }
     // assign fields and save

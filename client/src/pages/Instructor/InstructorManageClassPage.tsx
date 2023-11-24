@@ -6,6 +6,8 @@ import { ToastContainer, toast } from "react-toastify";
 import { ExpandedUser, ExpandedClass } from "../../entities";
 import { localSignupApi } from "../../api/auth";
 import ApplicationContext from "../../context/application.context";
+import { CartItem } from "../../entities/product";
+
 
 interface Student {
   id: number;
@@ -148,10 +150,27 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
     console.log(checkboxes)
     setCheckBoxStates(checkboxes)
     localStorage.setItem("selected_students", JSON.stringify(checkboxes))
-    console.log("\tstuArray =", stuArray)
+
     if (stuArray.includes(studentId)) {
       stuArray.splice(stuArray.indexOf(studentId), 1)
+      const temp: CartItem[] = ctx.cart
+      for (let i = 0; i < temp.length; i++) {
+        if (temp[i].quantity) {
+          temp[i].quantity = temp[i].quantity! > 1 ? temp[i].quantity! - 1 : 1
+        }
+      }
+      ctx.setCart(temp)
+
     } else {
+      if (stuArray.length != 0) {
+        const temp: CartItem[] = ctx.cart
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i].quantity) {
+            temp[i].quantity! += 1
+          }
+        }
+        ctx.setCart(temp)
+      }
       stuArray.push(studentId)
     }
 
