@@ -11,7 +11,7 @@ export class AuthService {
     ) {}
 
     async validateUserByEmail(email: string, hash: string): Promise<any> {
-        const user = await this.userService.findOneByEmail(email);
+        const user = await this.userService.findOneByEmail(email)
         if (user && user.passwordHash === hash) {
             return user
         }
@@ -20,7 +20,7 @@ export class AuthService {
 
     async login(user: UserDto) {
         console.log("logging in user:",user)
-        const userEntity = await this.userService.findOneByEmail(user.email);
+        const userEntity = await this.userService.findOneByEmail(user.email)
         const payload = {email: userEntity.email, sub: userEntity.userId, role: userEntity.role}
         return {
             user: userEntity,

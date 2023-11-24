@@ -152,7 +152,7 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 				/>
 				<Form.Input
 					error={
-						formState.confirmPasswordError ? { content: "Password must be at least 8 characters", pointing: "below" } : false
+						formState.confirmPasswordError ? { content: "Password must be at least 12 characters", pointing: "below" } : false
 					}
 					id="password"
 					label="Password"
@@ -161,7 +161,7 @@ const UserInfoForm: React.FC = (props): JSX.Element => {
 						console.log(data.value);
 						formStateDispatch({
 							type: "PASSWORD_ERROR",
-							payload: data.value.length != 0 && data.value.length < 8
+							payload: data.value.length != 0 && data.value.length < 12
 						});
 						setFormValues({ ...formValues, password: data.value });
 					}}

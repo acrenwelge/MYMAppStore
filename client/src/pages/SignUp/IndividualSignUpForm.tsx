@@ -27,6 +27,9 @@ type FormActionState = {
 };
 
 const formStateReducer = (state: FormActionState, action: FormAction): FormActionState => {
+	console.log(action.type)
+	console.log(action.payload)
+	console.log(state)
 	switch (action.type) {
 		case "CONFIRM_EMAIL_ERROR":
 			return { ...state, confirmEmailError: action.payload as boolean };
@@ -160,7 +163,7 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 				/>
 				<Form.Input
 					error={
-						formState.confirmPasswordError ? { content: "Password must be at least 8 characters", pointing: "below" } : false
+						formState.confirmPasswordError ? { content: "Password must be at least 12 characters and may not have have a sequence of 4 or more characters repeat", pointing: "below" } : false
 					}
 					id="password"
 					label="Password"
@@ -169,7 +172,7 @@ const IndividualSignUpForm: React.FC = (props): JSX.Element => {
 						console.log(data.value);
 						formStateDispatch({
 							type: "PASSWORD_ERROR",
-							payload: data.value.length < 8
+							payload: data.value.length < 12
 						});
 						setFormValues({ ...formValues, password: data.value });
 					}}
