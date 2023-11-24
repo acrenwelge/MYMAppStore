@@ -44,7 +44,7 @@ Then("login must be successful.", async () => {
 //Scenario 2: Unsuccessful Login with Invalid Password
 Then("unsuccessful login due to an invalid password.", async () => {
     driver = driverInstance.driver
-    
+    await driver.sleep(1500)
 	let errorMsg = await driver.findElement(webdriver.By.className("ui error message")).getText();
 	expect(errorMsg).to.equal("Incorrect email or password. Please ensure your email and password are correct and try again.");
 });
@@ -54,8 +54,9 @@ Then("unsuccessful login due to an invalid password.", async () => {
 //js Find element , 找到页面上面的元素
 Then("unsuccessful login due to an invalid email.", async () => {
     driver = driverInstance.driver
-    
-	let errorMsg = await driver.findElement(webdriver.By.className("ui error message")).getText();
+    await driver.sleep(500)
+	let errorMsg = await driver.findElement(webdriver.By.className("ui error message"))
+    errorMsg = await errorMsg.findElement(webdriver.By.xpath('./div/p')).getText()
 	expect(errorMsg).to.equal("Incorrect email or password. Please ensure your email and password are correct and try again.");
 });
 

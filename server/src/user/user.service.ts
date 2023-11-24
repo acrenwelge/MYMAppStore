@@ -75,9 +75,13 @@ export class UserService {
 		const email = loginUser.email
 		const password = loginUser.password
 		const user = await this.userRepo.findOne({ where:{email} });
+		console.log("in authenticate")
+		console.log(user.passwordHash)
+		console.log(password)
 		const validCredentials = await compare(password, user.passwordHash)
 		if (!validCredentials) {
-			Promise.reject(new UnauthorizedException("Incorrect email or password"))
+			throw new UnauthorizedException("Incorrect email or password. Please ensure your email and password are correct and try again.")
+			// Promise.reject(new UnauthorizedException("Incorrect email or password"))
 		}
 		return user
 	}
