@@ -14,36 +14,49 @@ Given("user is logged in as admin", async () => {
  	await driver.sleep(3 * 1000);
 
 	driver.findElement(webdriver.By.id("email")).sendKeys('ncc@me.com');
-	driver.findElement(webdriver.By.id("password")).sendKeys('ncc');
-	await driver.sleep(6 * 1000);
+	driver.findElement(webdriver.By.id("password")).sendKeys('password');
+	await driver.sleep(1 * 1000);
 	
 	await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click();
- 	await driver.sleep(6 * 1000);
-	
-	//navigate to admin:
-	await driver.get("http://localhost:3000/admin");
-	await driver.sleep(3 * 1000);
-	//setTimeout(myFunction, 10000);
+ 	await driver.sleep(3 * 1000);
 });
 
 When("go to purchase code page url", async () => {
 	driver = driverInstance.driver
-    
-    //driver.findElement(webdriver.By.id("email")).sendKeys("yushuang@me.com");
-    //driver.findElement(webdriver.By.id("password")).sendKeys("yushuang");
-	//await driver.sleep(6 * 1000);
-	await driver.get("http://localhost:3000/admin/purchase-code");
-    await driver.sleep(3 * 1000);
-	
+	const adminBtn = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.id(`admin-link`)),
+		2000
+	)
+	await adminBtn.click()
+	const pcBtn = await driver.wait(
+		webdriver.until.elementLocated(webdriver.By.id(`admin-pc`)),
+		2000
+	)
+	await pcBtn.click()
+    await driver.sleep(2 * 1000)
 });
 
 
 When("type in valid purchase code", async () => {
 	driver = driverInstance.driver
+
+	const button = await driver.findElement(webdriver.By.id("addNewButton"))
+	button.click()
     
-    driver.findElement(webdriver.By.id("name")).sendKeys("20percentoff");
-	driver.findElement(webdriver.By.id("priceOff")).sendKeys("20");
-	await driver.sleep(3 * 1000);
+	const nameField = await driver.wait(
+        webdriver.until.elementLocated(webdriver.By.id("name")), 
+        2000
+    )
+	await nameField.sendKeys("20percentoff")
+	const offField = await driver.wait(
+        webdriver.until.elementLocated(webdriver.By.id("priceOff")), 
+        2000
+    )
+	await offField.sendKeys("20")
+
+    // driver.findElement(webdriver.By.id("name")).sendKeys("20percentoff");
+	// driver.findElement(webdriver.By.id("priceOff")).sendKeys("20");
+	// await driver.sleep(1 * 1000);
 	
 });
 
@@ -52,14 +65,22 @@ When("click the add button", async () => {
     
     //driver.findElement(webdriver.By.id("name")).sendKeys(randomName);
     //await driver.sleep(3 * 1000);
-	await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/form/button`)).click();
- 	await driver.sleep(6 * 1000);
+	const addBtn = await driver.wait(
+        webdriver.until.elementLocated(webdriver.By.id("addButton")), 
+        2000
+    )
+	addBtn.click()
+	// await driver.findElement(webdriver.By.id('addButton')).click();
+ 	// await driver.sleep(6 * 1000);
 });
 
 Then("the purchase code should be added in", async () => {
 	driver = driverInstance.driver
-
-	let successMsg = await driver.findElement(webdriver.By.className("ui success message")).getText();
+	const successToast = await driver.wait(
+        webdriver.until.elementLocated(webdriver.By.className("ui success message")), 
+        2000
+    )
+	let successMsg = await successToast.getText();
     expect(successMsg).to.contains("SUCCESS");
 
 	/*

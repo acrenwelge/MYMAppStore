@@ -16,7 +16,7 @@ Given("user is logged in on test arunim account", async() => {
     await driver.findElement(webdriver.By.id("password")).sendKeys("arunimsamudra@gmail.com");
     await driver.sleep(1 * 1000);
 
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click();
+    await driver.findElement(webdriver.By.className(`ui green fluid button`)).click();
     await driver.sleep(1 * 1000);
 });
 

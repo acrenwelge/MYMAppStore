@@ -11,12 +11,10 @@ Given('user is logged in as instructor', async function () {
     // log in using a premade instructor account
     // this instructor account has a class with at least one student
     await driver.get('http://localhost:3000/login')
- 	await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.id("email")).sendKeys('test@test.com')
     await driver.findElement(webdriver.By.id("password")).sendKeys('password')
-    await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
-    await driver.sleep(1 * 1000)
+    await driver.sleep(500)
 })
 
 When('not accessing an item', async function () {
@@ -24,14 +22,14 @@ When('not accessing an item', async function () {
     
     // not accessing an item, so navigate to root
     await driver.get("http://localhost:3000/")
-	await driver.sleep(3 * 1000)
+    await driver.sleep(2000)
 })
 
 When('go to the class management url', async function () {
     driver = driverInstance.driver
     
     await driver.get("http://localhost:3000/instructor/class")
-	await driver.sleep(1 * 1000)
+    await driver.sleep(2000)
 })
 
 Then('the user should be at class management page with their class information displayed.', async function () {
@@ -53,12 +51,10 @@ Given('user is not logged in as instructor', async function () {
     
     // log in using a premade user account
     await driver.get('http://localhost:3000/login')
- 	await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.id("email")).sendKeys('stutest@test.com')
     await driver.findElement(webdriver.By.id("password")).sendKeys('password')
-    await driver.sleep(1 * 1000)
     await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/form/button`)).click()
-    await driver.sleep(1 * 1000)
+    await driver.sleep(500)
 })
 
 Then('the user will not see any class data.', async function () {
@@ -77,7 +73,7 @@ When('user is at the class management page', async function () {
     driver = driverInstance.driver
     
     await driver.get("http://localhost:3000/instructor/class")
-	await driver.sleep(1 * 1000)
+	await driver.sleep(2000)
     let array = await driver.findElements(webdriver.By.id('instructor-class-table-row'))
     initialNumberOfRows = array.length
 })
@@ -287,23 +283,76 @@ let old_quantity = 0
 Given('records the quantity', async function () {
     driver = driverInstance.driver
     const table = await driver.findElement(webdriver.By.id('cart-table'))
-    let quantity = await table.findElement(webdriver.By.xpath('//h:td[2]')).getText()
-    console.log("quantity = ", quantity)
+    let ele = await table.findElement(webdriver.By.xpath('.//tr[1]//td[2]'))
+    const quantity = await ele.getText()
     old_quantity = quantity
-    console.log("old_quantity = ", old_quantity)
 })
 
 Given('goes to the class management page', async function () {
     driver = driverInstance.driver
     
-    await driver.get("http://localhost:3000/instructor/class")
+    // await driver.get("http://localhost:3000/instructor/class")
+    // have to do it this way since cart is not stored in local storage, just in app context.
+    // So, using the get() refreshes the context and deletes the cart info
+    await driver.findElement(webdriver.By.id("class-mng-link")).click()
+    await driver.sleep(3000)
 })
 
 Then(`the quantity should still be 1`, async function () {
     driver = driverInstance.driver
-    const quantity = await driver.findElement(webdriver.By.id('1_quantity')).getText()
-    console.log("quantity = ", quantity)
+    const table = await driver.findElement(webdriver.By.id('cart-table'))
+    let ele = await table.findElement(webdriver.By.xpath('.//tr[1]//td[2]'))
+    const quantity = await ele.getText()
     expect(quantity).to.equal("1")
+})
+
+// Scenario: Quantity on Checkout Successfully Does Increment when Adding a Student
+//         And toggles checkbox for a student listed without a subscription on
+//         And goes to Product Pricing Page
+//         And adds the subscription item to cart
+//         And goes to checkout page
+//         And records the quantity
+//         And goes to the class management page
+//         And toggles checkbox for another student listed without a subscription on
+//         And goes to checkout page
+//         Then the quantity should be 2 from 1
+
+Given('toggles checkbox for another student listed without a subscription on', async function () {
+    driver = driverInstance.driver
+    // driver.findElements(By.css("input[type=\'checkbox\']"))
+    let box = await driver.findElement(webdriver.By.id('toggle-buy-19'))
+    box = await box.findElement(webdriver.By.xpath('..'))
+    await box.click()
+})
+
+Then(`the quantity should be 2 from 1`, async function () {
+    driver = driverInstance.driver
+    const table = await driver.findElement(webdriver.By.id('cart-table'))
+    let ele = await table.findElement(webdriver.By.xpath('.//tr[1]//td[2]'))
+    const quantity = await ele.getText()
+    expect(quantity).to.equal("2")
+    expect(old_quantity).to.equal("1")
+})
+
+//     Scenario: Quantity on Checkout Successfully Decrements when Removing a Student
+//         And toggles checkbox for a student listed without a subscription on
+//         And toggles checkbox for another student listed without a subscription on
+//         And goes to Product Pricing Page
+//         And adds the subscription item to cart
+//         And goes to checkout page
+//         And records the quantity
+//         And goes to the class management page
+//         And toggles checkbox for a student listed without a subscription off
+//         And goes to checkout page
+//         Then the quantity should be 1 from 2
+
+Then(`the quantity should be 1 from 2`, async function () {
+    driver = driverInstance.driver
+    const table = await driver.findElement(webdriver.By.id('cart-table'))
+    let ele = await table.findElement(webdriver.By.xpath('.//tr[1]//td[2]'))
+    const quantity = await ele.getText()
+    expect(quantity).to.equal("1")
+    expect(old_quantity).to.equal("2")
 })
 
 // Scenario: Successfully Purchase Subscription for Students
@@ -318,6 +367,7 @@ Then(`the quantity should still be 1`, async function () {
 Given('goes to Product Pricing Page', async function () {
     driver = driverInstance.driver
     await driver.get('http://localhost:3000/products')
+    await driver.sleep(3000)
 })
 
 Given('adds the subscription item to cart', async function () {
@@ -329,7 +379,7 @@ Given('adds the subscription item to cart', async function () {
 Given('goes to checkout page', async function () {
     driver = driverInstance.driver
     await driver.findElement(webdriver.By.xpath("//a[@class='ui green button']")).click()
-    await driver.sleep(2000)
+    await driver.sleep(3000)
 })
 
 Given('buys the subscription', async function () {
@@ -374,6 +424,7 @@ Given('buys the subscription', async function () {
 Given('goes to Manage Class page', async function () {
     driver = driverInstance.driver
     await driver.get("http://localhost:3000/instructor/class")
+    await driver.sleep(2000)
 })
 
 Then('the instructor now owns the student\'s subscription', async function () {
