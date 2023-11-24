@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Menu, Dropdown } from "semantic-ui-react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import ApplicationContext from "../../context/application.context";
 import Cart from "./Cart";
 import Profile from "./Profile";
@@ -8,31 +8,9 @@ import LoginSignUp from "./LoginSignUp";
 import { getUserSubscriptions } from "../../api/user";
 import { Subscription } from "../../entities";
 
-function renderSwitch(param: string) {
-	switch(param) {
-		case 'Calculus':
-			return <Dropdown className="link item" pointing="left" text="Calculus">
-						<Dropdown.Menu>
-							<Dropdown.Item as={Link} to="/read">
-								{"Calculus 1"}
-							</Dropdown.Item>
-							<Dropdown.Item as={Link} to="/read">
-								{"Calculus 2"}
-							</Dropdown.Item>
-							<Dropdown.Item as={Link} to="/read">
-								{"Calculus 3"}
-							</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>;
-		default:
-			return <Dropdown.Item as={Link} to="/read">
-						{param}
-					</Dropdown.Item>
-	}
-  }
-
 const NavMenu: React.FC = (): JSX.Element => {
 	const ctx = useContext(ApplicationContext);
+	const history = useHistory()
     const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -59,6 +37,33 @@ const NavMenu: React.FC = (): JSX.Element => {
 		})
 	}
 
+	function renderSwitch(param: string) {
+		switch(param) {
+			case 'Calculus':
+				return <Dropdown className="link item" pointing="left" text="Calculus">
+							<Dropdown.Menu>
+								<Dropdown.Item as={Link} to="/read" onClick={() => readBook("Calculus 1")}>
+									{"Calculus 1"}
+								</Dropdown.Item>
+								<Dropdown.Item as={Link} to="/read" onClick={() => readBook("Calculus 2")}>
+									{"Calculus 2"}
+								</Dropdown.Item>
+								<Dropdown.Item as={Link} to="/read" onClick={() => readBook("Calculus 3")}>
+									{"Calculus 3"}
+								</Dropdown.Item>
+							</Dropdown.Menu>
+						</Dropdown>;
+			default:
+				return <Dropdown.Item as={Link} to="/read" onClick={() => readBook(param)}>
+							{param}
+						</Dropdown.Item>
+		}
+	}
+
+	const readBook = (book: string) => {
+		localStorage.setItem("book", JSON.stringify(book));
+        history.push('/read')
+    }
 
 	return (
 		<nav>

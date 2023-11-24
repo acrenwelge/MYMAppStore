@@ -103,8 +103,7 @@ describe('PaymentService', () => {
   it('should not create a transaction from purchase data after payment', async () => {
     const orderDetails:PayPalOrderDetails = {
       orderId: "1",
-      cart: cartData,
-      recipientIds: [10]
+      cart: cartData
     };
     const res = createResponse({});
     const result = new TransactionEntity();

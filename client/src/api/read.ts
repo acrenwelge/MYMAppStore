@@ -1,9 +1,9 @@
 import { request } from "./baseRequest"
 
-export function readBook():Promise<any> {
+export function readBook(name: string):Promise<any> {
     return request({
         method: 'get',
-        url: `api/book/read`,
+        url: `api/book/read/${name}`,
     })
 }
 

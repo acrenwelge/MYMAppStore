@@ -4,7 +4,6 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { AuthGuard } from '@nestjs/passport';
 import { NeedRole } from 'src/roles/roles.decorator';
 import { Roles } from 'src/roles/role.enum';
-import { PurchaseCodeDto } from './purchaseCode.dto';
 
 @UseGuards(AuthGuard('jwt'),RolesGuard)
 @NeedRole(Roles.Admin)
