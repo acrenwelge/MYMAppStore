@@ -57,7 +57,7 @@ Given("user is in the transaction page", async () => {
     await driver.sleep(1 * 1000);
 
     // Go to Admin Page
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/nav/div/div[2]/a[2]`)).click();    
+    await driver.findElement(webdriver.By.id("adminButton")).click();    
     await driver.sleep(1 * 1000);
 
     // Go to Transaction Page

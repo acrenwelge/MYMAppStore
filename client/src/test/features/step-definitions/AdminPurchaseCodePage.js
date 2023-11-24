@@ -58,7 +58,7 @@ Given("user is in the purchase code page", async () => {
     await driver.sleep(1 * 1000);
 
     // Go to Admin Page
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/nav/div/div[2]/a[2]`)).click();    
+    await driver.findElement(webdriver.By.id("adminButton")).click();    
     await driver.sleep(1 * 1000);
 
     // Go to Purchase Code Page
@@ -136,7 +136,7 @@ Then("the table will show the added purchase code",  async () => {
       codeProduct = await cells[1].getText();
       codePercentOff = await cells[2].getText();
 
-      if(codeName == "test" && codeProduct == "Textbook - 6 months" && codePercentOff == "50%") {
+      if(codeName == "test" && codeProduct == "Calculus 1 - 6 months" && codePercentOff == "50%") {
         codePresent = true;
         codeRowNumber = rowNumber;
         break;
@@ -191,7 +191,7 @@ Then("the table will show the edited purchase code",  async () => {
     codeProduct = await cells[1].getText();
     codePercentOff = await cells[2].getText();
 
-    if(codeName != "test 2" || codeProduct != "Textbook - 6 months" || codePercentOff != "25%") {
+    if(codeName != "test 2" || codeProduct != "Calculus 1 - 6 months" || codePercentOff != "25%") {
         expect.fail(null, null, "Expected purchase code in not in Table");
     }
 
@@ -225,7 +225,7 @@ Then("the table will not show the purchase code",  async () => {
       codeProduct = await cells[1].getText();
       codePercentOff = await cells[2].getText();
 
-      if(codeName == "test 2" && codeProduct == "Textbook - 6 months" && codePercentOff == "25%") {
+      if(codeName == "test 2" && codeProduct == "Calculus 1 - 6 months" && codePercentOff == "25%") {
         expect.fail(null, null, "Expected purchase code in Table");
       }
     }

@@ -20,16 +20,17 @@ export class SubscriptionService {
   }
 
   async findAll() {
-    return await this.subscriptionRepo.find({relations: ["user", "item"]});
+    const subscriptions = await this.subscriptionRepo.find({
+      relations: ["user", "item", "owner"]
+    });
+    return subscriptions
   }
 
   async findAllForOwner(user_id: number) {
-    const subs = await this.subscriptionRepo.find({
-      relations: ["user", "item"],
+    return await this.subscriptionRepo.find({
+      relations: ["user", "item", "owner"],
       where: { owner: { userId: user_id } }
     });
-    console.log("in owner, subs = ", subs)
-    return subs
   }
 
   async findAllForUser(user_id: number) {

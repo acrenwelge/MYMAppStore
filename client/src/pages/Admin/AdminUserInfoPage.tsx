@@ -260,6 +260,7 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
 
     return (
       <AdminBasePage>
+        <h1>Manage Users</h1>
         <div style={{height:'80vh',overflowY:'auto'}}>
           {loading==true?<Dimmer active inverted>
             <Loader inverted>Loading User</Loader>

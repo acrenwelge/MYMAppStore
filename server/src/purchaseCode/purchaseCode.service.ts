@@ -14,7 +14,7 @@ export class PurchaseCodeService {
       @InjectRepository(ItemEntity) private itemRepo: Repository<ItemEntity>,
   ) {}
 
-  private convertToDto(purchaseCode: PurchaseCodeEntity): PurchaseCodeDto {
+  convertToDto(purchaseCode: PurchaseCodeEntity): PurchaseCodeDto {
     let res = new PurchaseCodeDto();
     res.name = purchaseCode.name;
     res.item = {
@@ -65,7 +65,7 @@ export class PurchaseCodeService {
       await this.purchaseCodeRepo.remove(findCode);
       return Promise.resolve(true);
     } else {
-      Promise.reject(new NotFoundException("Purchase code doesn't exist!"));
+      throw new NotFoundException("Purchase code doesn't exist!"); 
     }
   }
 
@@ -83,7 +83,7 @@ export class PurchaseCodeService {
     if (findCode != null && findCode.item.itemId === itemId) {
       return Promise.resolve(this.convertToDto(findCode));
     } else {
-      return Promise.reject("Purchase code doesn't exist!");
+      throw new NotFoundException("Purchase code Item doesn't exist!"); 
     }
   }
 

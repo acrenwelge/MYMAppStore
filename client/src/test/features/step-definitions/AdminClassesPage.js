@@ -5,23 +5,23 @@ const webdriver = require("selenium-webdriver");
 var { setDefaultTimeout } = require("@cucumber/cucumber");
 const driverInstance = require('./WebDriver');
 
-When("the user goes to the user page",  async () => {
+When("the user goes to the class page",  async () => {
     driver = driverInstance.driver
 
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[1]/div/div/a[1]`)).click();
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[1]/div/div/a[2]`)).click();
     await driver.sleep(1 * 1000);
 });
 
-Then("the user should be at user page", async () => {
+Then("the user should be at class page", async () => {
     driver = driverInstance.driver
 
     let curURL =  await driver.getCurrentUrl();
-    expect(curURL).to.equal("http://localhost:3000/admin/user");
+    expect(curURL).to.equal("http://localhost:3000/admin/class");
 
     await driver.sleep(1 * 1000);
 });
 
-Then("the user should see user info", async () => {
+Then("the user should see class info", async () => {
     driver = driverInstance.driver
     
     let tablebody = await driver.findElements(webdriver.By.tagName("td"));
@@ -34,14 +34,14 @@ Then("the user should see user info", async () => {
     await driver.sleep(1 * 1000);
 });
 
-When("the user goes to the user url",  async () => {
+When("the user goes to the class url",  async () => {
     driver = driverInstance.driver
 
-    await driver.get("http://localhost:3000/admin/user");
+    await driver.get("http://localhost:3000/admin/class");
     await driver.sleep(1 * 1000);
 });
 
-Given("user is in the user page", async () => {
+Given("user is in the class page", async () => {
     driver = driverInstance.driver
     
     // Login
@@ -63,29 +63,29 @@ Given("user is in the user page", async () => {
     await driver.findElement(webdriver.By.id("adminButton")).click();    
     await driver.sleep(1 * 1000);
 
-    // Go to Transaction Page
-    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[1]/div/div/a[1]`)).click();
+    // Go to Class Page
+    await driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[1]/div/div/a[2]`)).click();
     await driver.sleep(1 * 1000);
 });
 
-When("the user searches for a user",  async () => {
+When("the user searches for a class",  async () => {
     driver = driverInstance.driver
 
-    driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/div[3]/input`)).sendKeys("admin");
+    driver.findElement(webdriver.By.xpath(`//*[@id="root"]/div/main/div/div/div/div[2]/div[1]/div[3]/input`)).sendKeys("nikhil");
 
     await driver.sleep(1 * 1000);
 });
 
-Then("only the searched users appear", async () => {
+Then("only the searched classes appear", async () => {
     driver = driverInstance.driver
     
-    const table = await driver.findElement(webdriver.By.id("userTable"));
-    const rows = await table.findElements(webdriver.By.id("userRow"));
+    const table = await driver.findElement(webdriver.By.id("classTable"));
+    const rows = await table.findElements(webdriver.By.id("classRow"));
 
     for (const row of rows) {
         const cells = await row.findElements(webdriver.By.xpath(".//td"));
 
-        const searchKeyword = "admin"
+        const searchKeyword = "nikhil"
 
         firstName = await cells[1].getText();
         lastName = await cells[2].getText();

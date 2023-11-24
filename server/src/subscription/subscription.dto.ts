@@ -14,4 +14,7 @@ export class SubscriptionDto {
 
   @ApiProperty()
   user: UserDto;
+
+  @ApiProperty()
+  owner: UserDto;
 }

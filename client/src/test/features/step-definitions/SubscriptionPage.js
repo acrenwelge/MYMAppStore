@@ -9,12 +9,12 @@ let ele, dwn;
 Given("user is logged in on test arunim account", async() => {
     driver = driverInstance.driver;
 
-    await driver.get("http://localhost:3000/login");
-    await driver.sleep(1 * 1000);
+    // await driver.get("http://localhost:3000/login");
+    // await driver.sleep(1 * 1000);
 
-    await driver.findElement(webdriver.By.id("email")).sendKeys("arunimsamudra@gmail.com");
-    await driver.findElement(webdriver.By.id("password")).sendKeys("arunimsamudra@gmail.com");
-    await driver.sleep(1 * 1000);
+    // await driver.findElement(webdriver.By.id("email")).sendKeys("arunimsamudra@gmail.com");
+    // await driver.findElement(webdriver.By.id("password")).sendKeys("arunimsamudra@gmail.com");
+    // await driver.sleep(1 * 1000);
 
     await driver.findElement(webdriver.By.className(`ui green fluid button`)).click();
     await driver.sleep(1 * 1000);
