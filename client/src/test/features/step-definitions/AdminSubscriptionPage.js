@@ -48,7 +48,7 @@ Given("user is in the subscription page", async () => {
     await driver.get("http://localhost:3000/login");
     await driver.sleep(1 * 1000);
 
-    driver.findElement(webdriver.By.id("email")).sendKeys("admin@admin.com");
+    driver.findElement(webdriver.By.id("email")).sendKeys("administrator@admin.com");
     driver.findElement(webdriver.By.id("password")).sendKeys("admin@admin.com");
     await driver.sleep(1 * 1000);
 
