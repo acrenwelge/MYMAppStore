@@ -71,6 +71,13 @@ The application is built using React, Node.js, Express, and MySQL. Both front an
 2. yarn test
    
 ### Before running the Cucumber tests, some test data must be inserted into the database. Copy the init.sql file into the Docker container, run it, then run the tests.
+1. Navigate to the directory that the `init.sql` file is in (this should be the root directory of the project)
+2. Use this command to copy the file `docker cp ./init.sql container_id:/tmp/init.sql`
+3. Ensure the container is running and log in to the mysql on the container
+   - This can be done either through the CLI or docker desktop
+   - `mysql -u <database root username> -p`
+4. `source init.sql;`
+5. You should now be good to run the tests, note that this must be done each time the cucumber tests are run.
 
 ### Cucumber tests
 1. cd ./client
