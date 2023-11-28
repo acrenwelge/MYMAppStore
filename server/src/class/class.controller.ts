@@ -5,6 +5,11 @@ import {ClassService} from "./class.service";
 export class ClassController {
   constructor(private readonly classService: ClassService) {}
 
+  @Post("new/:instructorId")
+  async createClass(@Param("instructorId") instructorId: number) {
+    return this.classService.createNewClass(instructorId)
+  }
+
   @Get()
   async getAllClasses() {
     return this.classService.getAllClasses();

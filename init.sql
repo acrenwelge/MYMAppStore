@@ -9,6 +9,8 @@ INSERT INTO class (class_id, instructor_id) VALUES(102, NULL);
 INSERT INTO class (class_id, instructor_id) VALUES(101, NULL);
 
 -- User init
+insert into user (user_id, firstName, lastName, email_address, user_pw_hash, activated_account, role) values (100, 'no_class_yet', 'instr', 'noclasstest@test.com', '$2b$10$VUWIypuXOA0ADxsPIUjwAumK9wWtIan3rKU2Zc9Wko9QiG9lnyFXK', 1, 'instructor');
+
 insert into user (user_id, firstName, lastName, email_address, user_pw_hash, activated_account, role) values (1, 'insert_test', 'instr', 'test@test.com', '$2b$10$VUWIypuXOA0ADxsPIUjwAumK9wWtIan3rKU2Zc9Wko9QiG9lnyFXK', 1, 'instructor');
 insert into user (user_id, firstName, lastName, email_address, user_pw_hash, activated_account, role, class_id) values (2, 'stu', 'test1', 'stutest@test.com', '$2b$10$VUWIypuXOA0ADxsPIUjwAumK9wWtIan3rKU2Zc9Wko9QiG9lnyFXK', 1, 'user', NULL);
 insert into user (user_id, firstName, lastName, email_address, user_pw_hash, activated_account, role, class_id) values (3, 'stu', 'test2', 'stutest2@test.com', '$2b$10$VUWIypuXOA0ADxsPIUjwAumK9wWtIan3rKU2Zc9Wko9QiG9lnyFXK', 1, 'user', 1);

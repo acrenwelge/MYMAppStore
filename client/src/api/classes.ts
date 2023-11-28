@@ -4,6 +4,13 @@ import { ExpandedClass } from "../entities"
 //import User from "../entities/user"
 import { request } from "./baseRequest"
 
+export function createClass(instructorId: number): Promise<AxiosResponse<ExpandedClass>> {
+    return request({
+        method: 'POST',
+        url: `api/classes/new/${instructorId}`
+    })
+}
+
 export function getClasses(): Promise<AxiosResponse<Class[]>> {
     return request({
         method: 'GET',

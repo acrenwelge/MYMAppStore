@@ -20,6 +20,7 @@ export class ClassService {
       const instructor = await this.userRepo.findOne({where: {userId: instructorId}})
       newClass.instructor = instructor
     }
+    console.log(newClass)
     return await this.classRepo.save(newClass)
   }
 

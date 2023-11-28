@@ -32,6 +32,11 @@ describe('ClassController', () => {
     expect(controller).toBeDefined();
   });
 
+  it('calling createClass method', () => {
+    controller.createClass(1)
+    expect(service.createNewClass).toHaveBeenCalledWith(1)
+  });
+
   it('calling getAllClasses method', () => {
     controller.getAllClasses()
     expect(service.getAllClasses).toHaveBeenCalled()

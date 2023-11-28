@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import React, { useEffect, useContext } from "react";
 import { Button, Checkbox, CheckboxProps, Container, Form, Grid, GridColumn, Header, Input, Table } from "semantic-ui-react";
-import { getClassByInstructor, addStudentToClassByEmail, removeStudentFromClass } from "../../api/classes";
+import { getClassByInstructor, addStudentToClassByEmail, removeStudentFromClass, createClass } from "../../api/classes";
 import { ToastContainer, toast } from "react-toastify";
 import { ExpandedUser, ExpandedClass } from "../../entities";
 import { localSignupApi } from "../../api/auth";
@@ -43,6 +43,8 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
   const [newStudent, setNewStudent] = React.useState<NewStudent>({firstName: "", lastName: "", email: ""})
   const [addExistingStudentEmail, setExistingStudentEmail] = React.useState("")
   const [isInstructor, setIsInstructor] = React.useState<boolean>(true)
+  const [hasClass, setHasClass] = React.useState<boolean>(false)
+  const [instrId, setInstructorId] = React.useState<number>(-1)
   const [checkBoxStates, setCheckBoxStates] = React.useState<{[key:number]:boolean}>
   //@ts-ignore
                 (localStorage.getItem("selected_students") == null ? {} : JSON.parse(localStorage.getItem!("selected_students")))
@@ -76,14 +78,19 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
       const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
       console.log(instructor)
       const instructorId = instructor.userId
+      setInstructorId(instructorId)
       getClassByInstructor(instructorId)
         .then(res => {
-          // THERE'S AN ERROR WHERE IF THE INSTRUCTOR TRIES TO ADD THEIR OWN EMAIL, THIS ALL BREAKS
-          const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructorId));
-          setClassData({id: res.data.classId, students: students});
-          localStorage.setItem("current_students", JSON.stringify(students.map(stu => stu.id)))
-          console.log("LOADCLASS(), CLASSDATA SET")
-          // if (isEmpty(checkBoxStates)) {
+          console.log(res.data)
+          if (!res.data) {
+            setHasClass(false)
+          } else {
+            setHasClass(true)
+            // THERE'S AN ERROR WHERE IF THE INSTRUCTOR TRIES TO ADD THEIR OWN EMAIL, THIS ALL BREAKS
+            const students: Student[] = res.data.students.map(u => transformUserToStudent(u, instructorId));
+            setClassData({id: res.data.classId, students: students});
+            localStorage.setItem("current_students", JSON.stringify(students.map(stu => stu.id)))
+            console.log("LOADCLASS(), CLASSDATA SET")
             const checkboxes: {[key:number]:boolean} = {}
             console.log("\tstudents =", students)
             for (const student of students) {
@@ -98,11 +105,11 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
             console.log("\tcheckboxes = ", checkboxes)
             localStorage.setItem("selected_students", JSON.stringify(checkboxes))
             setCheckBoxStates(checkboxes)
-          // }
-
-          console.log("END OF LOADCLASS(), CHECKBOXES DONE")
-          if (students.length === 0) {
-            toast.warning("No students found in class");
+  
+            console.log("END OF LOADCLASS(), CHECKBOXES DONE")
+            if (students.length === 0) {
+              toast.warning("No students found in class");
+            }
           }
         }).catch(err => {
           console.log(err);
@@ -136,6 +143,22 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
         console.log(err)
         toast.error("Failed to remove student")
       });
+  }
+
+  const createNewClass = (instructorId: number) => {
+    const instructor = JSON.parse(localStorage.getItem('user') ?? 'null')
+    createClass(instructorId)
+      .then(res => {
+        if (res.data) {
+          setHasClass(true)
+          toast.success("Class created!")
+        } else {
+          toast.error("Failed to create new class")
+        }
+      }).catch(err => {
+        console.log(err)
+        toast.error("Failed to create new class")
+      })
   }
 
   const purchaseItems = (studentId: number) => (event: React.FormEvent<HTMLInputElement>, data: CheckboxProps) => {
@@ -229,82 +252,94 @@ const InstructorManageClassPage: React.FC = (props): JSX.Element | null => {
 
 
   if (isInstructor) {
-    return (
-      <Container name="valid-instructor" className="container-fluid" style={{padding: "2"}}>
-        <Grid>
-            <Grid.Row>
-                <GridColumn>
-                    <Header as="h1">Manage Class</Header>
-                    <Table className="student-grid" sortable>
-                      <Table.Header>
-                          <Table.Row>
-                              <Table.HeaderCell>First Name</Table.HeaderCell>
-                              <Table.HeaderCell>Last Name</Table.HeaderCell>
-                              <Table.HeaderCell>Email</Table.HeaderCell>
-                              <Table.HeaderCell>Has Active Subscription</Table.HeaderCell>
-                              <Table.HeaderCell>You Own Their Subscription</Table.HeaderCell>
-                              <Table.HeaderCell>Action</Table.HeaderCell>
-                          </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {classData.students.map(student => (
-                            <Table.Row id="instructor-class-table-row" key={student.id}>
-                              <Table.Cell>{student.firstName}</Table.Cell>
-                              <Table.Cell>{student.lastName}</Table.Cell>
-                              <Table.Cell id="instructor-class-table-cell-email">{student.email}</Table.Cell>
-                              <Table.Cell id="instructor-class-table-cell-has_subscription">{(student.hasSubscription).toString().toUpperCase()}</Table.Cell>
-                              <Table.Cell id={"instructor-class-table-cell-instr_owns-"+student.id}>{(student.instructorOwnsSub).toString().toUpperCase()} </Table.Cell>
-                              <Table.Cell id="action-cell">
-                                <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
-                                {/* <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button> */}
-                                {/* @ts-ignore */}
-                                <Checkbox id={"toggle-buy-"+student.id} checked={checkBoxStates[student.id]} onChange={purchaseItems(student.id)} inputprops={{ 'aria-label': 'controlled' }}/>
-                                {/* Add Student to Purchase List */}
-                              </Table.Cell>
+    if (hasClass) {
+      return (
+        <Container name="valid-instructor" className="container-fluid" style={{padding: "2"}}>
+          <Grid>
+              <Grid.Row>
+                  <GridColumn>
+                      <Header as="h1">Manage Class</Header>
+                      <Table className="student-grid" sortable>
+                        <Table.Header>
+                            <Table.Row>
+                                <Table.HeaderCell>First Name</Table.HeaderCell>
+                                <Table.HeaderCell>Last Name</Table.HeaderCell>
+                                <Table.HeaderCell>Email</Table.HeaderCell>
+                                <Table.HeaderCell>Has Active Subscription</Table.HeaderCell>
+                                <Table.HeaderCell>You Own Their Subscription</Table.HeaderCell>
+                                <Table.HeaderCell>Action</Table.HeaderCell>
                             </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
+                        </Table.Header>
+                        <Table.Body>
+                          {classData.students.map(student => (
+                              <Table.Row id="instructor-class-table-row" key={student.id}>
+                                <Table.Cell>{student.firstName}</Table.Cell>
+                                <Table.Cell>{student.lastName}</Table.Cell>
+                                <Table.Cell id="instructor-class-table-cell-email">{student.email}</Table.Cell>
+                                <Table.Cell id="instructor-class-table-cell-has_subscription">{(student.hasSubscription).toString().toUpperCase()}</Table.Cell>
+                                <Table.Cell id={"instructor-class-table-cell-instr_owns-"+student.id}>{(student.instructorOwnsSub).toString().toUpperCase()} </Table.Cell>
+                                <Table.Cell id="action-cell">
+                                  <Button compact id="remove-student" color="red" onClick={() => removeStudent(student.id)}>Remove Student</Button>
+                                  {/* <Button compact color="blue" onClick={() => purchaseItems(student.id)}>Purchase Items For</Button> */}
+                                  {/* @ts-ignore */}
+                                  <Checkbox id={"toggle-buy-"+student.id} checked={checkBoxStates[student.id]} onChange={purchaseItems(student.id)} inputprops={{ 'aria-label': 'controlled' }}/>
+                                  {/* Add Student to Purchase List */}
+                                </Table.Cell>
+                              </Table.Row>
+                          ))}
+                        </Table.Body>
+                      </Table>
+                  </GridColumn>
+              </Grid.Row>
+              <Grid.Row>
+                <GridColumn>
+                  <h3>Add Existing User as Student</h3>
+                  <p>If your student already has an account, enter their email below and we will add them to your class.</p>
+                  <Form>
+                    <Form.Field width={6}>
+                    <Input placeholder="jsmith123@email.com" id="existing-email" type="email" label="Email"
+                    value={addExistingStudentEmail} onChange={(e) => setExistingStudentEmail(e.target.value)}/>
+                    </Form.Field>
+                    <Button compact id="existing-add" color="green" onClick={() => addExistingUserAsStudent()}>Add Student</Button>
+                  </Form>
                 </GridColumn>
-            </Grid.Row>
-            <Grid.Row>
-              <GridColumn>
-                <h3>Add Existing User as Student</h3>
-                <p>If your student already has an account, enter their email below and we will add them to your class.</p>
-                <Form>
-                  <Form.Field width={6}>
-                  <Input placeholder="jsmith123@email.com" id="existing-email" type="email" label="Email"
-                  value={addExistingStudentEmail} onChange={(e) => setExistingStudentEmail(e.target.value)}/>
-                  </Form.Field>
-                  <Button compact id="existing-add" color="green" onClick={() => addExistingUserAsStudent()}>Add Student</Button>
-                </Form>
-              </GridColumn>
-            </Grid.Row>
-            <Grid.Row>
-              <GridColumn>
-                <h3>Add New User as Student</h3>
-                <p>If your student does not have an account, enter their information below and we will create an account for them and add them to your class automatically.</p>
-                <Form>
-                  <Form.Field width={5}>
-                  <Input placeholder="John" type="text" label="First Name" id="new-first-name"
-                  value={newStudent.firstName} onChange={(e) => handleInputChange('firstName',e.target.value)}/>
-                  </Form.Field>
-                  <Form.Field width={5}>
-                  <Input placeholder="Smith" type="text" label="Last Name" id="new-last-name"
-                  value={newStudent.lastName} onChange={(e) => handleInputChange('lastName',e.target.value)}/>
-                  </Form.Field>
-                  <Form.Field width={6}>
-                  <Input placeholder="jsmith123@email.com" type="email" label="Email" id="new-email"
-                  value={newStudent.email} onChange={(e) => handleInputChange('email',e.target.value)}/>
-                  </Form.Field>
-                  <Button compact id="new-add" color="green" onClick={() => addNewUserAsStudent()}>Add Student</Button>
-                </Form>
-              </GridColumn>
-            </Grid.Row>
-        </Grid>
-        <ToastContainer />
-      </Container>
-    )
+              </Grid.Row>
+              <Grid.Row>
+                <GridColumn>
+                  <h3>Add New User as Student</h3>
+                  <p>If your student does not have an account, enter their information below and we will create an account for them and add them to your class automatically.</p>
+                  <Form>
+                    <Form.Field width={5}>
+                    <Input placeholder="John" type="text" label="First Name" id="new-first-name"
+                    value={newStudent.firstName} onChange={(e) => handleInputChange('firstName',e.target.value)}/>
+                    </Form.Field>
+                    <Form.Field width={5}>
+                    <Input placeholder="Smith" type="text" label="Last Name" id="new-last-name"
+                    value={newStudent.lastName} onChange={(e) => handleInputChange('lastName',e.target.value)}/>
+                    </Form.Field>
+                    <Form.Field width={6}>
+                    <Input placeholder="jsmith123@email.com" type="email" label="Email" id="new-email"
+                    value={newStudent.email} onChange={(e) => handleInputChange('email',e.target.value)}/>
+                    </Form.Field>
+                    <Button compact id="new-add" color="green" onClick={() => addNewUserAsStudent()}>Add Student</Button>
+                  </Form>
+                </GridColumn>
+              </Grid.Row>
+          </Grid>
+          <ToastContainer />
+        </Container>
+      )
+    } else {
+      return (
+        <Container name="not-instructor" style={{padding: "2"}}>
+          <div id="no-class-found">
+            You currently have no class. Click the button below to create one!
+          </div>
+          <Button compact id="create-class" color="green" onClick={() => createNewClass(instrId)}>Create Class</Button>
+        </Container>
+
+      )
+    }
   } else {
     return (
     <Container name="not-instructor" style={{padding: "2"}}>
