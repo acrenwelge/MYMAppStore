@@ -48,15 +48,18 @@ Scenario: Successful sorting admin in user page
     Given user is in the user page
     When the user selects the category "Admin" to sort
     Then the table will only have rows where column number 4 is true
-    When the user selects the category "Admin" to sort
-    Then the table will only have rows where column number 4 is false
+
+Scenario: Successful sorting instructor in user page
+    Given user is in the user page
+    When the user selects the category "Instructor" to sort
+    Then the table will only have rows where column number 5 is true
 
 Scenario: Successful sorting activated in user page
     Given user is in the user page
     When the user selects the category "Activated" to sort
-    Then the table will only have rows where column number 5 is true
+    Then the table will only have rows where column number 6 is true
     When the user selects the category "Activated" to sort
-    Then the table will only have rows where column number 5 is false
+    Then the table will only have rows where column number 6 is false
 
 Scenario: Failed accessing user page as general user
     Given user is in home page

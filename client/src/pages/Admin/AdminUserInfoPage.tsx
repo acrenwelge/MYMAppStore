@@ -133,10 +133,15 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
                             ...state,
                             filterActivated: state.filterActivated === null ? true : state.filterActivated === true ? false : null,
                         }
-                    case 'role':
+                    case 'admin':
                         return {
                             ...state,
-                            filterRole: state.filterRole === null ? "admin" : state.filterRole === "admin" ? "user" : null,
+                            filterRole: state.filterRole === null || state.filterRole === "instructor" ? "admin" : null,
+                        }
+                    case 'instructor':
+                        return {
+                            ...state,
+                            filterRole: state.filterRole === null || state.filterRole === "admin" ? "instructor" : null,
                         }
                     default: throw new Error("invalid filter field")
                 }
@@ -299,7 +304,8 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
                           sorted={state.sortBy === 'createdAt' ? state.sortDirection : undefined}
                           onClick={() => handleSortChange('createdAt')}
                       >Register Time</Table.HeaderCell>
-                      <Table.HeaderCell onClick={() => handleFilterChange('role')}>Admin</Table.HeaderCell>
+                      <Table.HeaderCell onClick={() => handleFilterChange('admin')}>Admin</Table.HeaderCell>
+                      <Table.HeaderCell onClick={() => handleFilterChange('instructor')}>Instructor</Table.HeaderCell>
                       <Table.HeaderCell onClick={() => handleFilterChange('activated')}>Activated</Table.HeaderCell>
                       <Table.HeaderCell>Actions</Table.HeaderCell>
                   </Table.Row>
@@ -314,6 +320,11 @@ const AdminUserInfoPage: React.FC = (props): JSX.Element | null => {
                     <Table.Cell>
                         {user.role === "admin" ?
                             <Icon color='blue' name='checkmark' size='large' />:
+                            <div></div>}
+                    </Table.Cell>
+                    <Table.Cell>
+                        {user.role === "instructor" ?
+                            <Icon color='yellow' name='checkmark' size='large' />:
                             <div></div>}
                     </Table.Cell>
                     <Table.Cell>
